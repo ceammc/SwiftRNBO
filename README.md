@@ -1,10 +1,10 @@
 # SwiftRNBO
 
-## About SwiftRNBO
+## About
 
 SwiftRNBO is a translation layer between a _Swift-based_ Apple platform project and C++ code that was exported using [Cycling '74 RNBO](https://cycling74.com/products/rnbo) software. It requires no knowledge of C++ to use and allows any Apple platform developer familiar with the [Cycling '74 Max](https://cycling74.com/products/max) programming environment to build sophisticated and efficient audio applications with the ease of use of Swift and SwiftUI.
 
-## How to use SwiftRNBO
+## How to use
 
 ### Starting from a sample project
 
