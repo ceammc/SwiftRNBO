@@ -4,24 +4,22 @@
 
 SwiftRNBO is a translation layer between a _Swift-based_ Apple platform project and C++ code that was exported using [Cycling '74 RNBO](https://cycling74.com/products/rnbo) software. It requires no knowledge of C++ to use and allows any Apple platform developer familiar with the [Cycling '74 Max](https://cycling74.com/products/max) programming environment to build sophisticated and efficient audio applications with the ease of use of Swift and SwiftUI.
 
-## How to use
-
-### Starting from a sample project
+## Starting from a sample project
 
 The easiest way to start using SwiftRNBO is to simply download _the sample project_. This frees you from having to set up the project yourself: everything related to the translation layer is contained in a separate folder that does not require any manual changes. The only thing that will need to be done is to replace the contents of the `Export` folder with the result of your RNBO patcher export.
 
 If you want to create a project from scratch, please refer to [Creating a new project](#creating-a-new-project).
 
-### Folder structure
+## Folder structure
 
     ...
     ├── RNBO
     │   ├── Export              # replace this with your RNBO C++ Source Code Export
     │   ├── Bindings            # Objective-C++ files, the actual translation layer
-    │   └── Interface           # Swift classes and structs to use in your Swift-based app
+    │   └── Interface           # Swift classes and structures to use in your Swift-based app
     ...
 
-### Interacting with the exported patcher
+## Interacting with the exported patcher
 
 `RNBOAudioUnit` is the Objective-C++ wrapper for the exported RNBO C++ Source Code. It is the main class to interact with in order control the exported patcher's behavior.
 
