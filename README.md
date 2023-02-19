@@ -100,7 +100,7 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
    - Add `${PRODUCT_NAME}/RNBO/export` to it and select '_recursive_' in the dropdown to the right.
 1. **Enter the Microphone usage description (only for iOS and multiplatform)**
    - Without leaving the '_Build Settings_' tab search for the '_Privacy - Microphone usage description_' field;
-   - Enter _"This app uses microphone."_ into it.
+   - Enter _"This app uses microphone to ... (your reason)"_ into it.
 1. **Disable App Sandbox (only for macOS and multiplatform)**
    - Select the '_Signing & Capabilities_' tab.
    - Locate the '_App Sandbox_' section and press the trash icon to the right of the section title.
