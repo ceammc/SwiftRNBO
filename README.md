@@ -62,7 +62,7 @@ rnbo.setParameterValueNormalized(to: 0.5, at: 3)
 
 ... and its `parameters` property to keep your application's UI in sync with it.
 
-### Creating a new project
+## Creating a new project
 
 There are several steps to ensure that SwiftRNBO will work in your newly created project.
 
