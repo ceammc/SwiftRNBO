@@ -114,7 +114,7 @@ If you already have a `media` folder as a group as a result of adding of the who
 ## Current limitations
 
 - No audio input;
-- Only **16 bit** `wav` and `aiff` files **under 4Gb** in size are allowed as a sample dependency;
+- Only **16 bit** `wav` and `aiff` files **under 4Gb** in size are allowed as sample dependencies;
 - Only parameter changes are currently supported. MIDI functionality, messages, outports, inports, multichannel audio and other such things will be added during the ongoing development;
 - Only SwiftUI multiplatform and iOS example projects currently exist;
 - Only a fraction of methods currently implemented.
