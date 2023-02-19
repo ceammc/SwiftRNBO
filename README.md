@@ -107,10 +107,9 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 
 ## Using sample dependencies
 
-> **Important!**
-> In order for your audio sample dependencies to be recognized, you need to add your `media` folder from the RNBO export folder to your Bundle as a **_folder reference, not a group_**.
+> **Important!** In order for your audio sample dependencies to be recognized, you need to add your `media` folder from the RNBO export folder to your Bundle as a **_folder reference, not a group_**. This way its path will be preserved in App resources: `.../media/*.wav`.
 
-This way its path will be preserved in App resources: `.../media/*.wav`. If you already have it as a group as a result of adding of the whole `Export` folder to your project, you can right click on it and choose '_Show in Finder_', then drag and drop it into the same group this time with the '_Create folder references'_ option enabled. At this point you can delete the `media` group (gray icon) and leave only the `media` folder reference (blue icon). Just make sure to choose '_Remove References_' instead of '_Move to trash_' while deleting the group.
+If you already have a `media` folder as a group as a result of adding of the whole `Export` folder to your project, you can right click on it and choose '_Show in Finder_', then drag and drop it into the same group this time with the '_Create folder references'_ option enabled. At this point you can delete the `media` group (gray icon) and leave only the `media` folder reference (blue icon). Just make sure to choose '_Remove References_' instead of '_Move to trash_' while deleting the group.
 
 ## Current limitations
 
