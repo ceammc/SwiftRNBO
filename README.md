@@ -2,7 +2,11 @@
 
 ## About
 
-SwiftRNBO is a translation layer between a _Swift-based_ Apple platform project and C++ code that was exported using [Cycling '74 RNBO](https://cycling74.com/products/rnbo) software. It requires no knowledge of C++ to use and allows any Apple platform developer familiar with the [Cycling '74 Max](https://cycling74.com/products/max) programming environment to build sophisticated and efficient audio applications with the ease of use of Swift and SwiftUI.
+SwiftRNBO is a compatibility layer between a _Swift-based_ Apple platform project and C++ code that can be exported using [Cycling '74 RNBO](https://cycling74.com/products/rnbo) software. It requires no knowledge of C++ to use and allows any Apple platform developer familiar with the [Cycling '74 Max](https://cycling74.com/products/max) programming environment to build sophisticated and efficient audio applications with the ease of use of Swift and SwiftUI.
+
+## Supported platfroms
+
+iOS, macOS and tvOS are fully supported. However, all platform limitations are applied, for example there is no audio input or MIDI on tvOS.
 
 ## Starting from a sample project
 
@@ -114,5 +118,5 @@ If you already have a `media` folder as a group as a result of adding of the who
 - No audio input;
 - Only **16 bit** `wav` and `aiff` files **under 4Gb** in size are allowed as sample dependencies;
 - Only parameter changes are currently supported. MIDI functionality, messages, outports, inports, multichannel audio and other such things will be added during the ongoing development;
-- Only SwiftUI multiplatform and iOS example projects currently exist;
+- Only SwiftUI multiplatform sample project currently exists. UIKit and Objective-C examples will be added in the future;
 - Only a fraction of methods is currently implemented.
