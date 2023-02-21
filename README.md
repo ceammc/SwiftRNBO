@@ -6,7 +6,7 @@ SwiftRNBO is a compatibility layer between a _Swift-based_ Apple platform projec
 
 ## Supported platfroms
 
-iOS, macOS and tvOS are fully supported. However, all platform limitations are applied, for example there is no audio input or MIDI on tvOS.
+iOS, macOS and tvOS are fully supported. However, all universal platform restrictions apply, such as tvOS lacking audio input and MIDI.
 
 ## Starting from a sample project
 
