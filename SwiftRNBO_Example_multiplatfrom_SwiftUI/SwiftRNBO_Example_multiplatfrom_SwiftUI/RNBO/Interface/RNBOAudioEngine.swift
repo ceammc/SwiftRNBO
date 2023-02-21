@@ -13,7 +13,11 @@ class RNBOAudioEngine {
     var customEffect: AVAudioUnit?
 
     init() {
-        let myUnitType = kAudioUnitType_Effect // kAudioUnitType_Generator
+        #if os(tvOS)
+            let myUnitType = kAudioUnitType_Generator
+        #else
+            let myUnitType = kAudioUnitType_Effect
+        #endif
         let mySubType: OSType = 0x71717171
         let myManu: OSType = 0x70707070
 
@@ -36,10 +40,12 @@ class RNBOAudioEngine {
         }
 
         audioEngine.attach(customEffect!)
-        let input = audioEngine.inputNode
-        let format = input.inputFormat(forBus: 0)
+        #if !os(tvOS)
+            let input = audioEngine.inputNode
+            let format = input.inputFormat(forBus: 0)
 
-        audioEngine.connect(audioEngine.inputNode, to: customEffect!, format: format)
+            audioEngine.connect(audioEngine.inputNode, to: customEffect!, format: format)
+        #endif
         audioEngine.connect(customEffect!, to: audioEngine.mainMixerNode, format: audioEngine.mainMixerNode.outputFormat(forBus: 0))
 
         let outputFormat = audioEngine.outputNode.inputFormat(forBus: 0)

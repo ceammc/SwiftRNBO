@@ -12,7 +12,9 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            Sliders()
+            #if !os(tvOS)
+                Sliders()
+            #endif
             RandomizeButton()
         }
         .padding()
