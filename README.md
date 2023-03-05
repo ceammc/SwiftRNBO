@@ -18,7 +18,7 @@ If you want to create a project from scratch, please refer to [Creating a new pr
 
     ...
     ├── RNBO
-    │   ├── Export              # replace this with your RNBO C++ Source Code Export
+    │   ├── Export              # replace this folder's content with your RNBO C++ Source Code Export results
     │   ├── Bindings            # Objective-C++ files, the actual translation layer
     │   └── Interface           # Swift classes and structures to use in your Swift-based app
     ...
