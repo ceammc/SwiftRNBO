@@ -25,7 +25,7 @@ If you want to create a project from scratch, please refer to [Creating a new pr
 
 ## Interacting with the exported patcher
 
-`RNBOAudioUnit` is the Objective-C++ wrapper for the exported RNBO C++ Source Code. It is the main class to interact with in order control the exported patcher's behavior.
+`RNBOAudioUnit` is the Objective-C++ wrapper for the exported RNBO C++ Source Code. It is the main class to interact with in order to control the exported patcher's behavior.
 
 It is accessed through the `RNBOAudioEngine` Swift class:
 
