@@ -411,6 +411,9 @@ std::string _getStringFrom(CFURLRef cfUrl) {
     }
 }
 
+- (void)setParameterValue:(size_t)number valueNormalized:(float)v {
+}
+
 @end
 
 // eof
