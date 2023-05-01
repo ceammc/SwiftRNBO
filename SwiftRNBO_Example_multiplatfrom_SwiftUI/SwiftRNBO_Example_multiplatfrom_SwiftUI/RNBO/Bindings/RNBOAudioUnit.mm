@@ -94,6 +94,7 @@ double sampleRateHz = 44100.0;
     if (![super allocateRenderResourcesAndReturnError:outError]) {
         return NO;
     }
+
     _inputBus.allocateRenderResources(self.maximumFramesToRender);
     my_pcmBuffer = [[AVAudioPCMBuffer alloc]	initWithPCMFormat	:outputBus.format
                                                 frameCapacity		:4096];
@@ -139,13 +140,12 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
 
 - (AUInternalRenderBlock)internalRenderBlock {
     /*
-     Capture in locals to avoid ObjC member lookups. If "self" is captured in
-     render, we're doing it wrong.
+       Capture in locals to avoid ObjC member lookups. If "self" is captured in
+       render, we're doing it wrong.
      */
     // Specify captured objects are mutable.
     __block std::unique_ptr<RNBO::CoreObject> &object = _object;
     __block BufferedInputBus *input = &_inputBus;
-    AudioBufferList const **myABLCaptured = &myAudioBufferList;
 
     return ^AUAudioUnitStatus (AudioUnitRenderActionFlags *actionFlags,
                                const AudioTimeStamp *timestamp,
@@ -154,26 +154,36 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
                                AudioBufferList *outputData,
                                const AURenderEvent *realtimeEventListHead,
                                AURenderPullInputBlock pullInputBlock) {
-               int numBuffers = outputData->mNumberBuffers;
+               AudioBufferList *inAudioBufferList = input->mutableAudioBufferList;
+               int numInputBuffers = inAudioBufferList->mNumberBuffers;
 
-               AudioBufferList const *tmpABL = *myABLCaptured;
-               repairOutputBufferList(outputData, frameCount, false, tmpABL);
+               float *inLeft = (float *)inAudioBufferList->mBuffers[0].mData;
+               float *inRight = (float *)inAudioBufferList->mBuffers[1].mData;
+//
+//               if (numInputBuffers == 0) {
+//                   inRight = (float *)inAudioBufferList->mBuffers[1].mData;
+//               }
 
-               float *ptrLeft = (float *)outputData->mBuffers[0].mData;
-               float *ptrRight = NULL;
+               float *inputBuffer[numInputBuffers];
+               inputBuffer[0] = inLeft;
+               inputBuffer[1] = inRight;
 
-               if (numBuffers == 2) {
-                   ptrRight = (float *)outputData->mBuffers[1].mData;
+               AudioBufferList *outAudioBufferList = outputData;
+               int numOutputBuffers = outAudioBufferList->mNumberBuffers;
+
+               float *outLeft = (float *)outAudioBufferList->mBuffers[0].mData;
+               float *outRight = NULL;
+
+               if (numOutputBuffers == 2) {
+                   outRight = (float *)outAudioBufferList->mBuffers[1].mData;
                }
 
-               //        else ptrRight = ptrLeft;
-
-               float *buffer[numBuffers];
-               buffer[0] = ptrLeft;
-               buffer[1] = ptrRight;
+               float *outputBuffer[numOutputBuffers];
+               outputBuffer[0] = outLeft;
+               outputBuffer[1] = outRight;
 
                // ========== Actual process =========
-               object->process(buffer, numBuffers, buffer, numBuffers, frameCount);
+               object->process(inputBuffer, numInputBuffers, outputBuffer, numOutputBuffers, frameCount);
                // ========== Actual process =========
                return noErr;
     };
