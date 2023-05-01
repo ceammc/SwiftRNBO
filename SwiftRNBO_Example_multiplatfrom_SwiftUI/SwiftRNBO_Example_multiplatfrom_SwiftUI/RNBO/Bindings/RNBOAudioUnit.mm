@@ -32,7 +32,7 @@ double sampleRateHz = 44100.0;
     AudioBufferList const *myAudioBufferList;
     AVAudioPCMBuffer *my_pcmBuffer;
     AUAudioUnitBus *outputBus;
-    AUAudioUnitBus *inputBus;
+//    AUAudioUnitBus *inputBus;
     BufferedInputBus _inputBus;
     std::unique_ptr<RNBO::CoreObject> _object;
 }
@@ -62,10 +62,10 @@ double sampleRateHz = 44100.0;
                                                     busType				:AUAudioUnitBusTypeOutput
                                                     busses				:@[ outputBus ]];
 
-    inputBus = [[AUAudioUnitBus alloc] initWithFormat:defaultFormat error:nil];
+    _inputBus.init(defaultFormat, 8);
     inputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
                                                     busType				:AUAudioUnitBusTypeOutput
-                                                    busses				:@[ inputBus ]];
+                                                    busses				:@[ _inputBus.bus ]];
 
     self.maximumFramesToRender = 512;
 
@@ -94,7 +94,7 @@ double sampleRateHz = 44100.0;
     if (![super allocateRenderResourcesAndReturnError:outError]) {
         return NO;
     }
-
+    _inputBus.allocateRenderResources(self.maximumFramesToRender);
     my_pcmBuffer = [[AVAudioPCMBuffer alloc]	initWithPCMFormat	:outputBus.format
                                                 frameCapacity		:4096];
     myAudioBufferList = my_pcmBuffer.audioBufferList;
