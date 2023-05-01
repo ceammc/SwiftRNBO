@@ -14,6 +14,7 @@
 #include <memory>
 
 #import <AudioToolbox/AudioToolbox.h>
+#import "RNBOExtensionBufferedAudioBus.hpp"
 
 long int toneCount = 1;
 float testFrequency = 880.0; // an audio frequency in Hz
@@ -32,7 +33,7 @@ double sampleRateHz = 44100.0;
     AVAudioPCMBuffer *my_pcmBuffer;
     AUAudioUnitBus *outputBus;
     AUAudioUnitBus *inputBus;
-
+    BufferedInputBus _inputBus;
     std::unique_ptr<RNBO::CoreObject> _object;
 }
 
@@ -143,6 +144,7 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
      */
     // Specify captured objects are mutable.
     __block std::unique_ptr<RNBO::CoreObject> &object = _object;
+    __block BufferedInputBus *input = &_inputBus;
     AudioBufferList const **myABLCaptured = &myAudioBufferList;
 
     return ^AUAudioUnitStatus (AudioUnitRenderActionFlags *actionFlags,
@@ -178,6 +180,7 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
 }
 
 #pragma mark - Parameters
+
 
 - (void)setParameterValue:(size_t)number value:(float)v
 {

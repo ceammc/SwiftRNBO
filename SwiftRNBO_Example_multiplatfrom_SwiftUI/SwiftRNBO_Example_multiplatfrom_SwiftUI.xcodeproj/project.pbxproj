@@ -196,6 +196,7 @@
 		AFF2B4F429A2097600068DD0 /* media */ = {isa = PBXFileReference; lastKnownFileType = folder; path = media; sourceTree = "<group>"; };
 		AFF2B4F729A20A3500068DD0 /* Sliders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sliders.swift; sourceTree = "<group>"; };
 		AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizeButton.swift; sourceTree = "<group>"; };
+		AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOExtensionBufferedAudioBus.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -273,6 +274,7 @@
 				AFF2B43429A2093F00068DD0 /* RNBO-Bridging-Header.h */,
 				AFF2B43629A2093F00068DD0 /* RNBOAudioUnit.h */,
 				AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */,
+				AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */,
 			);
 			path = Bindings;
 			sourceTree = "<group>";
