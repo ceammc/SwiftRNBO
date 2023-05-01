@@ -171,6 +171,8 @@ void repairOutputBufferList(AudioBufferList       *outBufferList,
     };
 }
 
+#pragma mark - Parameters
+
 - (void)setParameterValue:(size_t)number value:(float)v
 {
     @synchronized(self) {
