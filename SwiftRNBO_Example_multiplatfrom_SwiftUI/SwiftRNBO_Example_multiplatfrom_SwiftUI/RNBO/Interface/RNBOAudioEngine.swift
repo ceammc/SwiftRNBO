@@ -8,55 +8,47 @@
 import AVFoundation
 
 class RNBOAudioEngine {
-    let audioEngine = AVAudioEngine()
-    var customEffect: AVAudioUnit?
+    private let engine = AVAudioEngine()
+    private var avAudioUnit: AVAudioUnit?
 
     init() {
         #if os(tvOS)
-            let myUnitType = kAudioUnitType_Generator
+            let type = kAudioUnitType_Generator
         #else
-            let myUnitType = kAudioUnitType_Effect
+            let type = kAudioUnitType_Effect
         #endif
-        let mySubType: OSType = 0x71717171
-        let myManu: OSType = 0x70707070
+        let subType: OSType = 0x71717171
+        let manufacturer: OSType = 0x70707070
 
-        let compDesc = AudioComponentDescription(componentType: myUnitType,
-                                                 componentSubType: mySubType,
-                                                 componentManufacturer: myManu,
-                                                 componentFlags: 0,
-                                                 componentFlagsMask: 0)
+        let componentDescription = AudioComponentDescription(componentType: type, componentSubType: subType, componentManufacturer: manufacturer, componentFlags: 0, componentFlagsMask: 0)
 
-        let cls = RNBOAudioUnit.self
-        AUAudioUnit.registerSubclass(cls,
-                                     as: compDesc,
-                                     name: "RNBOAudioUnit", // my AUAudioUnit subclass
-                                     version: 1)
+        let subclass = RNBOAudioUnit.self
 
-        AVAudioUnit.instantiate(with: compDesc,
-                                options: AudioComponentInstantiationOptions.loadOutOfProcess) { audiounit, _ in
+        AUAudioUnit.registerSubclass(subclass, as: componentDescription, name: "RNBOAudioUnit", version: 1)
 
-            self.customEffect = audiounit! // save AVAudioUnit
+        AVAudioUnit.instantiate(with: componentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess) { avAudioUnit, _ in
+            self.avAudioUnit = avAudioUnit! // save AVAudioUnit
         }
 
-        audioEngine.attach(customEffect!)
+        engine.attach(avAudioUnit!)
         #if !os(tvOS)
-            let input = audioEngine.inputNode
+            let input = engine.inputNode
             let format = input.inputFormat(forBus: 0)
 
-            audioEngine.connect(audioEngine.inputNode, to: customEffect!, format: format)
+            engine.connect(engine.inputNode, to: avAudioUnit!, format: format)
         #endif
-        audioEngine.connect(customEffect!, to: audioEngine.mainMixerNode, format: audioEngine.mainMixerNode.outputFormat(forBus: 0))
+        engine.connect(avAudioUnit!, to: engine.mainMixerNode, format: engine.mainMixerNode.outputFormat(forBus: 0))
 
-        let outputFormat = audioEngine.outputNode.inputFormat(forBus: 0)
-        audioEngine.connect(audioEngine.mainMixerNode,
-                            to: audioEngine.outputNode,
-                            format: outputFormat)
+        let outputFormat = engine.outputNode.inputFormat(forBus: 0)
+        engine.connect(engine.mainMixerNode,
+                       to: engine.outputNode,
+                       format: outputFormat)
 
-        audioEngine.prepare()
-        try! audioEngine.start()
+        engine.prepare()
+        try! engine.start()
     }
 
     func getAudioUnit() -> RNBOAudioUnit {
-        return customEffect!.auAudioUnit as! RNBOAudioUnit
+        return avAudioUnit!.auAudioUnit as! RNBOAudioUnit
     }
 }
