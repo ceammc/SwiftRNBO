@@ -20,13 +20,13 @@ class RNBOAudioEngine {
         let subType: OSType = 0x71717171
         let manufacturer: OSType = 0x70707070
 
-        let componentDescription = AudioComponentDescription(componentType: type, componentSubType: subType, componentManufacturer: manufacturer, componentFlags: 0, componentFlagsMask: 0)
+        let description = AudioComponentDescription(componentType: type, componentSubType: subType, componentManufacturer: manufacturer, componentFlags: 0, componentFlagsMask: 0)
 
         let subclass = RNBOAudioUnit.self
 
-        AUAudioUnit.registerSubclass(subclass, as: componentDescription, name: "RNBOAudioUnit", version: 1)
+        AUAudioUnit.registerSubclass(subclass, as: description, name: "RNBOAudioUnit", version: 1)
 
-        AVAudioUnit.instantiate(with: componentDescription, options: AudioComponentInstantiationOptions.loadOutOfProcess) { avAudioUnit, _ in
+        AVAudioUnit.instantiate(with: description, options: AudioComponentInstantiationOptions.loadOutOfProcess) { avAudioUnit, _ in
             self.avAudioUnit = avAudioUnit! // save AVAudioUnit
         }
 
