@@ -8,16 +8,16 @@
 import Foundation
 
 struct RNBOParameter: Equatable {
-    var index: Int
-    var initialValue: Double
+    let index: Int
+    let initialValue: Double
     var value: Double
-    var minValue: Double
-    var maxValue: Double
-    var exponent: Double
-    var unit: String
-    var displayName: String
-    var steps: Int
-    
+    let minValue: Double
+    let maxValue: Double
+    let exponent: Double
+    let unit: String
+    let displayName: String
+    let steps: Int
+
     var valueNormalized: Double {
         get {
             value.toNormalised(minValue: minValue, maxValue: maxValue, factor: exponent)
