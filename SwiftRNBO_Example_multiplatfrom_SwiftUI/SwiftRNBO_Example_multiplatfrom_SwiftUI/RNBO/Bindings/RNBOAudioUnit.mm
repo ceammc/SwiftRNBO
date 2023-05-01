@@ -155,6 +155,31 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
                                const AURenderEvent *realtimeEventListHead,
                                AURenderPullInputBlock pullInputBlock) {
                AudioBufferList *inAudioBufferList = input->mutableAudioBufferList;
+               AudioBufferList *outAudioBufferList = outputData;
+
+               /*
+                  Important:
+                  If the caller passed non-null output pointers (outputData->mBuffers[x].mData), use those.
+
+                  If the caller passed null output buffer pointers, process in memory owned by the Audio Unit
+                  and modify the (outputData->mBuffers[x].mData) pointers to point to this owned memory.
+                  The Audio Unit is responsible for preserving the validity of this memory until the next call to render,
+                  or deallocateRenderResources is called.
+
+                  If your algorithm cannot process in-place, you will need to preallocate an output buffer
+                  and use it here.
+
+                  See the description of the canProcessInPlace property.
+                */
+
+               // If passed null output buffer pointers, process in-place in the input buffer.
+
+               if (outAudioBufferList->mBuffers[0].mData == nullptr) {
+                   for (UInt32 i = 0; i < outAudioBufferList->mNumberBuffers; ++i) {
+                       outAudioBufferList->mBuffers[i].mData = inAudioBufferList->mBuffers[i].mData;
+                   }
+               }
+
                int numInputBuffers = inAudioBufferList->mNumberBuffers;
 
                float *inLeft = (float *)inAudioBufferList->mBuffers[0].mData;
@@ -168,7 +193,6 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
                inputBuffer[0] = inLeft;
                inputBuffer[1] = inRight;
 
-               AudioBufferList *outAudioBufferList = outputData;
                int numOutputBuffers = outAudioBufferList->mNumberBuffers;
 
                float *outLeft = (float *)outAudioBufferList->mBuffers[0].mData;
