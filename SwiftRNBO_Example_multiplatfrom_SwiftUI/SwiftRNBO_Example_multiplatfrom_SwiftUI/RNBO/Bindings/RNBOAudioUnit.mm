@@ -151,19 +151,19 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
                                const AudioTimeStamp *timestamp,
                                AVAudioFrameCount frameCount,
                                NSInteger outputBusNumber,
-                               AudioBufferList *outputBufferListPtr,
+                               AudioBufferList *outputData,
                                const AURenderEvent *realtimeEventListHead,
                                AURenderPullInputBlock pullInputBlock) {
-               int numBuffers = outputBufferListPtr->mNumberBuffers;
+               int numBuffers = outputData->mNumberBuffers;
 
                AudioBufferList const *tmpABL = *myABLCaptured;
-               repairOutputBufferList(outputBufferListPtr, frameCount, false, tmpABL);
+               repairOutputBufferList(outputData, frameCount, false, tmpABL);
 
-               float *ptrLeft = (float *)outputBufferListPtr->mBuffers[0].mData;
+               float *ptrLeft = (float *)outputData->mBuffers[0].mData;
                float *ptrRight = NULL;
 
                if (numBuffers == 2) {
-                   ptrRight = (float *)outputBufferListPtr->mBuffers[1].mData;
+                   ptrRight = (float *)outputData->mBuffers[1].mData;
                }
 
                //        else ptrRight = ptrLeft;
