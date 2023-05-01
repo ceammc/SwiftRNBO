@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RandomizeButton: View {
-    @EnvironmentObject var rnbo: RNBOContext
+    @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
     fileprivate func randomize() {
         for i in rnbo.parameters.indices {

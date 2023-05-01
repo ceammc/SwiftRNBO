@@ -13,7 +13,7 @@
 		AFF2B42629A2090300068DD0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42529A2090300068DD0 /* Preview Assets.xcassets */; };
 		AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */; };
 		AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */; };
-		AFF2B4ED29A2094600068DD0 /* RNBOContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B43129A2093F00068DD0 /* RNBOContext.swift */; };
+		AFF2B4ED29A2094600068DD0 /* RNBOAudioUnitHostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */; };
 		AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */; };
 		AFF2B4EF29A2094D00068DD0 /* dependencies.json in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B4E529A2093F00068DD0 /* dependencies.json */; };
 		AFF2B4F029A2094D00068DD0 /* presets.json in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B4E629A2093F00068DD0 /* presets.json */; };
@@ -33,7 +33,7 @@
 		AFF2B42329A2090300068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements; sourceTree = "<group>"; };
 		AFF2B42529A2090300068DD0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOParameter.swift; sourceTree = "<group>"; };
-		AFF2B43129A2093F00068DD0 /* RNBOContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOContext.swift; sourceTree = "<group>"; };
+		AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOAudioUnitHostModel.swift; sourceTree = "<group>"; };
 		AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOAudioEngine.swift; sourceTree = "<group>"; };
 		AFF2B43429A2093F00068DD0 /* RNBO-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNBO-Bridging-Header.h"; sourceTree = "<group>"; };
 		AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOAudioUnit.mm; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 			isa = PBXGroup;
 			children = (
 				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
-				AFF2B43129A2093F00068DD0 /* RNBOContext.swift */,
+				AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */,
 				AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */,
 			);
 			path = Interface;
@@ -700,7 +700,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */,
-				AFF2B4ED29A2094600068DD0 /* RNBOContext.swift in Sources */,
+				AFF2B4ED29A2094600068DD0 /* RNBOAudioUnitHostModel.swift in Sources */,
 				AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */,
 				AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */,
 				AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */,

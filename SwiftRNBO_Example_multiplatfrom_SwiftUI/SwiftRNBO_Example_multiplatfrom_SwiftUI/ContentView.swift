@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var rnbo: RNBOContext
+    @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
     var body: some View {
         VStack {

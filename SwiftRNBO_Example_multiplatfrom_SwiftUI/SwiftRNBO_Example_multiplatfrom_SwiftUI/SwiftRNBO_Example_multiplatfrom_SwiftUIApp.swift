@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct SwiftRNBO_Example_multiplatfrom_SwiftUIApp: App {
-    @ObservedObject var rnbo = RNBOContext()
+    @ObservedObject var rnbo = RNBOAudioUnitHostModel()
     var body: some Scene {
         WindowGroup {
             ContentView()

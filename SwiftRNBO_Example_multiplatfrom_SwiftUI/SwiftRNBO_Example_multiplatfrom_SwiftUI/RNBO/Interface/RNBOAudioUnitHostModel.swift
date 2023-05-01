@@ -7,7 +7,7 @@
 
 import Foundation
 
-class RNBOContext: ObservableObject {
+class RNBOAudioUnitHostModel: ObservableObject {
     private let audioEngine: RNBOAudioEngine
     private let audioUnit: RNBOAudioUnit
     @Published var parameters: [RNBOParameter]
