@@ -115,8 +115,8 @@ namespace RNBO {
 			_wrappedObject->prepareToProcess(sampleRate, maxBlockSize, force);
 		}
 
-		void process(SampleValue** audioInputs, Index numInputs,
-					 SampleValue** audioOutputs, Index numOutputs,
+		void process(const SampleValue* const* audioInputs, Index numInputs,
+					 SampleValue* const* audioOutputs, Index numOutputs,
 					 Index sampleFrames) override
 		{
 			_wrappedObject->process(audioInputs, numInputs, audioOutputs, numOutputs, sampleFrames);

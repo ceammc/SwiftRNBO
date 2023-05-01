@@ -33,7 +33,7 @@ void fillCurrentEventsFromMidiBuffer(EventList<EventVariant>& currentEvents,
 
 void fillAudioInputBuffers(const std::vector<SampleValue*>& audioInputs,
 						   size_t sampleFrames,
-						   AudioSampleBuffer& buffer)
+						   juce::AudioSampleBuffer& buffer)
 {
 	int channelIndex = 0;
 	for (SampleValue *pWritePtr : audioInputs)
@@ -57,7 +57,7 @@ void fillAudioInputBuffers(const std::vector<SampleValue*>& audioInputs,
 
 void fillAudioOutputBuffers(const std::vector<SampleValue*>& audioOutputs,
 							size_t sampleFrames,
-							AudioSampleBuffer& buffer)
+							juce::AudioSampleBuffer& buffer)
 {
 	int channelCount = buffer.getNumChannels();
 	for (int channelIndex = 0; channelIndex < channelCount; channelIndex++)
@@ -90,8 +90,8 @@ void sendOutgoingMidiEvents(EventList<MidiEvent>& midiEvents,
 		std::for_each(midiEvents.begin(),
 					  it,
 					  [&timeConverter, &midiMessages](const MidiEvent& ev) {
-						  int sampleNumber = timeConverter.convertMillisecondsToSampleOffset(ev.getTime());
-						  auto midiMessage = MidiMessage(ev.getData(), (int)ev.getLength());
+						  int sampleNumber = static_cast<int>(timeConverter.convertMillisecondsToSampleOffset(ev.getTime()));
+						  auto midiMessage = juce::MidiMessage(ev.getData(), (int)ev.getLength());
 						  midiMessages.addEvent(midiMessage, sampleNumber);
 					  });
 		midiEvents.erase(midiEvents.begin(), it);

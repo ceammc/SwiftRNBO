@@ -1,26 +1,59 @@
 /*******************************************************************************************************************
-Cycling '74 License for Max-Generated Code for Export
-Copyright (c) 2022 Cycling '74
-The code that Max generates automatically and that end users are capable of exporting and using, and any
-  associated documentation files (the “Software”) is a work of authorship for which Cycling '74 is the author
-  and owner for copyright purposes.  A license is hereby granted, free of charge, to any person obtaining a
-  copy of the Software (“Licensee”) to use, copy, modify, merge, publish, and distribute copies of the Software,
-  and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-The Software is licensed to Licensee only for non-commercial use. Users who wish to make commercial use of the
-  Software must contact the copyright owner to determine if a license for commercial use is available, and the
-  terms and conditions for same, which may include fees or royalties. For commercial use, please send inquiries
-  to licensing@cycling74.com.  The determination of whether a use is commercial use or non-commercial use is based
-  upon the use, not the user. The Software may be used by individuals, institutions, governments, corporations, or
-  other business whether for-profit or non-profit so long as the use itself is not a commercialization of the
-  materials or a use that generates or is intended to generate income, revenue, sales or profit.
-The above copyright notice and this license shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-  THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
-  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-  DEALINGS IN THE SOFTWARE.
+Copyright (c) 2023 Cycling '74
 
-Please see https://support.cycling74.com/hc/en-us/articles/10730637742483-RNBO-Export-Licensing-FAQ for additional information
+The code that Max generates automatically and that end users are capable of
+exporting and using, and any associated documentation files (the “Software”)
+is a work of authorship for which Cycling '74 is the author and owner for
+copyright purposes.
+
+This Software is dual-licensed either under the terms of the Cycling '74
+License for Max-Generated Code for Export, or alternatively under the terms
+of the General Public License (GPL) Version 3. You may use the Software
+according to either of these licenses as it is most appropriate for your
+project on a case-by-case basis (proprietary or not).
+
+A) Cycling '74 License for Max-Generated Code for Export
+
+A license is hereby granted, free of charge, to any person obtaining a copy
+of the Software (“Licensee”) to use, copy, modify, merge, publish, and
+distribute copies of the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following conditions:
+
+The Software is licensed to Licensee for all uses that do not include the sale,
+sublicensing, or commercial distribution of software that incorporates this
+source code. This means that the Licensee is free to use this software for
+educational, research, and prototyping purposes, to create musical or other
+creative works with software that incorporates this source code, or any other
+use that does not constitute selling software that makes use of this source
+code. Commercial distribution also includes the packaging of free software with
+other paid software, hardware, or software-provided commercial services.
+
+For entities with UNDER $200k in annual revenue or funding, a license is hereby
+granted, free of charge, for the sale, sublicensing, or commercial distribution
+of software that incorporates this source code, for as long as the entity's
+annual revenue remains below $200k annual revenue or funding.
+
+For entities with OVER $200k in annual revenue or funding interested in the
+sale, sublicensing, or commercial distribution of software that incorporates
+this source code, please send inquiries to licensing@cycling74.com.
+
+The above copyright notice and this license shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Please see
+https://support.cycling74.com/hc/en-us/articles/10730637742483-RNBO-Export-Licensing-FAQ
+for additional information
+
+B) General Public License Version 3 (GPLv3)
+Details of the GPLv3 license can be found at: https://www.gnu.org/licenses/gpl-3.0.html
 *******************************************************************************************************************/
 
 #include "RNBO_Common.h"
@@ -144,18 +177,18 @@ Index getNumMidiOutputPorts() const {
 }
 
 void process(
-    SampleValue ** inputs,
+    const SampleValue * const* inputs,
     Index numInputs,
-    SampleValue ** outputs,
+    SampleValue * const* outputs,
     Index numOutputs,
     Index n
 ) {
-    RNBO_UNUSED(numInputs);
-    RNBO_UNUSED(inputs);
     this->vs = n;
     this->updateTime(this->getEngine()->getCurrentTime());
     SampleValue * out1 = (numOutputs >= 1 && outputs[0] ? outputs[0] : this->dummyBuffer);
     SampleValue * out2 = (numOutputs >= 2 && outputs[1] ? outputs[1] : this->dummyBuffer);
+    const SampleValue * in1 = (numInputs >= 1 && inputs[0] ? inputs[0] : this->zeroBuffer);
+    const SampleValue * in2 = (numInputs >= 2 && inputs[1] ? inputs[1] : this->zeroBuffer);
 
     this->slide_tilde_01_perform(
         this->slide_tilde_01_x,
@@ -219,8 +252,8 @@ void process(
         n
     );
 
-    this->signaladder_01_perform(this->signals[1], this->signals[0], out2, n);
-    this->signaladder_02_perform(this->signals[1], this->signals[0], out1, n);
+    this->signaladder_01_perform(in1, this->signals[0], this->signals[1], out1, n);
+    this->signaladder_02_perform(in2, this->signals[0], this->signals[1], out2, n);
     this->stackprotect_perform(n);
     this->globaltransport_advance();
     this->audioProcessSampleCount += this->vs;
@@ -265,8 +298,10 @@ void prepareToProcess(number sampleRate, Index maxBlockSize, bool force) {
 void setProbingTarget(MessageTag id) {
     switch (id) {
     default:
+        {
         this->setProbingIndex(-1);
         break;
+        }
     }
 }
 
@@ -280,13 +315,19 @@ Index getProbingChannels(MessageTag outletId) const {
 DataRef* getDataRef(DataRefIndex index)  {
     switch (index) {
     case 0:
+        {
         return addressOf(this->RNBODefaultSinus);
         break;
+        }
     case 1:
+        {
         return addressOf(this->rnbuff1);
         break;
+        }
     default:
+        {
         return nullptr;
+        }
     }
 }
 
@@ -307,8 +348,10 @@ void fillRNBODefaultSinus(DataRef& ref) {
 void fillDataRef(DataRefIndex index, DataRef& ref) {
     switch (index) {
     case 0:
+        {
         this->fillRNBODefaultSinus(ref);
         break;
+        }
     }
 }
 
@@ -334,8 +377,8 @@ void processDataViewUpdate(DataRefIndex index, MillisecondTime time) {
 }
 
 void initialize() {
-    this->RNBODefaultSinus = initDataRef("RNBODefaultSinus", true, nullptr);
-    this->rnbuff1 = initDataRef("rnbuff1", false, "cherokee.aif");
+    this->RNBODefaultSinus = initDataRef("RNBODefaultSinus", true, nullptr, "buffer~");
+    this->rnbuff1 = initDataRef("rnbuff1", false, "cherokee.aif", "buffer~");
     this->assign_defaults();
     this->setState();
     this->RNBODefaultSinus->setIndex(0);
@@ -418,20 +461,30 @@ void setParameterValue(ParameterIndex index, ParameterValue v, MillisecondTime t
 
     switch (index) {
     case 0:
+        {
         this->param_01_value_set(v);
         break;
+        }
     case 1:
+        {
         this->param_02_value_set(v);
         break;
+        }
     case 2:
+        {
         this->param_03_value_set(v);
         break;
+        }
     case 3:
+        {
         this->param_04_value_set(v);
         break;
+        }
     case 4:
+        {
         this->param_05_value_set(v);
         break;
+        }
     }
 }
 
@@ -446,17 +499,29 @@ void processNormalizedParameterEvent(ParameterIndex index, ParameterValue value,
 ParameterValue getParameterValue(ParameterIndex index)  {
     switch (index) {
     case 0:
+        {
         return this->param_01_value;
+        }
     case 1:
+        {
         return this->param_02_value;
+        }
     case 2:
+        {
         return this->param_03_value;
+        }
     case 3:
+        {
         return this->param_04_value;
+        }
     case 4:
+        {
         return this->param_05_value;
+        }
     default:
+        {
         return 0;
+        }
     }
 }
 
@@ -475,34 +540,58 @@ ParameterIndex getNumParameters() const {
 ConstCharPointer getParameterName(ParameterIndex index) const {
     switch (index) {
     case 0:
+        {
         return "freq1";
+        }
     case 1:
+        {
         return "freq2";
+        }
     case 2:
+        {
         return "vol1";
+        }
     case 3:
+        {
         return "vol2";
+        }
     case 4:
+        {
         return "play";
+        }
     default:
+        {
         return "bogus";
+        }
     }
 }
 
 ConstCharPointer getParameterId(ParameterIndex index) const {
     switch (index) {
     case 0:
+        {
         return "freq1";
+        }
     case 1:
+        {
         return "freq2";
+        }
     case 2:
+        {
         return "vol1";
+        }
     case 3:
+        {
         return "vol2";
+        }
     case 4:
+        {
         return "play";
+        }
     default:
+        {
         return "bogus";
+        }
     }
 }
 
@@ -510,6 +599,7 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
     {
         switch (index) {
         case 0:
+            {
             info->type = ParameterTypeNumber;
             info->initialValue = 0;
             info->min = 220;
@@ -526,7 +616,9 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
             info->ioType = IOTypeUndefined;
             info->signalIndex = INVALID_INDEX;
             break;
+            }
         case 1:
+            {
             info->type = ParameterTypeNumber;
             info->initialValue = 0;
             info->min = 220;
@@ -543,7 +635,9 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
             info->ioType = IOTypeUndefined;
             info->signalIndex = INVALID_INDEX;
             break;
+            }
         case 2:
+            {
             info->type = ParameterTypeNumber;
             info->initialValue = 0;
             info->min = 0;
@@ -560,7 +654,9 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
             info->ioType = IOTypeUndefined;
             info->signalIndex = INVALID_INDEX;
             break;
+            }
         case 3:
+            {
             info->type = ParameterTypeNumber;
             info->initialValue = 0;
             info->min = 0;
@@ -577,12 +673,14 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
             info->ioType = IOTypeUndefined;
             info->signalIndex = INVALID_INDEX;
             break;
+            }
         case 4:
+            {
             info->type = ParameterTypeNumber;
-            info->initialValue = 0;
-            info->min = 0;
-            info->max = 1;
-            info->exponent = 1;
+            info->initialValue = 1;
+            info->min = 0.5;
+            info->max = 2;
+            info->exponent = 2;
             info->steps = 0;
             info->debug = false;
             info->saveable = true;
@@ -594,6 +692,7 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
             info->ioType = IOTypeUndefined;
             info->signalIndex = INVALID_INDEX;
             break;
+            }
         }
     }
 }
@@ -618,28 +717,41 @@ ParameterValue applyStepsToNormalizedParameterValue(ParameterValue normalizedVal
 
 ParameterValue convertToNormalizedParameterValue(ParameterIndex index, ParameterValue value) const {
     switch (index) {
-    case 4:
-        {
-            value = (value < 0 ? 0 : (value > 1 ? 1 : value));
-            ParameterValue normalizedValue = (value - 0) / (1 - 0);
-            return normalizedValue;
-        }
     case 2:
     case 3:
+        {
         {
             value = (value < 0 ? 0 : (value > 0.5 ? 0.5 : value));
             ParameterValue normalizedValue = (value - 0) / (0.5 - 0);
             return normalizedValue;
         }
+        }
     case 0:
     case 1:
+        {
         {
             value = (value < 220 ? 220 : (value > 440 ? 440 : value));
             ParameterValue normalizedValue = (value - 220) / (440 - 220);
             return normalizedValue;
         }
+        }
+    case 4:
+        {
+        {
+            value = (value < 0.5 ? 0.5 : (value > 2 ? 2 : value));
+            ParameterValue normalizedValue = (value - 0.5) / (2 - 0.5);
+
+            {
+                normalizedValue = rnbo_exp(rnbo_log(normalizedValue) * 1. / (number)2);
+            }
+
+            return normalizedValue;
+        }
+        }
     default:
+        {
         return value;
+        }
     }
 }
 
@@ -647,16 +759,9 @@ ParameterValue convertFromNormalizedParameterValue(ParameterIndex index, Paramet
     value = (value < 0 ? 0 : (value > 1 ? 1 : value));
 
     switch (index) {
-    case 4:
-        {
-            value = (value < 0 ? 0 : (value > 1 ? 1 : value));
-
-            {
-                return 0 + value * (1 - 0);
-            }
-        }
     case 2:
     case 3:
+        {
         {
             value = (value < 0 ? 0 : (value > 1 ? 1 : value));
 
@@ -664,8 +769,10 @@ ParameterValue convertFromNormalizedParameterValue(ParameterIndex index, Paramet
                 return 0 + value * (0.5 - 0);
             }
         }
+        }
     case 0:
     case 1:
+        {
         {
             value = (value < 0 ? 0 : (value > 1 ? 1 : value));
 
@@ -673,25 +780,50 @@ ParameterValue convertFromNormalizedParameterValue(ParameterIndex index, Paramet
                 return 220 + value * (440 - 220);
             }
         }
+        }
+    case 4:
+        {
+        {
+            value = (value < 0 ? 0 : (value > 1 ? 1 : value));
+
+            {
+                return 0.5 + rnbo_exp(rnbo_log(value) * 2) * (2 - 0.5);
+            }
+        }
+        }
     default:
+        {
         return value;
+        }
     }
 }
 
 ParameterValue constrainParameterValue(ParameterIndex index, ParameterValue value) const {
     switch (index) {
     case 0:
+        {
         return this->param_01_value_constrain(value);
+        }
     case 1:
+        {
         return this->param_02_value_constrain(value);
+        }
     case 2:
+        {
         return this->param_03_value_constrain(value);
+        }
     case 3:
+        {
         return this->param_04_value_constrain(value);
+        }
     case 4:
+        {
         return this->param_05_value_constrain(value);
+        }
     default:
+        {
         return value;
+        }
     }
 }
 
@@ -732,27 +864,80 @@ void processOutletEvent(
     this->processOutletAtCurrentTime(sender, index, value);
 }
 
-void processNumMessage(MessageTag , MessageTag , MillisecondTime , number ) {}
+void processNumMessage(MessageTag tag, MessageTag objectId, MillisecondTime time, number payload) {
+    RNBO_UNUSED(objectId);
+    this->updateTime(time);
 
-void processListMessage(MessageTag , MessageTag , MillisecondTime , const list& ) {}
+    switch (tag) {
+    case TAG("foo"):
+        {
+        this->inport_01_value_number_set(payload);
+        break;
+        }
+    }
+}
 
-void processBangMessage(MessageTag , MessageTag , MillisecondTime ) {}
+void processListMessage(
+    MessageTag tag,
+    MessageTag objectId,
+    MillisecondTime time,
+    const list& payload
+) {
+    RNBO_UNUSED(objectId);
+    this->updateTime(time);
+
+    switch (tag) {
+    case TAG("foo"):
+        {
+        this->inport_01_value_list_set(payload);
+        break;
+        }
+    }
+}
+
+void processBangMessage(MessageTag tag, MessageTag objectId, MillisecondTime time) {
+    RNBO_UNUSED(objectId);
+    this->updateTime(time);
+
+    switch (tag) {
+    case TAG("foo"):
+        {
+        this->inport_01_value_bang_bang();
+        break;
+        }
+    }
+}
 
 MessageTagInfo resolveTag(MessageTag tag) const {
     switch (tag) {
-
+    case TAG("foo"):
+        {
+        return "foo";
+        }
+    case TAG(""):
+        {
+        return "";
+        }
     }
 
     return "";
 }
 
 MessageIndex getNumMessages() const {
-    return 0;
+    return 1;
 }
 
 const MessageInfo& getMessageInfo(MessageIndex index) const {
     switch (index) {
+    case 0:
+        {
+        static const MessageInfo r0 = {
+            "foo",
+            Inport
+        };
 
+        return r0;
+        }
     }
 
     return NullMessageInfo;
@@ -825,6 +1010,18 @@ void param_05_value_set(number v) {
     this->trigger_01_input_number_set(v);
 }
 
+void inport_01_value_bang_bang() {
+    this->inport_01_out_bang_bang();
+}
+
+void inport_01_value_number_set(number v) {
+    this->inport_01_out_number_set(v);
+}
+
+void inport_01_value_list_set(const list& v) {
+    this->inport_01_out_list_set(v);
+}
+
 number msToSamps(MillisecondTime ms, number sampleRate) {
     return ms * sampleRate * 0.001;
 }
@@ -846,7 +1043,7 @@ bool hasFixedVectorSize() const {
 }
 
 Index getNumInputChannels() const {
-    return 0;
+    return 2;
 }
 
 Index getNumOutputChannels() const {
@@ -906,10 +1103,6 @@ void startup() {
         this->scheduleParamInit(3, 0);
     }
 
-    {
-        this->scheduleParamInit(4, 0);
-    }
-
     this->processParamInitEvents();
 }
 
@@ -950,7 +1143,7 @@ void slide_tilde_04_x_set(number v) {
 }
 
 static number param_05_value_constrain(number v) {
-    v = (v > 1 ? 1 : (v < 0 ? 0 : v));
+    v = (v > 2 ? 2 : (v < 0.5 ? 0.5 : v));
     return v;
 }
 
@@ -976,12 +1169,102 @@ void trigger_01_input_number_set(number v) {
     this->trigger_01_out1_bang();
 }
 
-void slide_tilde_01_perform(number x, number up, number down, Sample * out1, Index n) {
+void unpack_01_out5_bang() {
+    number v = this->unpack_01_out5;
+    this->param_05_value_set(v);
+}
+
+void unpack_01_out4_bang() {
+    number v = this->unpack_01_out4;
+    this->param_04_value_set(v);
+}
+
+void unpack_01_out3_bang() {
+    number v = this->unpack_01_out3;
+    this->param_03_value_set(v);
+}
+
+void unpack_01_out2_bang() {
+    number v = this->unpack_01_out2;
+    this->param_02_value_set(v);
+}
+
+void unpack_01_out1_bang() {
+    number v = this->unpack_01_out1;
+    this->param_01_value_set(v);
+}
+
+void unpack_01_input_bang_bang() {
+    this->unpack_01_out5_bang();
+    this->unpack_01_out4_bang();
+    this->unpack_01_out3_bang();
+    this->unpack_01_out2_bang();
+    this->unpack_01_out1_bang();
+}
+
+void inport_01_out_bang_bang() {
+    this->unpack_01_input_bang_bang();
+}
+
+void unpack_01_out5_set(number v) {
+    this->unpack_01_out5 = v;
+    this->param_05_value_set(v);
+}
+
+void unpack_01_out4_set(number v) {
+    this->unpack_01_out4 = v;
+    this->param_04_value_set(v);
+}
+
+void unpack_01_out3_set(number v) {
+    this->unpack_01_out3 = v;
+    this->param_03_value_set(v);
+}
+
+void unpack_01_out2_set(number v) {
+    this->unpack_01_out2 = v;
+    this->param_02_value_set(v);
+}
+
+void unpack_01_out1_set(number v) {
+    this->unpack_01_out1 = v;
+    this->param_01_value_set(v);
+}
+
+void unpack_01_input_list_set(const list& v) {
+    if (v->length > 4)
+        this->unpack_01_out5_set(v[4]);
+
+    if (v->length > 3)
+        this->unpack_01_out4_set(v[3]);
+
+    if (v->length > 2)
+        this->unpack_01_out3_set(v[2]);
+
+    if (v->length > 1)
+        this->unpack_01_out2_set(v[1]);
+
+    if (v->length > 0)
+        this->unpack_01_out1_set(v[0]);
+}
+
+void inport_01_out_number_set(number v) {
+    {
+        list converted = {v};
+        this->unpack_01_input_list_set(converted);
+    }
+}
+
+void inport_01_out_list_set(const list& v) {
+    this->unpack_01_input_list_set(v);
+}
+
+void slide_tilde_01_perform(number x, number up, number down, SampleValue * out1, Index n) {
     RNBO_UNUSED(down);
     RNBO_UNUSED(up);
     auto __slide_tilde_01_prev = this->slide_tilde_01_prev;
-    number iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
-    number idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -996,8 +1279,8 @@ void slide_tilde_01_perform(number x, number up, number down, Sample * out1, Ind
 void cycle_tilde_01_perform(
     const Sample * frequency,
     number phase_offset,
-    Sample * out1,
-    Sample * out2,
+    SampleValue * out1,
+    SampleValue * out2,
     Index n
 ) {
     RNBO_UNUSED(phase_offset);
@@ -1035,12 +1318,12 @@ void cycle_tilde_01_perform(
     this->cycle_tilde_01_phasei = __cycle_tilde_01_phasei;
 }
 
-void slide_tilde_02_perform(number x, number up, number down, Sample * out1, Index n) {
+void slide_tilde_02_perform(number x, number up, number down, SampleValue * out1, Index n) {
     RNBO_UNUSED(down);
     RNBO_UNUSED(up);
     auto __slide_tilde_02_prev = this->slide_tilde_02_prev;
-    number iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
-    number idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -1055,8 +1338,8 @@ void slide_tilde_02_perform(number x, number up, number down, Sample * out1, Ind
 void cycle_tilde_02_perform(
     const Sample * frequency,
     number phase_offset,
-    Sample * out1,
-    Sample * out2,
+    SampleValue * out1,
+    SampleValue * out2,
     Index n
 ) {
     RNBO_UNUSED(phase_offset);
@@ -1094,12 +1377,12 @@ void cycle_tilde_02_perform(
     this->cycle_tilde_02_phasei = __cycle_tilde_02_phasei;
 }
 
-void slide_tilde_03_perform(number x, number up, number down, Sample * out1, Index n) {
+void slide_tilde_03_perform(number x, number up, number down, SampleValue * out1, Index n) {
     RNBO_UNUSED(down);
     RNBO_UNUSED(up);
     auto __slide_tilde_03_prev = this->slide_tilde_03_prev;
-    number iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
-    number idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -1111,7 +1394,7 @@ void slide_tilde_03_perform(number x, number up, number down, Sample * out1, Ind
     this->slide_tilde_03_prev = __slide_tilde_03_prev;
 }
 
-void dspexpr_01_perform(const Sample * in1, const Sample * in2, Sample * out1, Index n) {
+void dspexpr_01_perform(const Sample * in1, const Sample * in2, SampleValue * out1, Index n) {
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -1119,12 +1402,12 @@ void dspexpr_01_perform(const Sample * in1, const Sample * in2, Sample * out1, I
     }
 }
 
-void slide_tilde_04_perform(number x, number up, number down, Sample * out1, Index n) {
+void slide_tilde_04_perform(number x, number up, number down, SampleValue * out1, Index n) {
     RNBO_UNUSED(down);
     RNBO_UNUSED(up);
     auto __slide_tilde_04_prev = this->slide_tilde_04_prev;
-    number iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
-    number idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto iup = this->safediv(1., this->maximum(1., rnbo_abs(200)));
+    auto idown = this->safediv(1., this->maximum(1., rnbo_abs(200)));
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -1136,7 +1419,7 @@ void slide_tilde_04_perform(number x, number up, number down, Sample * out1, Ind
     this->slide_tilde_04_prev = __slide_tilde_04_prev;
 }
 
-void dspexpr_03_perform(const Sample * in1, const Sample * in2, Sample * out1, Index n) {
+void dspexpr_03_perform(const Sample * in1, const Sample * in2, SampleValue * out1, Index n) {
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -1144,7 +1427,7 @@ void dspexpr_03_perform(const Sample * in1, const Sample * in2, Sample * out1, I
     }
 }
 
-void dspexpr_02_perform(const Sample * in1, const Sample * in2, Sample * out1, Index n) {
+void dspexpr_02_perform(const Sample * in1, const Sample * in2, SampleValue * out1, Index n) {
     Index i;
 
     for (i = 0; i < n; i++) {
@@ -1156,8 +1439,8 @@ void groove_01_perform(
     number rate_auto,
     number begin,
     number end,
-    Sample * out1,
-    Sample * sync,
+    SampleValue * out1,
+    SampleValue * sync,
     Index n
 ) {
     RNBO_UNUSED(out1);
@@ -1174,7 +1457,7 @@ void groove_01_perform(
     Index i = 0;
 
     if (bufferLength > 1) {
-        number effectiveChannels = this->minimum(this->groove_01_buffer->getChannels(), 1);
+        auto effectiveChannels = this->minimum(this->groove_01_buffer->getChannels(), 1);
         number srMult = 0.001 * this->groove_01_buffer->getSampleRate();
         number srInv = (number)1 / this->samplerate();
         number rateMult = this->groove_01_buffer->getSampleRate() * srInv;
@@ -1289,19 +1572,31 @@ void groove_01_perform(
     this->groove_01_playStatus = __groove_01_playStatus;
 }
 
-void signaladder_01_perform(const Sample * in1, const Sample * in2, Sample * out, Index n) {
+void signaladder_01_perform(
+    const SampleValue * in1,
+    const SampleValue * in2,
+    const SampleValue * in3,
+    SampleValue * out,
+    Index n
+) {
     Index i;
 
     for (i = 0; i < n; i++) {
-        out[(Index)i] = in1[(Index)i] + in2[(Index)i];
+        out[(Index)i] = in1[(Index)i] + in2[(Index)i] + in3[(Index)i];
     }
 }
 
-void signaladder_02_perform(const Sample * in1, const Sample * in2, Sample * out, Index n) {
+void signaladder_02_perform(
+    const SampleValue * in1,
+    const SampleValue * in2,
+    const SampleValue * in3,
+    SampleValue * out,
+    Index n
+) {
     Index i;
 
     for (i = 0; i < n; i++) {
-        out[(Index)i] = in1[(Index)i] + in2[(Index)i];
+        out[(Index)i] = in1[(Index)i] + in2[(Index)i] + in3[(Index)i];
     }
 }
 
@@ -1563,10 +1858,10 @@ number groove_01_crossfadedSample(
     number offset,
     number bufferLength
 ) {
-    number crossFadeStart1 = this->maximum(loopMin - this->groove_01_crossfadeInSamples, 0);
-    number crossFadeEnd1 = this->minimum(crossFadeStart1 + this->groove_01_crossfadeInSamples, bufferLength);
+    auto crossFadeStart1 = this->maximum(loopMin - this->groove_01_crossfadeInSamples, 0);
+    auto crossFadeEnd1 = this->minimum(crossFadeStart1 + this->groove_01_crossfadeInSamples, bufferLength);
     number crossFadeStart2 = crossFadeStart1 + loopLength;
-    number crossFadeEnd2 = this->minimum(crossFadeEnd1 + loopLength, bufferLength);
+    auto crossFadeEnd2 = this->minimum(crossFadeEnd1 + loopLength, bufferLength);
     number crossFadeLength = crossFadeEnd2 - crossFadeStart2;
 
     if (crossFadeLength > 0) {
@@ -1643,7 +1938,7 @@ bool globaltransport_setTempo(number tempo, bool notify) {
         this->processTempoEvent(this->currenttime(), tempo);
         this->globaltransport_notify = true;
     } else if (this->globaltransport_getTempo() != tempo) {
-        MillisecondTime ct = this->currenttime();
+        auto ct = this->currenttime();
         this->globaltransport_beatTimeChanges->push(this->globaltransport_getBeatTimeAtMsTime(ct));
         this->globaltransport_beatTimeChanges->push(ct);
 
@@ -1713,7 +2008,7 @@ bool globaltransport_setBeatTime(number beattime, bool notify) {
 }
 
 number globaltransport_getBeatTimeAtSample(SampleIndex sampleOffset) {
-    MillisecondTime msOffset = this->sampstoms(sampleOffset);
+    auto msOffset = this->sampstoms(sampleOffset);
     return this->globaltransport_getBeatTimeAtMsTime(this->currenttime() + msOffset);
 }
 
@@ -1737,7 +2032,7 @@ array<number, 2> globaltransport_getTimeSignature() {
 }
 
 array<number, 2> globaltransport_getTimeSignatureAtSample(SampleIndex sampleOffset) {
-    MillisecondTime msOffset = this->sampstoms(sampleOffset);
+    auto msOffset = this->sampstoms(sampleOffset);
     return this->globaltransport_getTimeSignatureAtMsTime(this->currenttime() + msOffset);
 }
 
@@ -1840,20 +2135,25 @@ void updateTime(MillisecondTime time) {
 
 void assign_defaults()
 {
+    dspexpr_01_in1 = 0;
+    dspexpr_01_in2 = 0;
     slide_tilde_01_x = 0;
     slide_tilde_01_up = 200;
     slide_tilde_01_down = 200;
     param_01_value = 0;
-    dspexpr_01_in1 = 0;
-    dspexpr_01_in2 = 0;
     cycle_tilde_01_frequency = 0;
     cycle_tilde_01_phase_offset = 0;
+    unpack_01_out1 = 0;
+    unpack_01_out2 = 0;
+    unpack_01_out3 = 0;
+    unpack_01_out4 = 0;
+    unpack_01_out5 = 0;
     dspexpr_02_in1 = 0;
     dspexpr_02_in2 = 0;
-    cycle_tilde_02_frequency = 0;
-    cycle_tilde_02_phase_offset = 0;
     dspexpr_03_in1 = 0;
     dspexpr_03_in2 = 0;
+    cycle_tilde_02_frequency = 0;
+    cycle_tilde_02_phase_offset = 0;
     slide_tilde_02_x = 0;
     slide_tilde_02_up = 200;
     slide_tilde_02_down = 200;
@@ -1871,11 +2171,11 @@ void assign_defaults()
     data_01_sizems = 0;
     data_01_normalize = 0.995;
     data_01_channels = 1;
-    param_05_value = 0;
+    param_05_value = 1;
     groove_01_rate_auto = 1;
     groove_01_begin = 0;
     groove_01_end = -1;
-    groove_01_loop = 1;
+    groove_01_loop = 0;
     groove_01_crossfade = 0;
     _currentTime = 0;
     audioProcessSampleCount = 0;
@@ -1934,20 +2234,25 @@ void assign_defaults()
 
 // member variables
 
+    number dspexpr_01_in1;
+    number dspexpr_01_in2;
     number slide_tilde_01_x;
     number slide_tilde_01_up;
     number slide_tilde_01_down;
     number param_01_value;
-    number dspexpr_01_in1;
-    number dspexpr_01_in2;
     number cycle_tilde_01_frequency;
     number cycle_tilde_01_phase_offset;
+    number unpack_01_out1;
+    number unpack_01_out2;
+    number unpack_01_out3;
+    number unpack_01_out4;
+    number unpack_01_out5;
     number dspexpr_02_in1;
     number dspexpr_02_in2;
-    number cycle_tilde_02_frequency;
-    number cycle_tilde_02_phase_offset;
     number dspexpr_03_in1;
     number dspexpr_03_in2;
+    number cycle_tilde_02_frequency;
+    number cycle_tilde_02_phase_offset;
     number slide_tilde_02_x;
     number slide_tilde_02_up;
     number slide_tilde_02_down;

@@ -60,7 +60,7 @@ namespace RNBO {
 	static_assert(sizeof(Float32AudioBuffer) == sizeof(DataType), "Do not add any members to the derived class.");
 
 	/**
-	 * @brief A data buffer for 64-bit floating point audio 
+	 * @brief A data buffer for 64-bit floating point audio
 	 */
 	struct Float64AudioBuffer : public DataType
 	{
@@ -85,6 +85,8 @@ namespace RNBO {
 		{
 			if (ref->getFile() == nullptr) _file.clear();
 			else _file = ref->getFile();
+			if (ref->getTag() == nullptr) _tag.clear();
+			else _tag = ref->getTag();
 			_data = _dataRef->getData();
 		}
 
@@ -94,6 +96,10 @@ namespace RNBO {
 
 		const char* getFile() const {
 			return _file.c_str();
+		}
+
+		const char *getTag() const {
+			return _tag.c_str();
 		}
 
 		DataRefIndex getInternalIndex() {
@@ -125,6 +131,8 @@ namespace RNBO {
 			_dataRef = ref;
 			if (ref->getFile() == nullptr) _file.clear();
 			else _file = ref->getFile();
+			if (ref->getTag() == nullptr) _tag.clear();
+			else _tag = ref->getTag();
 		}
 
 		void updateDataRef(char* data, size_t sizeInBytes) {
@@ -186,6 +194,7 @@ namespace RNBO {
 		std::string 	_name;				// make a copy of the name to avoid accessing
 											// undefined const chars when the old patcher goes away
 		std::string 	_file;
+		std::string		_tag;
 		char*			_data = nullptr;	// safe away the data pointer so we can hand it out for freeing
 		ReleaseCallback	_callback = nullptr;
 	};
@@ -261,8 +270,9 @@ namespace RNBO {
 	 * @brief Metadata about an external data reference
 	 */
 	struct ExternalDataInfo {
-		DataType::Type	type;  ///< The external data reference type
-		const char* 	file;  ///< The associated filename
+		DataType::Type	type;			///< The external data reference type
+		const char* 	file;			///< The associated filename
+		const char*		tag;			///< Arbitrary tag associated with the external data (usually buffer~ or data)
 	};
 
 	constexpr const char *InValidExternalDataId = "";

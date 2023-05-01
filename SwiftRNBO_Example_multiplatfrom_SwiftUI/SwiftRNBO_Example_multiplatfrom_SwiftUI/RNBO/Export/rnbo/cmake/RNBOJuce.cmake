@@ -1,6 +1,6 @@
 include_guard(GLOBAL)
 
-set(RNBO_JUCE_VERSION 6.1.2)
+set(RNBO_JUCE_VERSION 7.0.3)
 
 if (RNBO_JUCE_USE_CONAN)
 	include(${CMAKE_CURRENT_LIST_DIR}/RNBOConan.cmake)

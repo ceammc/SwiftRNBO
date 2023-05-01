@@ -10,8 +10,24 @@ import AVFoundation
 class RNBOAudioEngine {
     private let engine = AVAudioEngine()
     private var avAudioUnit: AVAudioUnit?
-
+    private let playerNode = AVAudioPlayerNode()
+    private let audioFile: AVAudioFile?
+    private let distortionEffect: AVAudioUnitDistortion
     init() {
+        distortionEffect = AVAudioUnitDistortion()
+        distortionEffect.loadFactoryPreset(.multiEcho1)
+        if let audioFileURL = Bundle.main.url(forResource: "Synth", withExtension: "aif") {
+            do {
+                audioFile = try AVAudioFile(forReading: audioFileURL)
+            } catch {
+                print("Error initializing audio file: \(error)")
+                audioFile = nil
+            }
+        } else {
+            print("Audio file not found")
+            audioFile = nil
+        }
+
         #if os(tvOS)
             let type = kAudioUnitType_Generator
         #else
@@ -29,7 +45,8 @@ class RNBOAudioEngine {
         AVAudioUnit.instantiate(with: description, options: AudioComponentInstantiationOptions.loadOutOfProcess) { avAudioUnit, _ in
             self.avAudioUnit = avAudioUnit! // save AVAudioUnit
         }
-
+//        engine.attach(distortionEffect)
+        engine.attach(playerNode)
         engine.attach(avAudioUnit!)
         #if !os(tvOS)
             let input = engine.inputNode
@@ -37,18 +54,35 @@ class RNBOAudioEngine {
 
             engine.connect(engine.inputNode, to: avAudioUnit!, format: format)
         #endif
-        engine.connect(avAudioUnit!, to: engine.mainMixerNode, format: engine.mainMixerNode.outputFormat(forBus: 0))
+        engine.connect(playerNode, to: avAudioUnit!, format: audioFile?.processingFormat)
+        engine.connect(avAudioUnit!, to: engine.mainMixerNode, format: audioFile?.processingFormat)
 
         let outputFormat = engine.outputNode.inputFormat(forBus: 0)
-        engine.connect(engine.mainMixerNode,
-                       to: engine.outputNode,
-                       format: outputFormat)
+        engine.connect(engine.mainMixerNode, to: engine.outputNode, format: outputFormat)
 
         engine.prepare()
         try! engine.start()
+
+//        play()
     }
 
     func getAudioUnit() -> RNBOAudioUnit {
         return avAudioUnit!.auAudioUnit as! RNBOAudioUnit
+    }
+
+    func play() {
+        guard let audioFile = audioFile else {
+            return
+        }
+
+        playerNode.scheduleFile(audioFile, at: nil) {
+            print("Audio playback finished")
+        }
+
+        playerNode.play()
+    }
+
+    func pause() {
+        playerNode.pause()
     }
 }

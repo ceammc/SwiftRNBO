@@ -96,8 +96,8 @@ namespace RNBO {
 			_maxBlockSize = maxBlockSize;
 		}
 
-		void process(SampleValue** audioInputs, Index numInputs,
-					 SampleValue** audioOutputs, Index numOutputs,
+		void process(const SampleValue* const* audioInputs, Index numInputs,
+					 SampleValue* const* audioOutputs, Index numOutputs,
 					 Index sampleFrames) override
 		{
 			RNBO_UNUSED(audioInputs);

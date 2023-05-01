@@ -23,6 +23,7 @@
 		AFF2B4F529A2097600068DD0 /* media in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B4F429A2097600068DD0 /* media */; };
 		AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */; };
 		AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F729A20A3500068DD0 /* Sliders.swift */; };
+		AFF4B5222A006A8200087CB8 /* Synth.aif in Resources */ = {isa = PBXBuildFile; fileRef = AFF4B5212A0069D800087CB8 /* Synth.aif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -197,6 +198,7 @@
 		AFF2B4F729A20A3500068DD0 /* Sliders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sliders.swift; sourceTree = "<group>"; };
 		AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizeButton.swift; sourceTree = "<group>"; };
 		AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOExtensionBufferedAudioBus.hpp; sourceTree = "<group>"; };
+		AFF4B5212A0069D800087CB8 /* Synth.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Synth.aif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,6 +231,7 @@
 		AFF2B41C29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				AFF4B5212A0069D800087CB8 /* Synth.aif */,
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
@@ -687,6 +690,7 @@
 			files = (
 				AFF2B4EF29A2094D00068DD0 /* dependencies.json in Resources */,
 				AFF2B42629A2090300068DD0 /* Preview Assets.xcassets in Resources */,
+				AFF4B5222A006A8200087CB8 /* Synth.aif in Resources */,
 				AFF2B4F129A2094D00068DD0 /* description.json in Resources */,
 				AFF2B4F529A2097600068DD0 /* media in Resources */,
 				AFF2B4F029A2094D00068DD0 /* presets.json in Resources */,

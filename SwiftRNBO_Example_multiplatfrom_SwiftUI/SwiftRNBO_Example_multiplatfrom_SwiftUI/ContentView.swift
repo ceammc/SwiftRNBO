@@ -16,6 +16,9 @@ struct ContentView: View {
                 Sliders()
             #endif
             RandomizeButton()
+            Button("Play") {
+                rnbo.play()
+            }
         }
         .padding()
     }

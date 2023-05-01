@@ -17,7 +17,9 @@ extern "C" {
 		t_buffer_ref	*r_buffer_ref;
 		t_symbol 		*r_name;
 		float			*r_lastKnownAddress; // To determine if memory changed
+		float			*r_staleAddress; // Stale address after a deferred call to set_external_ptr
 		char			r_islocked;
+		char			r_pending;
 	} t_rnbo_bufferref;
 
 	void rnbo_bufferref_register();
@@ -33,6 +35,8 @@ extern "C" {
 	void rnbo_bufferref_setlastaddress(t_rnbo_bufferref *x, float *lastAddress);
 	float *rnbo_bufferref_getlastaddress(t_rnbo_bufferref *x);
 	bool rnbo_bufferref_buffer_exists(t_rnbo_bufferref *x);
+	void rnbo_bufferref_make_pending(t_rnbo_bufferref *x, float *fromaddr);
+	bool rnbo_bufferref_ispending(t_rnbo_bufferref *x);
 }
 
 namespace RNBO {

@@ -1,36 +1,36 @@
 [
-    {
-        "name": "untitled",
-        "preset": {
-            "freq1": {
-                "value": 220
-            },
-            "freq2": {
-                "value": 220
-            },
-            "play": {
-                "value": 0
-            },
-            "vol1": {
-                "value": 0
-            },
-            "vol2": {
-                "value": 0
-            }
-        }
-    },
-    {
-        "name": "untitled",
-        "preset": {
-            "freq1": {
-                "value": 55
-            },
-            "freq2": {
-                "value": 55
-            },
-            "gain": {
-                "value": 0.5
-            }
-        }
+  {
+    "name": "untitled",
+    "preset": {
+      "freq1": {
+        "value": 220
+      },
+      "freq2": {
+        "value": 220
+      },
+      "play": {
+        "value": 1
+      },
+      "vol1": {
+        "value": 0
+      },
+      "vol2": {
+        "value": 0
+      }
     }
+  },
+  {
+    "name": "untitled",
+    "preset": {
+      "freq1": {
+        "value": 55
+      },
+      "freq2": {
+        "value": 55
+      },
+      "gain": {
+        "value": 0.5
+      }
+    }
+  }
 ]

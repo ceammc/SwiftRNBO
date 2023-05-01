@@ -518,8 +518,8 @@ namespace RNBO {
 			_currentEvents.clear();
 		}
 
-		virtual void process(SampleValue** audioInputs, Index numInputs,
-							 SampleValue** audioOutputs, Index numOutputs,
+		virtual void process(const SampleValue* const* audioInputs, Index numInputs,
+							 SampleValue* const* audioOutputs, Index numOutputs,
 							 Index sampleFrames,
 							 const MidiEventList* midiInput = nullptr, MidiEventList* midiOutput = nullptr)
 		{
@@ -633,7 +633,7 @@ namespace RNBO {
 	protected:
 
 		/**
-		 * @private 
+		 * @private
 		 *
 		 * helper class to hold information about the currently processed event
 		 */
@@ -712,8 +712,8 @@ namespace RNBO {
 			}
 		}
 
-		void processCore(SampleValue** audioInputs, Index numInputs,
-						 SampleValue** audioOutputs, Index numOutputs,
+		void processCore(const SampleValue* const* audioInputs, Index numInputs,
+						 SampleValue* const* audioOutputs, Index numOutputs,
 						 Index sampleFrames)
 		{
 			_inAudioProcess = true;

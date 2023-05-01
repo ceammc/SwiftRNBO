@@ -11,9 +11,19 @@
 #ifndef _RNBO_JUCEPLUGINPROCESSOR_H_
 #define _RNBO_JUCEPLUGINPROCESSOR_H_
 
-#include "JuceHeader.h"
 #include "RNBO.h"
+#include "RNBO_BinaryData.h"
 #include <unordered_map>
+#include <mutex>
+
+#include <json/json.hpp>
+#include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_audio_formats/juce_audio_formats.h>
+
+namespace moodycamel {
+template<typename T, size_t MAX_BLOCK_SIZE>
+class ReaderWriterQueue;
+}
 
 namespace RNBO {
 
@@ -33,26 +43,36 @@ namespace RNBO {
 	//==============================================================================
 	/**
 	 */
-	class JuceAudioProcessor  : public RNBO::EventHandler, public CoreObjectHolder, public AudioProcessor, public AsyncUpdater
+	class JuceAudioProcessor :
+		public RNBO::EventHandler,
+		public CoreObjectHolder,
+		public juce::AudioProcessor,
+		public juce::AsyncUpdater,
+		private juce::Thread
 	{
 		using String = juce::String;
 	public:
 		//==============================================================================
-		JuceAudioProcessor();
+		JuceAudioProcessor(
+				const nlohmann::json& patcher_description,
+				const nlohmann::json& presets,
+				const RNBO::BinaryData& data
+		);
 		~JuceAudioProcessor() override;
 
 		//==============================================================================
 		void prepareToPlay (double sampleRate, int samplesPerBlock) override;
 		void releaseResources() override;
 
-		static BusesProperties makeBusesPropertiesForRNBOObject(RNBO::CoreObject &object);
+		static BusesProperties makeBusesPropertiesForRNBOObject(RNBO::CoreObject &object, const nlohmann::json& patcher_description);
 
 		bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
-		void processBlock (AudioSampleBuffer&, juce::MidiBuffer&) override;
+		void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+		void processBlock (juce::AudioBuffer<double>&, juce::MidiBuffer&) override;
 
 		//==============================================================================
-		AudioProcessorEditor* createEditor() override;
+		juce::AudioProcessorEditor* createEditor() override;
 		bool hasEditor() const override;
 
 		//==============================================================================
@@ -72,7 +92,7 @@ namespace RNBO {
 		void changeProgramName (int index, const String& newName) override;
 
 		//==============================================================================
-		void getStateInformation (MemoryBlock& destData) override;
+		void getStateInformation (juce::MemoryBlock& destData) override;
 		void setStateInformation (const void* data, int sizeInBytes) override;
 
 		//==============================================================================
@@ -83,8 +103,20 @@ namespace RNBO {
 		void handleParameterEvent(const RNBO::ParameterEvent& event) override;
 		void handleStartupEvent(const RNBO::StartupEvent& event) override;
 		void handlePresetEvent(const RNBO::PresetEvent& event) override;
+		void handleMessageEvent(const RNBO::MessageEvent& event) override;
+
+		//background thread
+		void run() override;
+
+		void addDataRefListener(juce::MessageListener * listener);
+
+		juce::String loadedDataRefFile(const juce::String refName);
+		void loadDataRef(const juce::String refName, const juce::File file);
 
 	private:
+		void loadDataRef(const juce::String refName, const juce::String fileName, std::unique_ptr<juce::AudioFormatReader> reader);
+
+		void wrapProcess(Index numSamples, juce::MidiBuffer& midiMessages, std::function<void(void)> process);
 
 		class SyncEventHandler : public RNBO::EventHandler
 		{
@@ -108,8 +140,7 @@ namespace RNBO {
 
 		RNBO::MidiEventList						_midiInput;
 		RNBO::MidiEventList						_midiOutput;
-		RNBO::PresetList						*_presetList;
-		RNBO::DataRefList						*_datarefList;
+		std::unique_ptr<RNBO::PresetList>	_presetList;
 		SyncEventHandler						_syncEventHandler;
 		RNBO::ParameterEventInterfaceUniquePtr	_syncParamInterface;
 		int										_currentPresetIdx;
@@ -118,11 +149,32 @@ namespace RNBO {
 		//rnbo might have some invisible parameters that aren't given to juce, so we map the rnbo index to the juce index
 		std::unordered_map<RNBO::ParameterIndex, int> _rnboParamIndexToJuceParamIndex;
 
+		//id -> file name
+		std::unordered_map<juce::String, juce::String> _loadedDataRefs;
+		std::mutex _loadedDataRefsMutex;
+
 		double _lastBPM = -1.0;
 		int _lastTimeSigNumerator = 0;
 		int _lastTimeSigDenominator = 0;
 		double _lastPpqPosition = -1.0;
 		bool _lastIsPlaying = false;
+
+    juce::AudioFormatManager _formatManager;
+		juce::MessageListener * _dataRefListener = nullptr;
+
+		std::unique_ptr<moodycamel::ReaderWriterQueue<char *, 32>> _dataRefCleanupQueue;
+		std::unique_ptr<moodycamel::ReaderWriterQueue<std::pair<juce::String, juce::File>, 32>> _dataRefLoadQueue;
+	};
+
+	class DataRefUpdatedMessage : public juce::Message {
+		public:
+			DataRefUpdatedMessage(juce::String refName, juce::String fileName) :_refName(refName), _fileName(fileName) { }
+			virtual ~DataRefUpdatedMessage() { }
+			juce::String refName() const { return _refName; }
+			juce::String fileName() const { return _fileName; }
+		private:
+			juce::String _refName;
+			juce::String _fileName;
 	};
 
 

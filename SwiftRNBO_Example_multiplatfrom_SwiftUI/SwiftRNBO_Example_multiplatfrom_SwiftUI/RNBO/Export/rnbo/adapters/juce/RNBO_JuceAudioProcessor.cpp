@@ -11,29 +11,59 @@
 #include "RNBO_JuceAudioProcessor.h"
 #include "RNBO_JuceAudioProcessorEditor.h"
 #include "RNBO_JuceAudioProcessorUtils.h"
+#include <readerwriterqueue/readerwriterqueue.h>
+#include <iostream>
+#include <sstream>
 
-#if JUCE_TARGET_HAS_BINARY_DATA
-#include "BinaryData.h"
-#endif
+//TODO get rid of this
+using namespace juce;
+
+namespace {
+
+	//RNBO parameter ID's can be too long for some hosts, so we hash the ID and render a string from the hash instead
+	juce::ParameterID paramIdForRNBOParam(RNBO::CoreObject& rnboObject, RNBO::ParameterIndex index, int versionHint) {
+		RNBO::MessageTag t = RNBO::TAG(rnboObject.getParameterId(index));
+		std::stringstream s;
+		s << std::string("hashed_0x") << std::hex << std::setfill('0') << std::setw(8) << t;
+		return juce::ParameterID(s.str(), versionHint);
+	}
+}
+
 namespace RNBO {
 
-class FloatParameter : public AudioProcessorParameter
+class FloatParameter : public juce::RangedAudioParameter
 {
 	using String = juce::String;
 public:
 
-	FloatParameter (ParameterIndex index, CoreObject& rnboObject)
+	FloatParameter (ParameterIndex index, const ParameterInfo& info, CoreObject& rnboObject, int versionHint = 0)
 	:
-		AudioProcessorParameter()
+		juce::RangedAudioParameter(
+				paramIdForRNBOParam(rnboObject, index, versionHint),
+				String(rnboObject.getParameterName(index))
+		)
 	, _index(index)
 	, _rnboObject(rnboObject)
 	{
-		ParameterInfo info;
-		_rnboObject.getParameterInfo(index, &info);
+
 		if (info.unit) {
 			_unitName = String(info.unit);
 		}
+
+		_name = String(info.displayName);
+		if (_name.isEmpty()) {
+			_name = String(_rnboObject.getParameterId(_index));
+		}
+
 		_defaultValue = static_cast<float>(_rnboObject.convertToNormalizedParameterValue(_index, info.initialValue));
+
+		auto min = static_cast<float>(info.min);
+		auto max = static_cast<float>(info.max);
+		if (info.steps) {
+			_normRange = NormalisableRange<float>(min, max, 1.0f);
+		} else {
+			_normRange = NormalisableRange<float>(min, max);
+		}
 	}
 
 	float getValue() const override
@@ -57,17 +87,14 @@ public:
 		return _defaultValue;
 	}
 
-	/*
-	 * exists in newer JUCE with HostedAudioProcessorParameter
 	String getParameterID() const override
 	{
 		return String(_rnboObject.getParameterId(_index));
 	}
-	*/
 
 	String getName (int maximumStringLength) const override
 	{
-		return (String(_rnboObject.getParameterId(_index))).substring(0, maximumStringLength);
+		return _name.substring(0, maximumStringLength);
 	}
 
 	String getLabel() const override
@@ -91,11 +118,18 @@ public:
 		return AudioProcessorParameter::getText(displayValue, maximumStringLength);
 	}
 
+	const NormalisableRange<float>& getNormalisableRange () const override
+	{
+		return _normRange;
+	}
+
 protected:
 	ParameterIndex			_index;
 	CoreObject&				_rnboObject;
 	String _unitName;
+	String _name;
 	float _defaultValue;
+	juce::NormalisableRange<float> _normRange;
 };
 
 class EnumParameter : public FloatParameter
@@ -103,11 +137,11 @@ class EnumParameter : public FloatParameter
 	using String = juce::String;
 public:
 
-	EnumParameter (ParameterIndex index, Index steps, const char** enumValues,  CoreObject& rnboObject)
-	: FloatParameter(index, rnboObject)
+	EnumParameter (ParameterIndex index, const ParameterInfo& info, CoreObject& rnboObject, int versionHint = 0)
+	: FloatParameter(index, info, rnboObject, versionHint)
 	{
-		for (Index i = 0; i < steps; i++) {
-			_enumValues.push_back(enumValues[i]);
+		for (Index i = 0; i < static_cast<Index>(info.steps); i++) {
+			_enumValues.push_back(info.enumValues[i]);
 		}
 	}
 
@@ -129,157 +163,178 @@ private:
 
 //==============================================================================
 
-JuceAudioProcessor::BusesProperties JuceAudioProcessor::makeBusesPropertiesForRNBOObject(RNBO::CoreObject &object)
+
+JuceAudioProcessor::BusesProperties JuceAudioProcessor::makeBusesPropertiesForRNBOObject(RNBO::CoreObject &object, const nlohmann::json& patcher_desc)
 {
-	auto bp = BusesProperties();
-	if (object.getNumInputChannels() > 0)
-		bp.addBus(true, "Input", juce::AudioChannelSet::canonicalChannelSet((int) object.getNumInputChannels()), true);
-	if (object.getNumOutputChannels() > 0)
-		bp.addBus(false, "Output", juce::AudioChannelSet::canonicalChannelSet((int) object.getNumOutputChannels()), true);
-	return bp;
+	auto addBusses = [](bool isInput, const std::string& defaultName, const nlohmann::json &iolet, BusesProperties& bp) -> bool {
+		if (!iolet.is_array()) {
+			return false;
+		}
+
+		//name, count
+		std::map<std::string, int> busses;
+		for (auto i: iolet) {
+			if (!(i.contains("index") && i.contains("tag") && i.contains("type") && i["type"].get<std::string>() == "signal")) {
+				continue;
+			}
+			std::string busName = defaultName;
+
+			//lookup meta data
+			if (i.contains("meta") && i["meta"].is_object()) {
+				nlohmann::json meta = i["meta"];
+				if (meta.contains("bus") && meta["bus"].is_string()) {
+					busName = meta["bus"].get<std::string>();
+				}
+			}
+			auto it = busses.find(busName);
+			if (it != busses.end()) {
+				it->second++;
+			} else {
+				busses.insert({busName, 1});
+			}
+		}
+
+		for (auto& kv: busses) {
+			String busName(kv.first);
+			int count = kv.second;
+			bp.addBus(isInput, busName, juce::AudioChannelSet::canonicalChannelSet(count), true);
+		}
+
+		return true;
+	};
+
+	{
+		//add bus properties, if we fail, simply create Input/Output with all the channels
+		auto bp = BusesProperties();
+		try {
+			if (
+					patcher_desc.contains("inlets") && addBusses(true, "Input", patcher_desc["inlets"], bp) &&
+					patcher_desc.contains("outlets") && addBusses(false, "Output", patcher_desc["outlets"], bp)
+				 ) {
+				return bp;
+			}
+		} catch (std::exception& e) {
+			std::cerr << "exception processing inlet json" << std::endl;
+		}
+	}
+
+	{
+		auto bp = BusesProperties();
+		if (object.getNumInputChannels() > 0)
+			bp.addBus(true, "Input", juce::AudioChannelSet::canonicalChannelSet((int) object.getNumInputChannels()), true);
+		if (object.getNumOutputChannels() > 0)
+			bp.addBus(false, "Output", juce::AudioChannelSet::canonicalChannelSet((int) object.getNumOutputChannels()), true);
+		return bp;
+	}
 }
 
-JuceAudioProcessor::JuceAudioProcessor()
+JuceAudioProcessor::JuceAudioProcessor(
+		const nlohmann::json& patcher_desc,
+		const nlohmann::json& presets,
+		const RNBO::BinaryData& data
+		)
 	: CoreObjectHolder(this)
 	, AudioProcessor(
 #ifdef PLUGIN_BUSES_PROPERTIES
 		PLUGIN_BUSES_PROPERTIES
 #else
-		JuceAudioProcessor::makeBusesPropertiesForRNBOObject(_rnboObject)
+		JuceAudioProcessor::makeBusesPropertiesForRNBOObject(_rnboObject, patcher_desc)
 #endif
 	)
-	, _presetList(nullptr)
-	, _datarefList(nullptr)
+	, Thread("fileLoadAndDealloc")
 	, _syncEventHandler(*this)
 	, _currentPresetIdx(-1)
 {
+	_dataRefCleanupQueue = make_unique<moodycamel::ReaderWriterQueue<char *, 32>>(static_cast<size_t>(32));
+	_dataRefLoadQueue = make_unique<moodycamel::ReaderWriterQueue<std::pair<juce::String, juce::File>, 32>>(static_cast<size_t>(32));
+
+	_formatManager.registerBasicFormats();
+
+	//parse metadata for version hints
+	std::unordered_map<RNBO::ParameterIndex, int> paramVersionHints;
+	try {
+		const std::string key = "parameters";
+		const std::string vkey = "versionhint";
+		if (patcher_desc.contains(key) && patcher_desc[key].is_array()) {
+			for (auto p: patcher_desc[key]) {
+				if (
+						p.is_object() &&
+						p.contains("index") && p["index"].is_number() &&
+						p.contains("meta") && p["meta"].is_object() &&
+						p["meta"].contains(vkey) && p["meta"][vkey].is_number()) {
+					ParameterIndex id = static_cast<ParameterIndex>(p["index"].get<int>());
+					int versionHint = p[vkey].get<int>();
+					paramVersionHints[id] = versionHint;
+				}
+			}
+		}
+	} catch (std::exception& e) {
+		std::cerr << "exception reading parameters json " << e.what() << std::endl;
+	}
+
 	int juceIndex = 0;
 	for (ParameterIndex i = 0; i < _rnboObject.getNumParameters(); i++) {
 		ParameterInfo info;
 		_rnboObject.getParameterInfo(i, &info);
 		if (info.visible) {
 			_rnboParamIndexToJuceParamIndex.insert({i, juceIndex++});
+
+			//find version hint, if we have one
+			auto it = paramVersionHints.find(i);
+			int versionHint = it != paramVersionHints.end() ? it->second : 1;
+
 			if (info.enumValues && info.steps > 0) {
-				addParameter(new EnumParameter(i, static_cast<Index>(info.steps), info.enumValues, _rnboObject));
+				addParameter(new EnumParameter(i, info, _rnboObject, versionHint));
 			}
 			else {
-				addParameter(new FloatParameter(i, _rnboObject));
+				addParameter(new FloatParameter(i, info, _rnboObject, versionHint));
 			}
 		}
 	}
 
 	_syncParamInterface = _rnboObject.createParameterInterface(ParameterEventInterface::NotThreadSafe, &_syncEventHandler);
 
-#if JUCE_TARGET_HAS_BINARY_DATA
-	// Read the preset file, if available
+	//Read presets
 	try  {
-		const char *presetData = nullptr;
-		int presetDataSize = 0;
-		presetData = BinaryData::getNamedResource("presets_json", presetDataSize);
-		if (presetDataSize > 0) {
-			juce::String s = juce::String(presetData, (size_t) presetDataSize);
-			_presetList = new PresetList(s.toStdString());
+		if (!(presets.is_null() || presets.empty())) {
+			std::string s = presets.dump();
+			_presetList = std::make_unique<PresetList>(s);
 		}
-	} catch (std::exception& e) {
+	} catch (const std::exception& e) {
 		std::cerr << "exception reading presets json " << e.what() << std::endl;
 	}
 
-	try {
-		// Read the datarefs file in the same way
-		const char *dependenciesData = nullptr;
-		int dependenciesDataSize = 0;
-
-		dependenciesData = BinaryData::getNamedResource("dependencies_json", dependenciesDataSize);
-		if (dependenciesDataSize > 0) {
-			juce::String s = juce::String(dependenciesData, (size_t) dependenciesDataSize);
-			_datarefList = new DataRefList(s.toStdString());
-
-			// Create a format manager--we'll need it later
-			AudioFormatManager formatManager;
-			formatManager.registerBasicFormats();
-
-			// Go through the JUCE binary resources, and make an index on the file name
-			juce::HashMap<String, String> dependencyMap;
-			for (int i = 0; i < BinaryData::namedResourceListSize; i++) {
-				dependencyMap.set(BinaryData::originalFilenames[i],
-								  BinaryData::namedResourceList[i]);
-			}
-
-			// Now load whatever local dependencies you can
-			for (size_t i = 0; i < _datarefList->size(); i++) {
-				std::string name = _datarefList->datarefIdAtIndex(i);
-				std::string location = _datarefList->datarefLocationAtIndex(i);
-				RNBO::DataRefType type = _datarefList->datarefTypeAtIndex(i);
-
-				// TODO: Handle remote URL resources
-				if (type == RNBO::DataRefType::URL && location.rfind("file://", 0) != 0)
-					continue;
-
-				// Get the filename from the path
-				// JUCE File needs the location to start with a ./ if it's a relative path
-				File temp = File::getCurrentWorkingDirectory().getChildFile (location);
-				String filename = temp.getFileName();
-
-				// Load the resource data
-				String resourceName = dependencyMap[filename];
-				if (resourceName.length() == 0) continue;
-				const char *resourceData = nullptr;
-				int resourceDataSize = 0;
-				resourceData = BinaryData::getNamedResource(resourceName.getCharPointer(), resourceDataSize);
-				if (resourceDataSize == 0) continue;
-
-				std::unique_ptr<MemoryInputStream> memoryStream = make_unique<MemoryInputStream>(resourceData, static_cast<size_t>(resourceDataSize), false);
-				AudioFormatReader* reader = formatManager.createReaderFor (std::move(memoryStream));
-				if (reader) {
-					AudioBuffer<float> buffer;
-					buffer.setSize((int) reader->numChannels, (int) reader->lengthInSamples);
-					reader->read(&buffer, 0, (int)reader->lengthInSamples, 0, true, true);
-
-					size_t samps = static_cast<size_t>(reader->numChannels * reader->lengthInSamples);
-					std::shared_ptr<std::vector<float>> data = std::make_shared<std::vector<float>>(samps);
-
-					// interleave
-					// TODO: Handle other sample formats
-#if 1
-					juce::AudioDataConverters::interleaveSamples(buffer.getArrayOfReadPointers(), &data->front(), static_cast<int>(reader->lengthInSamples), static_cast<int>(reader->numChannels));
-#else
-					using SourceFormat = AudioData::Format<AudioData::Float32, AudioData::NativeEndian>;
-					using DestFormat = AudioData::Format<AudioData::Float32, AudioData::NativeEndian>;
-					auto sourceFormat = AudioData::NonInterleavedSource<SourceFormat> { buffer.getArrayOfReadPointers(), (int)reader->numChannels };
-					auto destFormat = AudioData::InterleavedDest<DestFormat> { &data->front(),   (int)reader->numChannels };
-					AudioData::interleaveSamples(sourceFormat, destFormat, (int) reader->lengthInSamples);
-#endif
-
-					RNBO::Float32AudioBuffer bufferType(reader->numChannels, reader->sampleRate);
-					_rnboObject.setExternalData(name.c_str(), reinterpret_cast<char *>(&data->front()), samps * sizeof(float), bufferType , [data](RNBO::ExternalDataId, char*) mutable {
-							//TODO: if we ever allow for loading datarefs after the plugin is loaded, we need to move the dealloc out of the audio thread
-							//see RNBOOSCQueryRunner
-
-							//hold onto shared_ptr until rnbo stops using it
-							data.reset();
-							});
-				} else {
-					std::cerr << "failed to load dataref " << name << std::endl;
+	//datarefs
+	try  {
+		const std::string key("externalDataRefs");
+		const std::string fkey("file");
+		const std::string idkey("id");
+		if (patcher_desc.contains(key) && patcher_desc[key].is_array()) {
+			for (auto dep: patcher_desc[key]) {
+				if (dep.contains(fkey) && dep.contains(idkey)) {
+					const std::string fileName = dep[fkey].get<std::string>();
+					const std::string id = dep[idkey].get<std::string>();
+					BinaryDataEntry entry;
+					if (data.get(fileName, entry) && entry.length() > 0) {
+						std::unique_ptr<MemoryInputStream> memoryStream = make_unique<MemoryInputStream>(entry.data(), entry.length(), false);
+						std::unique_ptr<juce::AudioFormatReader> reader(_formatManager.createReaderFor(std::move(memoryStream)));
+						loadDataRef(id, fileName, std::move(reader));
+					}
 				}
 			}
 		}
-	} catch (std::exception& e) {
-		std::cerr << "exception reading datarefs " << e.what() << std::endl;
+	} catch (const std::exception& e) {
+		std::cerr << "exception reading/loading externalDataRefs" << e.what() << std::endl;
 	}
-#endif // HAS_DEPENDENCIES
+
+	//start audio loading/dealloc thread
+	startThread();
 }
 
 JuceAudioProcessor::~JuceAudioProcessor()
 {
-	if (_presetList) {
-		delete _presetList;
-		_presetList = nullptr;
-	}
-
-	if (_datarefList) {
-		delete _datarefList;
-		_datarefList = nullptr;
-	}
+	//stop audio loading/dealloc thread
+	stopThread(200);
 }
 
 #ifdef JUCE_STATIC_PLUGIN
@@ -290,8 +345,12 @@ JuceAudioProcessor::~JuceAudioProcessor()
 const juce::String JuceAudioProcessor::getName() const
 {
 #ifndef JUCE_STATIC_PLUGIN
+#ifdef JucePlugin_Name
+	return JucePlugin_Name;
+#else
 		// Perhaps we should get the name from the generated code via some call?
 	return "RNBO Plugin";
+#endif
 #else
 	return juce::String(JuceStatic_Plugin_Name());
 #endif
@@ -329,6 +388,103 @@ void JuceAudioProcessor::handlePresetEvent(const RNBO::PresetEvent& event)
 	}
 	else if (event.getType() == RNBO::PresetEvent::SettingEnd) {
 		_isSettingPresetAsync = false;
+	}
+}
+
+void JuceAudioProcessor::handleMessageEvent(const RNBO::MessageEvent& event) {
+	static MessageTag setlatency = RNBO::TAG("setlatency");
+	if (event.getTag() == setlatency) {
+		if (event.getType() == RNBO::MessageEvent::Type::Number) {
+			setLatencySamples(static_cast<int>(event.getNumValue()));
+		}
+	} else {
+		RNBO::EventHandler::handleMessageEvent(event);
+	}
+}
+
+void JuceAudioProcessor::run() {
+	while (! threadShouldExit())
+	{
+		std::pair<juce::String, juce::File> load;
+		while (_dataRefLoadQueue->try_dequeue(load)) {
+			auto refName = load.first;
+			auto file = load.second;
+			std::unique_ptr<juce::AudioFormatReader> reader (_formatManager.createReaderFor (file));
+			loadDataRef(refName, file.getFileName(), std::move(reader));
+		}
+
+		//cleanup any buffers we need to dealloc
+		char * b;
+		while (_dataRefCleanupQueue->try_dequeue(b)) {
+			delete [] b;
+		}
+
+		wait (500);
+	}
+}
+
+void JuceAudioProcessor::addDataRefListener(juce::MessageListener * listener) {
+	std::lock_guard g(_loadedDataRefsMutex);
+	_dataRefListener = listener;
+}
+
+juce::String JuceAudioProcessor::loadedDataRefFile(const juce::String refName) {
+	std::lock_guard g(_loadedDataRefsMutex);
+	juce::String file;
+	auto it = _loadedDataRefs.find(refName);
+	if (it != _loadedDataRefs.end()) {
+		file = it->second;
+	}
+	return file;
+}
+
+void JuceAudioProcessor::loadDataRef(const juce::String refName, const juce::File file) {
+	_dataRefLoadQueue->enqueue(std::make_pair(refName, file));
+	notify();//wakeup
+}
+
+void JuceAudioProcessor::loadDataRef(const juce::String refName, const juce::String fileName, std::unique_ptr<juce::AudioFormatReader> reader) {
+	try {
+		if (reader)
+		{
+			std::shared_ptr<juce::AudioSampleBuffer> buffer = std::make_shared<juce::AudioSampleBuffer>();
+			auto chans = static_cast<int>(reader->numChannels);
+			auto length = static_cast<int>(reader->lengthInSamples);
+			buffer->setSize (chans, length);
+			if (reader->read(buffer.get(), 0, length, 0, true, true)) {
+				size_t samps = static_cast<size_t>(reader->numChannels * reader->lengthInSamples);
+
+				RNBO::Float32AudioBuffer bufferType(reader->numChannels, reader->sampleRate);
+
+				float * data = new float[samps];
+				using Format = AudioData::Format<AudioData::Float32, AudioData::NativeEndian>;
+
+				juce::AudioData::interleaveSamples(
+						AudioData::NonInterleavedSource<Format> { buffer->getArrayOfReadPointers(), chans },
+						AudioData::InterleavedDest<Format> { data, chans },
+						length
+						);
+
+				{
+					std::lock_guard g(_loadedDataRefsMutex);
+					_rnboObject.setExternalData(
+							refName.toRawUTF8(),
+							reinterpret_cast<char *>(data),
+							samps * sizeof(float),
+							bufferType,
+							[this](RNBO::ExternalDataId, char* d) {
+								//hold onto shared_ptr until rnbo stops using it
+								_dataRefCleanupQueue->enqueue(d);
+							}
+					);
+					_loadedDataRefs.insert({refName, fileName});
+					if (_dataRefListener) {
+						_dataRefListener->postMessage(new DataRefUpdatedMessage(refName, fileName));
+					}
+				}
+			}
+		}
+	} catch (...) {
 	}
 }
 
@@ -422,45 +578,81 @@ void JuceAudioProcessor::releaseResources()
 {
 }
 
-bool JuceAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool JuceAudioProcessor::isBusesLayoutSupported (const BusesLayout& /*layouts*/) const
 {
 	#if JucePlugin_IsMidiEffect
 		return true;
 	#endif
-	return static_cast<Index>(layouts.getMainInputChannels()) == _rnboObject.getNumInputChannels() && static_cast<Index>(layouts.getMainOutputChannels()) == _rnboObject.getNumOutputChannels();
+	//TODO count the number of main inputs/outputs and make sure they match?
+	// return static_cast<Index>(layouts.getMainInputChannels()) == _rnboObject.getNumInputChannels() && static_cast<Index>(layouts.getMainOutputChannels()) == _rnboObject.getNumOutputChannels();
+	return true;
 }
 
-void JuceAudioProcessor::processBlock (AudioSampleBuffer& buffer, juce::MidiBuffer& midiMessages)
+void JuceAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-	_rnboObject.prepareToProcess(getSampleRate(), static_cast<Index>(buffer.getNumSamples()));
+	auto samples = static_cast<Index>(buffer.getNumSamples());
+	wrapProcess(samples, midiMessages, [this, samples, &buffer]() {
+			_rnboObject.process(
+					buffer.getArrayOfReadPointers(), static_cast<Index>(buffer.getNumChannels()),
+					buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
+					samples,
+					&_midiInput, &_midiOutput
+					);
+			}
+			);
+}
 
+void JuceAudioProcessor::processBlock (juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages)
+{
+	auto samples = static_cast<Index>(buffer.getNumSamples());
+	wrapProcess(samples, midiMessages, [this, samples, &buffer]() {
+			_rnboObject.process(
+					buffer.getArrayOfReadPointers(), static_cast<Index>(buffer.getNumChannels()),
+					buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
+					samples,
+					&_midiInput, &_midiOutput
+					);
+			}
+			);
+}
+
+void JuceAudioProcessor::wrapProcess(Index numSamples, juce::MidiBuffer& midiMessages, std::function<void(void)> process) {
 	RNBO::MillisecondTime time = _rnboObject.getCurrentTime();
 
 	//transport
 	{
 		AudioPlayHead* playhead = getPlayHead();
-		AudioPlayHead::CurrentPositionInfo info;
-		if (playhead && playhead->getCurrentPosition(info)) {
-			if (info.bpm != _lastBPM) {
-				_lastBPM = info.bpm;
-				RNBO::TempoEvent event(time, _lastBPM);
-				_rnboObject.scheduleEvent(event);
-			}
-			if (info.timeSigNumerator != _lastTimeSigNumerator || info.timeSigDenominator != _lastTimeSigDenominator) {
-				_lastTimeSigNumerator = info.timeSigNumerator;
-				_lastTimeSigDenominator = info.timeSigDenominator;
-				RNBO::TimeSignatureEvent event(time, _lastTimeSigNumerator, _lastTimeSigDenominator);
-				_rnboObject.scheduleEvent(event);
-			}
-			if (info.ppqPosition != _lastPpqPosition) {
-				_lastPpqPosition = info.ppqPosition;
-				RNBO::BeatTimeEvent event(time, _lastPpqPosition);
-				_rnboObject.scheduleEvent(event);
-			}
-			if (info.isPlaying != _lastIsPlaying) {
-				_lastIsPlaying = info.isPlaying;
-				RNBO::TransportEvent event(time, _lastIsPlaying ? RNBO::TransportState::RUNNING : RNBO::TransportState::STOPPED);
-				_rnboObject.scheduleEvent(event);
+		if (playhead) {
+			auto info = playhead->getPosition();
+			if (info) {
+				auto bpm = info->getBpm();
+				if (bpm && *bpm != _lastBPM) {
+					_lastBPM = *bpm;
+					RNBO::TempoEvent event(time, _lastBPM);
+					_rnboObject.scheduleEvent(event);
+				}
+
+				auto timesig = info->getTimeSignature();
+				if (timesig && (timesig->numerator != _lastTimeSigNumerator || timesig->denominator != _lastTimeSigDenominator)) {
+					_lastTimeSigNumerator = timesig->numerator;
+					_lastTimeSigDenominator = timesig->denominator;
+					RNBO::TimeSignatureEvent event(time, _lastTimeSigNumerator, _lastTimeSigDenominator);
+					_rnboObject.scheduleEvent(event);
+				}
+
+				auto ppqPos = info->getPpqPosition();
+				if (ppqPos && *ppqPos != _lastPpqPosition) {
+					_lastPpqPosition = *ppqPos;
+					RNBO::BeatTimeEvent event(time, _lastPpqPosition);
+					_rnboObject.scheduleEvent(event);
+				}
+
+				auto playing = info->getIsPlaying();
+				if (playing != _lastIsPlaying) {
+					_lastIsPlaying = playing;
+					RNBO::TransportEvent event(time, _lastIsPlaying ? RNBO::TransportState::RUNNING : RNBO::TransportState::STOPPED);
+					_rnboObject.scheduleEvent(event);
+				}
 			}
 		}
 	}
@@ -471,14 +663,11 @@ void JuceAudioProcessor::processBlock (AudioSampleBuffer& buffer, juce::MidiBuff
 	_midiInput.clear();  // make sure midi input starts clear
 	for (auto meta: midiMessages)
 	{
-		MillisecondTime time = timeConverter.convertSampleOffsetToMilliseconds(meta.samplePosition);
-		_midiInput.addEvent(MidiEvent(time, 0, meta.data, (Index)meta.numBytes));
+		MillisecondTime t = timeConverter.convertSampleOffsetToMilliseconds(meta.samplePosition);
+		_midiInput.addEvent(MidiEvent(t, 0, meta.data, (Index)meta.numBytes));
 	}
 
-	_rnboObject.process(buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
-						buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
-						static_cast<Index>(buffer.getNumSamples()),
-						&_midiInput, &_midiOutput);
+	process();
 
 	// consume midi output
 	midiMessages.clear();		// clear the input that we consumed above so juce doesn't get confused
@@ -486,7 +675,7 @@ void JuceAudioProcessor::processBlock (AudioSampleBuffer& buffer, juce::MidiBuff
 		std::for_each(_midiOutput.begin(),
 					  _midiOutput.end(),
 					  [&timeConverter, &midiMessages](const MidiEvent& ev) {
-						  int sampleNumber = timeConverter.convertMillisecondsToSampleOffset(ev.getTime());
+						  int sampleNumber = static_cast<int>(timeConverter.convertMillisecondsToSampleOffset(ev.getTime()));
 						  auto midiMessage = MidiMessage(ev.getData(), (int)ev.getLength());
 						  midiMessages.addEvent(midiMessage, sampleNumber);
 					  });
@@ -546,12 +735,31 @@ void JuceAudioProcessor::SyncEventHandler::handlePresetEvent(const PresetEvent& 
 
 } // namespace RNBO
 
+#ifdef RNBO_INCLUDE_DESCRIPTION_FILE
+#include <rnbo_description.h>
+#endif
+
 // optionally disable createPluginFilter so you can implement your own with a subclass of RNBO::JuceAudioProcessor
 #ifndef RNBO_JUCE_NO_CREATE_PLUGIN_FILTER
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-	return new RNBO::JuceAudioProcessor();
+	nlohmann::json patcher_desc, presets;
+
+#ifdef RNBO_BINARY_DATA_STORAGE_NAME
+	extern RNBO::BinaryDataImpl::Storage RNBO_BINARY_DATA_STORAGE_NAME;
+	RNBO::BinaryDataImpl::Storage dataStorage = RNBO_BINARY_DATA_STORAGE_NAME;
+#else
+	RNBO::BinaryDataImpl::Storage dataStorage;
+#endif
+	RNBO::BinaryDataImpl data(dataStorage);
+
+#ifdef RNBO_INCLUDE_DESCRIPTION_FILE
+	patcher_desc = RNBO::patcher_description;
+	presets = RNBO::patcher_presets;
+#endif
+
+	return new RNBO::JuceAudioProcessor(patcher_desc, presets, data);
 }
 #endif

@@ -19,8 +19,8 @@ namespace RNBO {
 
 		virtual void prepareToProcess(number sampleRate, Index maxBlockSize, bool force = false) = 0;
 
-		virtual void process(SampleValue** audioInputs, Index numInputs,
-							 SampleValue** audioOutputs, Index numOutputs,
+		virtual void process(const SampleValue* const* audioInputs, Index numInputs,
+							 SampleValue* const* audioOutputs, Index numOutputs,
 							 Index sampleFrames) = 0;
 
 	};

@@ -142,8 +142,8 @@ ParameterIndex CoreObject::getNumParameters() const
 		return _engine->prepareToProcess(sampleRate, maxBlockSize, force);
 	}
 
-	void CoreObject::process(SampleValue** audioInputs, Index numInputs,
-				 SampleValue** audioOutputs, Index numOutputs,
+	void CoreObject::process(const SampleValue* const* audioInputs, Index numInputs,
+				 SampleValue* const* audioOutputs, Index numOutputs,
 				 Index sampleFrames,
 				 const MidiEventList* midiInput, MidiEventList* midiOutput)
 	{
@@ -339,6 +339,7 @@ ParameterIndex CoreObject::getNumParameters() const
 #ifdef RNBO_SIMPLEENGINE
 		return {
 			DataType::Untyped,
+			nullptr,
 			nullptr
 		};
 #else

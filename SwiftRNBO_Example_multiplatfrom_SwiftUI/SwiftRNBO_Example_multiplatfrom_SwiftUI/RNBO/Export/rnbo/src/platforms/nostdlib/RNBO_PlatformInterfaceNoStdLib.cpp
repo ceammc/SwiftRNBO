@@ -213,6 +213,12 @@ namespace RNBO {
 			// snprintf(str, maxlen, "%d", val);
 		}
 
+		void toString(char *str, size_t maxlen, unsigned int val) override
+		{
+			// no stdio without stdlib, sorry
+			// snprintf(str, maxlen, "%u", val);
+		}
+
 		void toString(char *str, size_t maxlen, long val) override
 		{
 			// no stdio without stdlib, sorry

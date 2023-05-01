@@ -247,7 +247,7 @@ ParameterValue convertFromNormalizedParameterValue(h_extHandle handle, Index ind
 		return ((ExternalBase *)handle)->prepareToProcess(sampleRate, blockSize);
 	}
 
-	void process(h_extHandle handle, SampleValue** audioInputs, size_t numInputs, SampleValue** audioOutputs, size_t numOutputs, size_t sampleFrames)
+	void process(h_extHandle handle, const SampleValue* const* audioInputs, size_t numInputs, SampleValue* const* audioOutputs, size_t numOutputs, size_t sampleFrames)
 	{
 		return ((ExternalBase *)handle)->process(audioInputs, numInputs, audioOutputs, numOutputs, sampleFrames);
 	}

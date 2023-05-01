@@ -69,7 +69,7 @@ namespace RNBO
 		f_getFunction		_extFunctionGetter = nullptr;
 		bool				_isValid;
 	};
-	
+
 	/**
 	 * @private
 	 */
@@ -96,7 +96,7 @@ namespace RNBO
 		ParameterValue constrainParameterValue(ParameterIndex index, ParameterValue value) const override;
 
 		void prepareToProcess(number sampleRate, Index maxBlockSize, bool force) override;
-		void process(SampleValue** audioInputs, Index numInputs, SampleValue** audioOutputs, Index numOutputs, Index sampleFrames) override;
+		void process(const SampleValue* const* audioInputs, Index numInputs, SampleValue* const* audioOutputs, Index numOutputs, Index sampleFrames) override;
 
 		Index getNumInputChannels() const override;
 		Index getNumOutputChannels() const override;

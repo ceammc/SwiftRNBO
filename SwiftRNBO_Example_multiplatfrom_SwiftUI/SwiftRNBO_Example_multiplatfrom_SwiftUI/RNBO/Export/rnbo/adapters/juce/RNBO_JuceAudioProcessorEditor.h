@@ -11,10 +11,13 @@
 #ifndef RNBO_JUCEAUDIOPROCESSOREDITOR_H_INCLUDED
 #define RNBO_JUCEAUDIOPROCESSOREDITOR_H_INCLUDED
 
-#include "JuceHeader.h"
 #include "RNBO.h"
+#include "RNBO_JuceAudioProcessor.h"
+#include <unordered_map>
 
 namespace RNBO {
+	//forward decl
+	class DataRefPropertyComp;
 
 	//==============================================================================
 	/**
@@ -23,15 +26,15 @@ namespace RNBO {
 		difference that it can be refreshed via a ParameterInterfacHandle
 
 	 */
-	class RNBOAudioProcessorEditor : public AudioProcessorEditor, public AsyncUpdater, public RNBO::EventHandler
+	class RNBOAudioProcessorEditor : public juce::AudioProcessorEditor, public juce::AsyncUpdater, public RNBO::EventHandler, public juce::MessageListener
 	{
 	public:
 		//==============================================================================
-		RNBOAudioProcessorEditor (AudioProcessor* owner, CoreObject& rnboObject);
+		RNBOAudioProcessorEditor (JuceAudioProcessor* owner, CoreObject& rnboObject);
 		~RNBOAudioProcessorEditor() override;
 
 		//==============================================================================
-		void paint (Graphics&) override;
+		void paint (juce::Graphics&) override;
 		void resized() override;
 
 		void handleAsyncUpdate() override;
@@ -39,18 +42,25 @@ namespace RNBO {
 		void eventsAvailable() override;
 		void handleParameterEvent(const RNBO::ParameterEvent& event) override;
 		void handlePresetEvent(const RNBO::PresetEvent& event) override;
-		
+
+		void chooseFileForDataRef(const juce::String refName);
+		JuceAudioProcessor * owner() const { return _owner; }
+
+		void handleMessage(const juce::Message& message) override;
+
 	private:
 
 		void updateAllParams();
 
 		//==============================================================================
-		PropertyPanel							_panel;
+		JuceAudioProcessor* _owner;
+		juce::PropertyPanel							_panel;
 		CoreObject&								_rnboObject;
 		ParameterEventInterfaceUniquePtr		_parameterInterface;
 
-		Array <PropertyComponent*>	_params;
-        Array <PropertyComponent*>  _presetChooserComponents;
+		juce::Array <juce::PropertyComponent*>	_params;
+		std::unique_ptr<juce::FileChooser> _dataRefChooser;
+		std::unordered_map<juce::String, DataRefPropertyComp*> _dataRefPropertyMap;
 	};
 
 } // namespace RNBO

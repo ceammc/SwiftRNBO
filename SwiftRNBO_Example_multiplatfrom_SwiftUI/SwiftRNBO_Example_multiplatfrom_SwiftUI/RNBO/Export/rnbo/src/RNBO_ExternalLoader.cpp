@@ -364,7 +364,7 @@ namespace RNBO {
 		_externalModule->_ext_prepareToProcess(_extHandle, sampleRate, maxBlockSize, force);
 	}
 
-	void ExternalLoader::process(SampleValue** audioInputs, Index numInputs, SampleValue** audioOutputs, Index numOutputs, Index sampleFrames)
+	void ExternalLoader::process(const SampleValue* const* audioInputs, Index numInputs, SampleValue* const* audioOutputs, Index numOutputs, Index sampleFrames)
 	{
 		_externalModule->_ext_process(_extHandle, audioInputs, numInputs, audioOutputs, numOutputs, sampleFrames);
 	}

@@ -10,6 +10,9 @@
 
 #include "RNBO_JuceAudioProcessorEditor.h"
 
+//TODO get rid of this
+using namespace juce;
+
 namespace RNBO {
 
 
@@ -167,14 +170,71 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetPropertyComp)
 };
 
+class DataRefPropertyComp : public PropertyComponent, Button::Listener
+{
+    using String = juce::String;
+
+public:
+    DataRefPropertyComp (const String& name, JuceAudioProcessor& p, RNBOAudioProcessorEditor * editor)
+    : PropertyComponent(name), owner (p), _editor(editor), _label(), _button("load")
+    {
+			_button.addListener(this);
+			_label.setText (p.loadedDataRefFile(name), juce::dontSendNotification);
+			addAndMakeVisible (_label);
+			addAndMakeVisible (_button);
+    }
+
+    ~DataRefPropertyComp() override { }
+
+    void refresh() override {}
+
+		void resized() override
+		{
+			auto bounds = getLocalBounds();
+			auto width = bounds.getWidth();
+
+			auto height = bounds.getHeight();
+			juce::FlexBox fb;
+
+			fb.flexDirection = juce::FlexBox::Direction::row;
+			fb.flexWrap = juce::FlexBox::Wrap::noWrap;
+
+			fb.items.add (juce::FlexItem (_label).withHeight(height).withFlex(2.0));
+			fb.items.add (juce::FlexItem (_button).withHeight(height).withFlex(0.5));
+			//layout includes Panel label, so we just use the right 1/2
+			fb.performLayout(bounds.removeFromRight(width / 2).toFloat());
+		}
+
+    void audioProcessorChanged (AudioProcessor*) {}
+		virtual void buttonClicked (juce::Button *) override {
+			if (_editor) {
+				_editor->chooseFileForDataRef(getName());
+			}
+		}
+
+		void updateFileName(juce::String v) {
+			_label.setText(v, juce::dontSendNotification);
+		}
+
+private:
+    JuceAudioProcessor& owner;
+		RNBOAudioProcessorEditor * _editor;
+		Label _label;
+		TextButton _button;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DataRefPropertyComp)
+};
+
 //==============================================================================
-RNBOAudioProcessorEditor::RNBOAudioProcessorEditor(AudioProcessor* const p, CoreObject& rnboObject)
+RNBOAudioProcessorEditor::RNBOAudioProcessorEditor(JuceAudioProcessor* const p, CoreObject& rnboObject)
 : AudioProcessorEditor (p)
+, _owner(p)
 , _rnboObject(rnboObject)
 , _parameterInterface(_rnboObject.createParameterInterface(ParameterEventInterface::SingleProducer, this))
 {
 	jassert (p != nullptr);
 	setOpaque (true);
+	p->addDataRefListener(this);
 
 	addAndMakeVisible (_panel);
 
@@ -191,13 +251,34 @@ RNBOAudioProcessorEditor::RNBOAudioProcessorEditor(AudioProcessor* const p, Core
 		_params.add (pc);
 		totalHeight += pc->getPreferredHeight();
 	}
-
-    PresetPropertyComp* const presetChooserComponent = new PresetPropertyComp (*p);
-    _presetChooserComponents.add (presetChooserComponent);
-    totalHeight += presetChooserComponent->getPreferredHeight();
-
 	_panel.addProperties (_params);
-    _panel.addProperties (_presetChooserComponents);
+
+	//datarefs
+	for (auto index = 0; index < _rnboObject.getNumExternalDataRefs(); index++) {
+		auto id = _rnboObject.getExternalDataId(index);
+		juce::String name(id);
+		auto d = new DataRefPropertyComp(name, *p, this);
+		totalHeight += d->getPreferredHeight();
+		_dataRefPropertyMap.insert({name, d});
+		_panel.addProperties(d);
+	}
+
+	//add presets if we have them
+	{
+		bool hasPresets = false;
+		for (int i = 0; i < p->getNumPrograms(); i++) {
+			juce::String name = p->getProgramName(i);
+			if (!name.isEmpty()) {
+				hasPresets = true;
+				break;
+			}
+		}
+		if (hasPresets) {
+			PresetPropertyComp* const presetChooserComponent = new PresetPropertyComp (*p);
+			totalHeight += presetChooserComponent->getPreferredHeight();
+			_panel.addProperties (presetChooserComponent);
+		}
+	}
 
 	setSize (400, jlimit (25, 400, totalHeight));
 }
@@ -241,6 +322,29 @@ void RNBOAudioProcessorEditor::handleParameterEvent(const ParameterEvent&) {
 void RNBOAudioProcessorEditor::handlePresetEvent(const PresetEvent& event) {
 	if (event.getType() == RNBO::PresetEvent::Touched) {
 		updateAllParams();
+	}
+}
+
+void RNBOAudioProcessorEditor::chooseFileForDataRef(const juce::String refName) {
+	_dataRefChooser = std::make_unique<juce::FileChooser> ("Select an audio file to load..");
+
+	auto folderChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
+
+	_dataRefChooser->launchAsync (folderChooserFlags, [this, refName] (const FileChooser& chooser)
+	{
+		auto file = chooser.getResult();
+		if (file.exists()) {
+			_owner->loadDataRef(refName, file);
+		}
+	});
+}
+
+void RNBOAudioProcessorEditor::handleMessage(const Message& message) {
+	if (auto* m = dynamic_cast<const DataRefUpdatedMessage*>(&message)) {
+		auto it = _dataRefPropertyMap.find(m->refName());
+		if (it != _dataRefPropertyMap.end()) {
+			it->second->updateFileName(m->fileName());
+		}
 	}
 }
 

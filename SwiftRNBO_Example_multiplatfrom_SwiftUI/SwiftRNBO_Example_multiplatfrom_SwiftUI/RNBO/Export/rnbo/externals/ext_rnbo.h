@@ -46,7 +46,7 @@ namespace RNBO {
 	typedef ParameterValue (*f_ext_constrainParameterValue)(h_extHandle handle, ParameterIndex index, ParameterValue value);
 
 	typedef void (*f_ext_prepareToProcess)(h_extHandle handle, double sampleRate, Index blockSize, bool force);
-	typedef void (*f_ext_process)(h_extHandle handle, SampleValue** audioInputs, Index numInputs, SampleValue** audioOutputs, Index numOutputs, Index sampleFrames);
+	typedef void (*f_ext_process)(h_extHandle handle, const SampleValue* const* audioInputs, Index numInputs, SampleValue* const* audioOutputs, Index numOutputs, Index sampleFrames);
 
 	typedef Index (*f_ext_getNumInputChannels)(h_extHandle handle);
 	typedef Index (*f_ext_getNumOutputChannels)(h_extHandle handle);

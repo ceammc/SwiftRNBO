@@ -239,8 +239,8 @@ namespace RNBO {
 	}
 
 
-	void Engine::process(SampleValue** audioInputs, Index numInputs,
-						 SampleValue** audioOutputs, Index numOutputs,
+	void Engine::process(const SampleValue* const* audioInputs, Index numInputs,
+						 SampleValue* const* audioOutputs, Index numOutputs,
 						 Index	sampleFrames,
 						 const MidiEventList* midiInput, MidiEventList* midiOutput
 	) {
@@ -325,6 +325,7 @@ namespace RNBO {
 		if (index < 0 || index >= getNumExternalDataRefs()) {
 			return {
 				DataType::Untyped,
+				nullptr,
 				nullptr
 			};
 		}
@@ -332,7 +333,8 @@ namespace RNBO {
 		Index iindex = static_cast<Index>(index);
 		return {
 			_externalDataRefs[iindex]->getType().type,
-			_externalDataRefs[iindex]->getFile()
+			_externalDataRefs[iindex]->getFile(),
+			_externalDataRefs[iindex]->getTag()
 		};
 	}
 

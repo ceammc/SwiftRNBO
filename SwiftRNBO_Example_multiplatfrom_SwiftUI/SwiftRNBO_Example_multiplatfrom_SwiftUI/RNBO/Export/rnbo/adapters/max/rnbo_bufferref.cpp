@@ -25,7 +25,9 @@ extern "C" {
 			x->r_buffer_ref = buffer_ref_new((t_object *)x, buffername);
 			x->r_name = buffername;
 			x->r_lastKnownAddress = NULL;
+			x->r_staleAddress = NULL;
 			x->r_islocked = false;
+			x->r_pending = false;
 		}
 
 		return x;
@@ -46,6 +48,8 @@ extern "C" {
 		t_buffer_obj *b = buffer_ref_getobject(x->r_buffer_ref);
 		float *smps = buffer_locksamples(b);
 		x->r_islocked = smps != nullptr;
+		if (x->r_pending)
+			x->r_pending = smps == x->r_staleAddress;
 		return smps;
 	}
 
@@ -92,6 +96,17 @@ extern "C" {
 		return buffer_ref_exists(x->r_buffer_ref);
 	}
 
+	void rnbo_bufferref_make_pending(t_rnbo_bufferref *x, float *fromaddr)
+	{
+		x->r_pending = true;
+		x->r_staleAddress = fromaddr;
+	}
+
+	bool rnbo_bufferref_ispending(t_rnbo_bufferref *x)
+	{
+		return x->r_pending;
+	}
+
 }
 
 namespace RNBO {
@@ -109,6 +124,7 @@ namespace RNBO {
 		if (dataref) {
 			float *smps = rnbo_bufferref_lock(dataref); // might not actually lock if there is no buffer
 			bool didlock = rnbo_bufferref_islocked(dataref);
+			bool pending = rnbo_bufferref_ispending(dataref); // is a deferred call to set_external_sampleptr pending
 			if (!ref->getData() && !smps) return; // don't bother if there's no data to bind
 
 			Index channelcount = 0;
@@ -151,8 +167,12 @@ namespace RNBO {
 					// of a situation that would cause this, but it shouldn't cause
 					// a problem.
 					if (!smps) sizeInBytes = 0;
-					updateDataRef(dataRefIndex, (char *)smps, sizeInBytes, newType);
-					rnbo_bufferref_setlastaddress(dataref, smps);
+
+					// Don't do anything if you're still waiting for set_external_sampleptr
+					if (!pending) {
+						updateDataRef(dataRefIndex, (char *)smps, sizeInBytes, newType);
+						rnbo_bufferref_setlastaddress(dataref, smps);
+					}
 				} else {
 					t_atom_long rnbo_framecount = ref->getSizeInBytes() / (type.audioBufferInfo.channels * sizeof(float));
 
@@ -162,6 +182,7 @@ namespace RNBO {
 					}
 
 					object_method(b, set_external_sampleptr, ref->getData(), rnbo_framecount, type.audioBufferInfo.channels, !didlock);
+					rnbo_bufferref_make_pending(dataref, smps);
 					rnbo_bufferref_setlastaddress(dataref, (float *) ref->getData());
 				}
 			}

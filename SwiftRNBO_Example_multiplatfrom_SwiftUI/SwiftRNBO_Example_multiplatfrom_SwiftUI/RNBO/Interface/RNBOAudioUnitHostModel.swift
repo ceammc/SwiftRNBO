@@ -18,6 +18,10 @@ class RNBOAudioUnitHostModel: ObservableObject {
         audioUnit = audioEngine.getAudioUnit()
         parameters = audioUnit.getParametersArray()
     }
+    
+    func play() {
+        audioEngine.play()
+    }
 
     func setParameterValue(to value: Double, at parameterIndex: Int) {
         audioUnit.setParameterValue(parameterIndex, valueNormalized: Float(value))

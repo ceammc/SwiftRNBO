@@ -219,6 +219,7 @@ namespace RNBO {
 		// string formatting
 		virtual void toString(char* str, size_t maxlen, number val) = 0;
 		virtual void toString(char* str, size_t maxlen, int val) = 0;
+		virtual void toString(char* str, size_t maxlen, unsigned int val) = 0;
 		virtual void toString(char* str, size_t maxlen, long val) = 0;
 		virtual void toString(char* str, size_t maxlen, long long val) = 0;
 		virtual void toString(char* str, size_t maxlen, unsigned long val) = 0;

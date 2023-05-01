@@ -28,7 +28,7 @@ namespace RNBO {
 
 		// audio and event processing
 		virtual void prepareToProcess(double sampleRate, Index blockSize, bool force = false) override = 0;
-		virtual void process(SampleValue** audioInputs, Index numInputs, SampleValue** audioOutputs, Index numOutputs, Index sampleFrames) override = 0;
+		virtual void process(const SampleValue* const* audioInputs, Index numInputs, SampleValue* const* audioOutputs, Index numOutputs, Index sampleFrames) override = 0;
 
 		virtual Index getNumInputChannels() const override = 0;
 		virtual Index getNumOutputChannels() const override = 0;

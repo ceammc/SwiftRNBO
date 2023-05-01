@@ -16,7 +16,7 @@ namespace RNBO {
 
 	/**
 	 * @brief Metadata info for an UntypedBuffer (empty)
-	 * 
+	 *
 	 * Required for compatibility between untyped and audio buffers
 	 */
 	struct UntypedBufferInfo {
@@ -45,7 +45,7 @@ namespace RNBO {
 			Untyped,  ///< generic, untyped memory buffer
 			Float32AudioBuffer,  ///< 32-bit float audio buffer
 			Float64AudioBuffer,  ///< 64-bit float audio buffer
-			TypedArray  ///< typed memory buffer 
+			TypedArray  ///< typed memory buffer
 		} type = Untyped;
 
 
@@ -82,7 +82,7 @@ namespace RNBO {
 	};
 
 	/**
-	 * @private 
+	 * @private
 	 */
 	class DataRef {
 	public:
@@ -90,6 +90,7 @@ namespace RNBO {
 		DataRef()
 		: _name(nullptr)
 		, _file(nullptr)
+		, _tag(nullptr)
 		, _sizeInBytes(0)
 		, _data(nullptr)
 		, _touched(false)
@@ -103,6 +104,7 @@ namespace RNBO {
 			_data = other._data;
 			_type = other._type;
 			_touched = other._touched;
+			_tag = other._tag;
 			_internal = other._internal;
 			_index = other._index;
 			_requestedSizeInBytes = other._requestedSizeInBytes;
@@ -116,15 +118,16 @@ namespace RNBO {
 			other._file = nullptr;
 			other._requestedSizeInBytes = 0;
 			other._index = -1;
+			other._tag = nullptr;
 		}
 
 		void operator=(const DataRef& ref ) = delete;
 
 		/**
 		 * @brief Move assignment operator
-		 * 
+		 *
 		 * @param other DataRef to move from
-		 * @return DataRef& 
+		 * @return DataRef&
 		 */
 		DataRef& operator=(DataRef&& other)
 		{
@@ -136,6 +139,7 @@ namespace RNBO {
 				_type = other._type;
 				_touched = other._touched;
 				_deAlloc = other._deAlloc;
+				_tag = other._tag;
 				_internal = other._internal;
 				_index = other._index;
 				_requestedSizeInBytes = other._requestedSizeInBytes;
@@ -148,6 +152,7 @@ namespace RNBO {
 				other._file = nullptr;
 				other._requestedSizeInBytes = 0;
 				other._index = -1;
+				other._tag = nullptr;
 			}
 
 			return *this;
@@ -163,6 +168,7 @@ namespace RNBO {
                 _type = other._type;
                 _touched = other._touched;
                 _deAlloc = other._deAlloc;
+				_tag = other._tag;
 				_internal = other._internal;
 				_index = other._index;
 				_requestedSizeInBytes = other._requestedSizeInBytes;
@@ -175,6 +181,7 @@ namespace RNBO {
 				other._file = nullptr;
 				other._requestedSizeInBytes = 0;
 				other._index = -1;
+				other._tag = nullptr;
             }
         }
 
@@ -190,6 +197,9 @@ namespace RNBO {
 			}
 			if (_file != nullptr) {
 				Platform::get()->free(_file);
+			}
+			if (_tag != nullptr) {
+				Platform::get()->free(_tag);
 			}
 		}
 
@@ -311,6 +321,22 @@ namespace RNBO {
 			_wantsFill = value;
 		}
 
+		inline const char *getTag() const {
+			return _tag;
+		}
+
+		void setTag(const char *tag) {
+			if (_tag) Platform::get()->free(_tag);
+			if (tag) {
+				size_t len = Platform::get()->strlen(tag);
+				_tag = static_cast<char *>(Platform::get()->malloc((len + 1) * sizeof(char)));
+				Platform::get()->strcpy(_tag, tag);
+			}
+			else {
+				_tag = nullptr;
+			}
+		}
+
 		void setInternal(bool value) {
 			_internal = value;
 		}
@@ -334,6 +360,7 @@ namespace RNBO {
 	private:
 		char			*_name = nullptr;
 		char			*_file = nullptr;
+		char			*_tag = nullptr;
 
 		size_t			_sizeInBytes = 0;
 		size_t			_requestedSizeInBytes = 0;
@@ -350,16 +377,17 @@ namespace RNBO {
 	// set the name of the DataRef, this is needed for Javascript and C to be similar
 	// might go away in the future
 	ATTRIBUTE_UNUSED
-	static inline DataRef initDataRef(const char *name, bool internal, const char* file) {
+	static inline DataRef initDataRef(const char *name, bool internal, const char* file, const char* tag) {
 		DataRef ref;
 		ref.setName(name);
 		ref.setInternal(internal);
 		ref.setFile(file);
+		ref.setTag(tag);
 		return ref;
 	}
 
 	/**
-	 * @private 
+	 * @private
 	 */
 	class MultiDataRef
 	{
@@ -666,10 +694,12 @@ namespace RNBO {
 		virtual ~InterleavedAudioBuffer() override {}
 
 		inline T getSample(const size_t channel, const size_t index) const {
+			if (!_audioData) return 0;
 			return _audioData[_channels * index + channel];
 		}
 
 		inline T getSampleSafe(const long channel, const long index) const {
+			if (!_audioData) return 0;
 			const auto ind = _channels * index + channel;
 			if (ind < 0 || static_cast<size_t>(ind) >= DataView<T, DR>::getSize()) {
 				return static_cast<T>(0);
@@ -679,7 +709,8 @@ namespace RNBO {
 
 		// channel numbers are 0 based
 		inline void setSample(const size_t channel, const size_t index, const T value) {
-			_audioData[_channels * index + channel] = value;
+			if (_audioData)
+				_audioData[_channels * index + channel] = value;
 		}
 
 		inline void setSampleSafe(const long channel, const long index, const T value) {
@@ -832,12 +863,12 @@ namespace RNBO {
 	 * @private
 	 *
 	 * @brief Base class for multi buffers
-	 * 
+	 *
 	 * Since we always re-create the view when the multi buffer changes, we can
 	 * here simply construct a normal data view with the currently selected
 	 * underlying DataRef
-	 * 
-	 * @tparam T 
+	 *
+	 * @tparam T
 	 */
 	template <typename T> class MultiBuffer : public InterleavedAudioBuffer<T, DataRef>
 	{
