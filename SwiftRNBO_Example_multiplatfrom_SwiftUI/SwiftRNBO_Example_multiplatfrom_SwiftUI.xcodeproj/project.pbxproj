@@ -271,8 +271,8 @@
 			isa = PBXGroup;
 			children = (
 				AFF2B43429A2093F00068DD0 /* RNBO-Bridging-Header.h */,
-				AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */,
 				AFF2B43629A2093F00068DD0 /* RNBOAudioUnit.h */,
+				AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */,
 			);
 			path = Bindings;
 			sourceTree = "<group>";
