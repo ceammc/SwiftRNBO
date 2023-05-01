@@ -18,7 +18,7 @@
 long int toneCount = 1;
 float testFrequency = 880.0; // an audio frequency in Hz
 float testVolume = 0.5; // volume setting
-double sampleRateHz = 48000.0;
+double sampleRateHz = 44100.0;
 
 @interface RNBOAudioUnit ()
 @property AUAudioUnitBusArray *outputBusArray;
@@ -41,12 +41,12 @@ double sampleRateHz = 48000.0;
 @synthesize inputBusArray;
 
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
-                                     options:(AudioComponentInstantiationOptions)options
-                                       error:(NSError **)outError
+                options						:(AudioComponentInstantiationOptions)options
+                error						:(NSError **)outError
 {
-    self = [super initWithComponentDescription:componentDescription
-                                       options:options
-                                         error:outError];
+    self = [super	initWithComponentDescription:componentDescription
+                    options						:options
+                    error						:outError];
 
     if (self == nil) {
         return nil;
@@ -54,17 +54,17 @@ double sampleRateHz = 48000.0;
 
     AVAudioFormat *defaultFormat = [[AVAudioFormat alloc]
                                     initStandardFormatWithSampleRate:sampleRateHz
-                                                            channels:2];
+                                    channels						:2];
 
     outputBus = [[AUAudioUnitBus alloc] initWithFormat:defaultFormat error:nil];
-    outputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
-                                                            busType:AUAudioUnitBusTypeOutput
-                                                             busses:@[ outputBus ]];
+    outputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
+                                                    busType				:AUAudioUnitBusTypeOutput
+                                                    busses				:@[ outputBus ]];
 
     inputBus = [[AUAudioUnitBus alloc] initWithFormat:defaultFormat error:nil];
-    inputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
-                                                           busType:AUAudioUnitBusTypeOutput
-                                                            busses:@[ inputBus ]];
+    inputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
+                                                    busType				:AUAudioUnitBusTypeOutput
+                                                    busses				:@[ inputBus ]];
 
     self.maximumFramesToRender = 512;
 
@@ -94,8 +94,8 @@ double sampleRateHz = 48000.0;
         return NO;
     }
 
-    my_pcmBuffer = [[AVAudioPCMBuffer alloc] initWithPCMFormat:outputBus.format
-                                                 frameCapacity:4096];
+    my_pcmBuffer = [[AVAudioPCMBuffer alloc]	initWithPCMFormat	:outputBus.format
+                                                frameCapacity		:4096];
     myAudioBufferList = my_pcmBuffer.audioBufferList;
 
     _object->prepareToProcess(44100, 4096);
@@ -109,10 +109,10 @@ double sampleRateHz = 48000.0;
 }
 
 // sometimes the buffers come back nil, so fix them
-void repairOutputBufferList(AudioBufferList       *outBufferList,
-                            AVAudioFrameCount     frameCount,
-                            bool                  zeroFill,
-                            AudioBufferList const *myAudioBufferList) {
+void repairOutputBufferList(AudioBufferList			*outBufferList,
+                            AVAudioFrameCount		frameCount,
+                            bool					zeroFill,
+                            AudioBufferList const	*myAudioBufferList) {
     UInt32 byteSize = frameCount * sizeof(float);
     int numberOfOutputBuffers = outBufferList->mNumberBuffers;
 
@@ -136,8 +136,13 @@ void repairOutputBufferList(AudioBufferList       *outBufferList,
 
 #pragma mark - AUAudioUnit (AUAudioUnitImplementation)
 
-- (AUInternalRenderBlock)internalRenderBlock
-{
+- (AUInternalRenderBlock)internalRenderBlock {
+    /*
+     Capture in locals to avoid ObjC member lookups. If "self" is captured in
+     render, we're doing it wrong.
+     */
+    // Specify captured objects are mutable.
+    __block std::unique_ptr<RNBO::CoreObject> &object = _object;
     AudioBufferList const **myABLCaptured = &myAudioBufferList;
 
     return ^AUAudioUnitStatus (AudioUnitRenderActionFlags *actionFlags,
@@ -165,8 +170,9 @@ void repairOutputBufferList(AudioBufferList       *outBufferList,
                buffer[0] = ptrLeft;
                buffer[1] = ptrRight;
 
-               self->_object->process(buffer, numBuffers, buffer, numBuffers, frameCount);
-
+               // ========== Actual process =========
+               object->process(buffer, numBuffers, buffer, numBuffers, frameCount);
+               // ========== Actual process =========
                return noErr;
     };
 }
@@ -404,8 +410,8 @@ std::string _getStringFrom(CFURLRef cfUrl) {
                 frames * sizeof(float) / sizeof(char),
                 bufferType,
                 [](RNBO::ExternalDataId id, char *data) {
-                std::cout << "--- Buffer freed"
-                          << "\n";
+                std::cout	<< "--- Buffer freed"
+                            << "\n";
                 free(data);
             });
             std::cout << "--- Success: Read " << frames << " samples (" << dataSize << ") from file " << filepath << "\n";
