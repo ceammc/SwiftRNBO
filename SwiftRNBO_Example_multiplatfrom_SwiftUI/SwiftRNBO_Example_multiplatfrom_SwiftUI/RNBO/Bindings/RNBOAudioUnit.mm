@@ -99,6 +99,18 @@ double sampleRateHz = 44100.0;
         return NO;
     }
 
+    const auto inputChannelCount = [self.inputBusses objectAtIndexedSubscript:0].format.channelCount;
+    const auto outputChannelCount = [self.outputBusses objectAtIndexedSubscript:0].format.channelCount;
+    
+    if (inputChannelCount != outputChannelCount) {
+        if (outError) {
+            *outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:kAudioUnitErr_FailedInitialization userInfo:nil];
+        }
+        // Notify superclass that initialization was not successful
+        self.renderResourcesAllocated = NO;
+        
+        return NO;
+    }
     _inputBus.allocateRenderResources(self.maximumFramesToRender);
     my_pcmBuffer = [[AVAudioPCMBuffer alloc]	initWithPCMFormat	:outputBus.format
                                                 frameCapacity		:4096];
