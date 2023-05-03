@@ -38,14 +38,14 @@ let audioUnit = audioEngine.getAudioUnit()
 
 In order get an array of all of the parameters an `RNBOAudioUnit`'s `getParametersArray()` method can be used.
 
-Since the initialization of an `RNBOAudioEngine` instance, getting an `RNBOAudioUnit` from it and storing its parameters in an array is usually done in one time, all of these operations are performed during the `RNBOContext` structure's initialization. Therefore, it is suggested just to store an instance of this structure in some always accessible place, for example:
+Since the initialization of an `RNBOAudioEngine` instance, getting an `RNBOAudioUnit` from it and storing its parameters in an array is usually done in one time during the initial setup, all of these operations are performed during the `RNBOContext` structure's initialization. Therefore, it is suggested just to store an instance of this structure in some always accessible place, for example:
 
 ```Swift
 import SwiftUI
 
 @main
 struct SwiftRNBOApp: App {
-    @ObservedObject var rnbo = RNBOContext()
+    @ObservedObject var rnbo = RNBOAudioUnitHostModel()
 
     var body: some Scene {
         WindowGroup {
@@ -56,7 +56,7 @@ struct SwiftRNBOApp: App {
 }
 ```
 
-Then use this `RNBOContext` instance's methods to interact with the RNBO patcher:
+Then use this `RNBOAudioUnitHostModel` instance's methods to interact with the RNBO patcher:
 
 ```Swift
 var rnbo = RNBOContext()
@@ -115,7 +115,6 @@ If you already have a `media` folder as a group as a result of adding of the who
 
 ## Current limitations
 
-- No audio input;
 - Only **16 bit** `wav` and `aiff` files **under 4Gb** in size are allowed as sample dependencies;
 - Only parameter changes are currently supported. MIDI functionality, messages, outports, inports, multichannel audio and other such things will be added during the ongoing development;
 - Only SwiftUI multiplatform sample project currently exists. UIKit and Objective-C examples will be added in the future;
