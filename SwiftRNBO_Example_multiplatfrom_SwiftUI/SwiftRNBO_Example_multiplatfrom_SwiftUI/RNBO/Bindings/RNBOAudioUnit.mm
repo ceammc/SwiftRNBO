@@ -163,6 +163,18 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
                AudioBufferList *inAudioBufferList = input->mutableAudioBufferList;
                AudioBufferList *outAudioBufferList = outputData;
 
+        AudioUnitRenderActionFlags pullFlags = 0;
+        
+//        if (frameCount > kernel->maximumFramesToRender()) {
+//            return kAudioUnitErr_TooManyFramesToProcess;
+//        }
+        
+        AUAudioUnitStatus err = input->pullInput(&pullFlags, timestamp, frameCount, 0, pullInputBlock);
+        
+        if (err != 0) { return err; }
+        
+//        AudioBufferList *inAudioBufferList = input->mutableAudioBufferList;
+        
                /*
                   Important:
                   If the caller passed non-null output pointers (outputData->mBuffers[x].mData), use those.
