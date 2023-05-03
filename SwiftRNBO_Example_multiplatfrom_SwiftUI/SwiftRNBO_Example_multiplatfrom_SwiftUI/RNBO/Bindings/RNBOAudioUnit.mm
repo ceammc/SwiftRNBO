@@ -117,7 +117,7 @@ double sampleRateHz = 44100.0;
 
     _object->prepareToProcess(44100, 4096);
 
-    return YES;
+    return [super allocateRenderResourcesAndReturnError:outError];
 }
 
 - (void)deallocateRenderResources
