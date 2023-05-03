@@ -118,32 +118,6 @@ double sampleRateHz = 44100.0;
     [super deallocateRenderResources];
 }
 
-// sometimes the buffers come back nil, so fix them
-void repairOutputBufferList(AudioBufferList			*outBufferList,
-                            AVAudioFrameCount		frameCount,
-                            bool					zeroFill,
-                            AudioBufferList const	*myAudioBufferList) {
-    UInt32 byteSize = frameCount * sizeof(float);
-    int numberOfOutputBuffers = outBufferList->mNumberBuffers;
-
-    if (numberOfOutputBuffers > 2) {
-        numberOfOutputBuffers = 2;
-    }
-
-    for (int i = 0; i < numberOfOutputBuffers; ++i) {
-        outBufferList->mBuffers[i].mNumberChannels = myAudioBufferList->mBuffers[i].mNumberChannels;
-        outBufferList->mBuffers[i].mDataByteSize = byteSize; // set buffer size
-
-        if (outBufferList->mBuffers[i].mData == NULL) { // copy buffer pointers if needed
-            outBufferList->mBuffers[i].mData = myAudioBufferList->mBuffers[i].mData;
-        }
-
-        if (zeroFill) {
-            memset(outBufferList->mBuffers[i].mData, 0, byteSize);
-        }
-    }
-}
-
 #pragma mark - AUAudioUnit (AUAudioUnitImplementation)
 
 - (AUInternalRenderBlock)internalRenderBlock {
