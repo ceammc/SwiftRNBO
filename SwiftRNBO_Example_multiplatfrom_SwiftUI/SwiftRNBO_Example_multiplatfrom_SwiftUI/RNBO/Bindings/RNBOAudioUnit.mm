@@ -67,6 +67,7 @@ double sampleRateHz = 44100.0;
                                                     busType				:AUAudioUnitBusTypeOutput
                                                     busses				:@[ _inputBus.bus ]];
 
+    const auto maxChannels = 2 ;
     self.maximumFramesToRender = 512;
 
     // our
