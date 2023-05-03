@@ -112,9 +112,7 @@ double sampleRateHz = 44100.0;
         return NO;
     }
     _inputBus.allocateRenderResources(self.maximumFramesToRender);
-    my_pcmBuffer = [[AVAudioPCMBuffer alloc]	initWithPCMFormat	:outputBus.format
-                                                frameCapacity		:4096];
-    myAudioBufferList = my_pcmBuffer.audioBufferList;
+    
     printf("allocated resources: inputs %d outputs %d\n", inputChannelCount, outputChannelCount);
 
     _object->prepareToProcess(44100, 4096);
