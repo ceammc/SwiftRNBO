@@ -18,8 +18,8 @@ extern long int testMagnitude;
 extern void processBuffer(float *p, int len);
 
 @interface RNBOAudioUnit : AUAudioUnit {
-    AUAudioUnitBusArray *outputBusArray;
-    AUAudioUnitBusArray *inputBusArray;
+//    AUAudioUnitBusArray *outputBusArray;
+//    AUAudioUnitBusArray *inputBusArray;
 }
 
 - (void)setParameterValue:(size_t)number valueNormalized:(float)v;
