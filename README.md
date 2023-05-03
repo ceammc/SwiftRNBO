@@ -38,7 +38,7 @@ let audioUnit = audioEngine.getAudioUnit()
 
 In order get an array of all of the parameters an `RNBOAudioUnit`'s `getParametersArray()` method can be used.
 
-Since the initialization of an `RNBOAudioEngine` instance, getting an `RNBOAudioUnit` from it and storing its parameters in an array is usually done in one time during the initial setup, all of these operations are performed during the `RNBOContext` structure's initialization. Therefore, it is suggested just to store an instance of this structure in some always accessible place, for example:
+Since the initialization of an `RNBOAudioEngine` instance, getting an `RNBOAudioUnit` from it and storing its parameters in an array is usually done in one time during the initial setup, all of these operations are performed during the `RNBOAudioUnitHostModel` structure's initialization. Therefore, it is suggested just to store an instance of this structure in some always accessible place, for example:
 
 ```Swift
 import SwiftUI
@@ -59,7 +59,7 @@ struct SwiftRNBOApp: App {
 Then use this `RNBOAudioUnitHostModel` instance's methods to interact with the RNBO patcher:
 
 ```Swift
-var rnbo = RNBOContext()
+var rnbo = RNBOAudioUnitHostModel()
 rnbo.setParameterValue(to: 0.0, at: 1)
 rnbo.setParameterValueNormalized(to: 0.5, at: 3)
 ```
