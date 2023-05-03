@@ -15,7 +15,9 @@ struct ContentView: View {
             #if !os(tvOS)
                 Sliders()
             #endif
+            Spacer()
             RandomizeButton()
+            Spacer()
             Button("Play") {
                 rnbo.play()
             }

@@ -14,7 +14,6 @@ struct SwiftRNBO_Example_multiplatfrom_SwiftUIApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(rnbo)
-                .frame(minWidth: 600)
         }
     }
 }
