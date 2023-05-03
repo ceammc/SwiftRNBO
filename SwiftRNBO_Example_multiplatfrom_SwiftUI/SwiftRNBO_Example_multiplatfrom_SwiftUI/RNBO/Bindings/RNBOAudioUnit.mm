@@ -81,12 +81,12 @@ double sampleRateHz = 44100.0;
 
 - (AUAudioUnitBusArray *)outputBusses
 {
-    return outputBusArray;
+    return _outputBusArray;
 }
 
 - (AUAudioUnitBusArray *)inputBusses
 {
-    return inputBusArray;
+    return _inputBusArray;
 }
 
 - (BOOL)allocateRenderResourcesAndReturnError:(NSError **)outError
