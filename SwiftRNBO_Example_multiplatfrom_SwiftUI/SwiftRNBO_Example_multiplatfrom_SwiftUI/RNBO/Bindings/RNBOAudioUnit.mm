@@ -29,9 +29,9 @@ double sampleRateHz = 44100.0;
 
 @implementation RNBOAudioUnit { // an eXperimental V3 AudioUnit
     // float            frequency;
-    AudioBufferList const *myAudioBufferList;
-    AVAudioPCMBuffer *my_pcmBuffer;
-    AUAudioUnitBus *outputBus;
+//    AudioBufferList const *myAudioBufferList;
+//    AVAudioPCMBuffer *my_pcmBuffer;
+//    AUAudioUnitBus *outputBus;
 //    AUAudioUnitBus *inputBus;
     BufferedInputBus _inputBus;
     std::unique_ptr<RNBO::CoreObject> _object;
