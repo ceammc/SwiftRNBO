@@ -7,6 +7,8 @@
 
 import Foundation
 
+typealias RNBOContext = RNBOAudioUnitHostModel
+
 class RNBOAudioUnitHostModel: ObservableObject {
     private let audioEngine: RNBOAudioEngine
     private let audioUnit: RNBOAudioUnit
