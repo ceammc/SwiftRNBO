@@ -44,24 +44,24 @@ double sampleRateHz = 44100.0;
         return nil;
     }
 
-    const auto maxChannels = 2 ;
-    
+    const auto maxChannels = 2;
+
     AVAudioFormat *format = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:44100 channels:2];
     _outputBus = [[AUAudioUnitBus alloc] initWithFormat:format error:nil];
     _outputBus.maximumChannelCount = maxChannels;
-    
+
     // Create the input and output busses.
     _inputBus.init(format, maxChannels);
-    
+
     // Create the input and output bus arrays.
-    _inputBusArray  = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
-                                                             busType:AUAudioUnitBusTypeInput
-                                                              busses: @[_inputBus.bus]];
+    _inputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
+                                                    busType				:AUAudioUnitBusTypeInput
+                                                    busses				:@[_inputBus.bus]];
     // then an array with it
-    _outputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
-                                                             busType:AUAudioUnitBusTypeOutput
-                                                              busses: @[_outputBus]];
-    
+    _outputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
+                                                    busType				:AUAudioUnitBusTypeOutput
+                                                    busses				:@[_outputBus]];
+
     self.maximumFramesToRender = 512;
 
     // our
@@ -92,18 +92,20 @@ double sampleRateHz = 44100.0;
 
     const auto inputChannelCount = [self.inputBusses objectAtIndexedSubscript:0].format.channelCount;
     const auto outputChannelCount = [self.outputBusses objectAtIndexedSubscript:0].format.channelCount;
-    
+
     if (inputChannelCount != outputChannelCount) {
         if (outError) {
             *outError = [NSError errorWithDomain:NSOSStatusErrorDomain code:kAudioUnitErr_FailedInitialization userInfo:nil];
         }
+
         // Notify superclass that initialization was not successful
         self.renderResourcesAllocated = NO;
-        
+
         return NO;
     }
+
     _inputBus.allocateRenderResources(self.maximumFramesToRender);
-    
+
     printf("allocated resources: inputs %d outputs %d\n", inputChannelCount, outputChannelCount);
 
     _object->prepareToProcess(44100, 4096);
@@ -160,57 +162,63 @@ void repairOutputBufferList(AudioBufferList			*outBufferList,
                                AudioBufferList *outputData,
                                const AURenderEvent *realtimeEventListHead,
                                AURenderPullInputBlock pullInputBlock) {
-        
-        AudioUnitRenderActionFlags pullFlags = 0;
-        
+               AudioUnitRenderActionFlags pullFlags = 0;
+
 //        if (frameCount > kernel->maximumFramesToRender()) {
 //            return kAudioUnitErr_TooManyFramesToProcess;
 //        }
-        
-        AUAudioUnitStatus err = input->pullInput(&pullFlags, timestamp, frameCount, 0, pullInputBlock);
-        
-        if (err != 0) { return err; }
-        
-        AudioBufferList *inAudioBufferList = input->mutableAudioBufferList;
-        
-        /*
-         Important:
-         If the caller passed non-null output pointers (outputData->mBuffers[x].mData), use those.
-         
-         If the caller passed null output buffer pointers, process in memory owned by the Audio Unit
-         and modify the (outputData->mBuffers[x].mData) pointers to point to this owned memory.
-         The Audio Unit is responsible for preserving the validity of this memory until the next call to render,
-         or deallocateRenderResources is called.
-         
-         If your algorithm cannot process in-place, you will need to preallocate an output buffer
-         and use it here.
-         
-         See the description of the canProcessInPlace property.
-         */
-        
-        // If passed null output buffer pointers, process in-place in the input buffer.
-        AudioBufferList *outAudioBufferList = outputData;
-        if (outAudioBufferList->mBuffers[0].mData == nullptr) {
-            for (UInt32 i = 0; i < outAudioBufferList->mNumberBuffers; ++i) {
-                outAudioBufferList->mBuffers[i].mData = inAudioBufferList->mBuffers[i].mData;
-            }
-        }
-        
-        // The following code goes in place of a 'processHelper->processWithEvents' in the Apple's template, adapted for RNBO::CoreObject
-        int numInputBuffers = inAudioBufferList->mNumberBuffers;
-        float *inputBuffer [numInputBuffers];
-        for (int i=0;i<inAudioBufferList->mNumberBuffers;i++)
-            inputBuffer[i] = (float *)inAudioBufferList->mBuffers[i].mData;
-        
-        int numOutputBuffers = outAudioBufferList->mNumberBuffers;
-        float *outputBuffer [numOutputBuffers ? numOutputBuffers : numInputBuffers ];
-        for (int i=0;i<outAudioBufferList->mNumberBuffers;i++)
-            outputBuffer[i] = (float *)(numOutputBuffers ? outAudioBufferList->mBuffers[i].mData : inAudioBufferList->mBuffers[i].mData);
-                
+
+               AUAudioUnitStatus err = input->pullInput(&pullFlags, timestamp, frameCount, 0, pullInputBlock);
+
+               if (err != 0) {
+                   return err;
+               }
+
+               AudioBufferList *inAudioBufferList = input->mutableAudioBufferList;
+
+               /*
+                  Important:
+                  If the caller passed non-null output pointers (outputData->mBuffers[x].mData), use those.
+
+                  If the caller passed null output buffer pointers, process in memory owned by the Audio Unit
+                  and modify the (outputData->mBuffers[x].mData) pointers to point to this owned memory.
+                  The Audio Unit is responsible for preserving the validity of this memory until the next call to render,
+                  or deallocateRenderResources is called.
+
+                  If your algorithm cannot process in-place, you will need to preallocate an output buffer
+                  and use it here.
+
+                  See the description of the canProcessInPlace property.
+                */
+
+               // If passed null output buffer pointers, process in-place in the input buffer.
+               AudioBufferList *outAudioBufferList = outputData;
+
+               if (outAudioBufferList->mBuffers[0].mData == nullptr) {
+                   for (UInt32 i = 0; i < outAudioBufferList->mNumberBuffers; ++i) {
+                       outAudioBufferList->mBuffers[i].mData = inAudioBufferList->mBuffers[i].mData;
+                   }
+               }
+
+               // The following code goes in place of a 'processHelper->processWithEvents' in the Apple's template, adapted for RNBO::CoreObject
+               int numInputBuffers = inAudioBufferList->mNumberBuffers;
+               float *inputBuffer [numInputBuffers];
+
+               for (int i = 0; i < inAudioBufferList->mNumberBuffers; i++) {
+                   inputBuffer[i] = (float *)inAudioBufferList->mBuffers[i].mData;
+               }
+
+               int numOutputBuffers = outAudioBufferList->mNumberBuffers;
+               float *outputBuffer [numOutputBuffers ? numOutputBuffers : numInputBuffers ];
+
+               for (int i = 0; i < outAudioBufferList->mNumberBuffers; i++) {
+                   outputBuffer[i] = (float *)(numOutputBuffers ? outAudioBufferList->mBuffers[i].mData : inAudioBufferList->mBuffers[i].mData);
+               }
+
                // ========== Actual process =========
-        object->process(inputBuffer, numInputBuffers, outputBuffer, numOutputBuffers, frameCount);
+               object->process(inputBuffer, numInputBuffers, outputBuffer, numOutputBuffers, frameCount);
                // ========== Actual process =========
-        return noErr;
+               return noErr;
     };
 }
 
