@@ -38,8 +38,8 @@ double sampleRateHz = 44100.0;
 }
 
 // @synthesize parameterTree;
-@synthesize outputBusArray;
-@synthesize inputBusArray;
+//@synthesize outputBusArray;
+//@synthesize inputBusArray;
 
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
                 options						:(AudioComponentInstantiationOptions)options
