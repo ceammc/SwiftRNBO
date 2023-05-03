@@ -24,7 +24,7 @@ double sampleRateHz = 44100.0;
 @interface RNBOAudioUnit ()
 @property AUAudioUnitBusArray *outputBusArray;
 @property AUAudioUnitBusArray *inputBusArray;
-
+@property (nonatomic, readonly) AUAudioUnitBus *outputBus;
 @end
 
 @implementation RNBOAudioUnit { // an eXperimental V3 AudioUnit
