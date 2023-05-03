@@ -53,21 +53,24 @@ double sampleRateHz = 44100.0;
         return nil;
     }
 
-    AVAudioFormat *defaultFormat = [[AVAudioFormat alloc]
-                                    initStandardFormatWithSampleRate:sampleRateHz
-                                    channels						:2];
-
-    outputBus = [[AUAudioUnitBus alloc] initWithFormat:defaultFormat error:nil];
-    outputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
-                                                    busType				:AUAudioUnitBusTypeOutput
-                                                    busses				:@[ outputBus ]];
-
-    _inputBus.init(defaultFormat, 8);
-    inputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
-                                                    busType				:AUAudioUnitBusTypeOutput
-                                                    busses				:@[ _inputBus.bus ]];
-
     const auto maxChannels = 2 ;
+    
+    AVAudioFormat *format = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:44100 channels:2];
+    _outputBus = [[AUAudioUnitBus alloc] initWithFormat:format error:nil];
+    _outputBus.maximumChannelCount = maxChannels;
+    
+    // Create the input and output busses.
+    _inputBus.init(format, maxChannels);
+    
+    // Create the input and output bus arrays.
+    _inputBusArray  = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
+                                                             busType:AUAudioUnitBusTypeInput
+                                                              busses: @[_inputBus.bus]];
+    // then an array with it
+    _outputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
+                                                             busType:AUAudioUnitBusTypeOutput
+                                                              busses: @[_outputBus]];
+    
     self.maximumFramesToRender = 512;
 
     // our
