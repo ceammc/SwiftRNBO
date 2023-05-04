@@ -99,7 +99,7 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
    - Enter `${PRODUCT_NAME}/RNBO/Bindings/RNBO-Bridging-Header.h` into it.
 1. **Define the Header Search Paths**
    - Without leaving the '_Build Settings_' tab search for the '_Header Search Paths_' field;
-   - Add `${PRODUCT_NAME}/RNBO/export` to it and select '_recursive_' in the dropdown to the right.
+   - Add `${PRODUCT_NAME}/RNBO/Export` to it and select '_recursive_' in the dropdown to the right.
 1. **Enter the Microphone usage description (only for iOS and multiplatform)**
    - Without leaving the '_Build Settings_' tab search for the '_Privacy - Microphone usage description_' field;
    - Enter _"This app uses microphone to ... (your reason)"_ into it.
