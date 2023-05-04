@@ -22,7 +22,7 @@ extern void processBuffer(float *p, int len);
 //    AUAudioUnitBusArray *inputBusArray;
 }
 
-- (void)setParameterValue:(size_t)number valueNormalized:(float)v;
+- (void)setParameterValue:(size_t)number value:(float)v;
 - (void)setParameterValueNormalized:(size_t)number valueNormalized:(float)v;
 - (size_t)getParameterCount;
 
