@@ -20,7 +20,7 @@ class RNBOAudioEngine {
         let format = avAudioUnit!.inputFormat(forBus: 0)
         
         if (format.channelCount > 0) {
-           engine.connect(engine.inputNode, to: avAudioUnit!, format: format)
+           engine.connect(input, to: avAudioUnit!, format: format)
         }
     }
     init() {
@@ -95,7 +95,7 @@ class RNBOAudioEngine {
         
         // engine.connect(playerNode, to: avAudioUnit!, format: audioFile?.processingFormat)
         let audioUnitFormat =  avAudioUnit!.inputFormat(forBus: 0)
-        let procFormat = audioFile?.processingFormat
+//        let procFormat = audioFile?.processingFormat
         engine.connect(playerNode, to: avAudioUnit!, format: audioUnitFormat)
         engine.connect(avAudioUnit!, to: engine.mainMixerNode, format: audioUnitFormat)
         
