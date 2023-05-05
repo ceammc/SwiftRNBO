@@ -26,7 +26,7 @@ class RNBOAudioUnitHostModel: ObservableObject {
     }
 
     func setParameterValue(to value: Double, at parameterIndex: Int) {
-        audioUnit.setParameterValue(parameterIndex, valueNormalized: Float(value))
+        audioUnit.setParameterValue(parameterIndex, value: Float(value))
         parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
     }
 
