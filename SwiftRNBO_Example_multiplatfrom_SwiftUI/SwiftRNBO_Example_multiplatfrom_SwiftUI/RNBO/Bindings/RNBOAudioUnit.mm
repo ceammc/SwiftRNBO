@@ -66,7 +66,7 @@ double sampleRateHz = 44100.0;
 
     // our
     _object.reset(new RNBO::CoreObject());
-    _object->prepareToProcess(44100, 64);
+    _object->prepareToProcess(_outputBusArray[0].format.sampleRate, 64);
 
     //
     [self loadFileDependencies];
@@ -108,7 +108,7 @@ double sampleRateHz = 44100.0;
 
     printf("allocated resources: inputs %d outputs %d\n", inputChannelCount, outputChannelCount);
 
-    _object->prepareToProcess(44100, 4096);
+    _object->prepareToProcess(_outputBusArray[0].format.sampleRate, 4096);
 
     return [super allocateRenderResourcesAndReturnError:outError];
 }
