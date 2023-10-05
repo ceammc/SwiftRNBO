@@ -378,7 +378,7 @@ std::string _getStringFrom(CFURLRef cfUrl) {
             auto channels = audioFormat.mChannelsPerFrame;
             auto samplerate = audioFormat.mSampleRate;
             auto sampleFormat = audioFormat.mBitsPerChannel;
-            auto bigEndian = audioFormat.mFormatFlags | kAudioFormatFlagIsBigEndian;
+            auto bigEndian = audioFormat.mFormatFlags & kAudioFormatFlagIsBigEndian;
 
             if (dataSize > (1LL << 32)) {
                 std::cout << "WARNING: reading file larger than 4GB is not yet supported; reading first 4GB" << std::endl;
@@ -392,21 +392,16 @@ std::string _getStringFrom(CFURLRef cfUrl) {
             const uint32_t sampleBufferSize = sizeof(float) * frames * channels;
             float *sampleBuffer = (float *)malloc(sampleBufferSize);
 
-            // import 16-bit
             if (sampleFormat == 16) {
                 struct Data {
-                    char b1 {
-                        0
-                    };
-                    char b2 {
-                        0
-                    };
+                    char b1 { 0 };
+                    char b2 { 0 };
                 };
-                const auto getData = [](const Data& d, const bool& b)->int16_t {
+                const auto getData = [](const Data& d, const bool& b)->float {
                     if (!b) {
-                        return d.b1 + (d.b2 << 8);
+                        return float(d.b1 + (d.b2 << 8)) / 32768.;
                     } else {
-                        return d.b2 + (d.b1 << 8);
+                        return float(d.b2 + (d.b1 << 8)) / 32768.;
                     }
                 };
 
@@ -418,7 +413,32 @@ std::string _getStringFrom(CFURLRef cfUrl) {
                 size_t i = 0;
 
                 for (auto& e : rawBuffer) {
-                    sampleBuffer[i++] = (float(getData(e, bigEndian))) / 32768.;
+                    sampleBuffer[i++] = getData(e, bigEndian);
+                }
+            }
+            else if (sampleFormat == 24) {
+                struct Data {
+                    char b1 { 0 };
+                    char b2 { 0 };
+                    char b3 { 0 };
+                };
+                const auto getData = [](const Data& d, const bool& b)->float {
+                    if (!b) {
+                        return float(d.b1 + (d.b2 << 8) + (d.b3 << 16)) / 8388608.;
+                    } else {
+                        return float(d.b3 + (d.b2 << 8) + (d.b1 << 16)) / 8388608.;
+                    }
+                };
+
+                std::vector<Data> rawBuffer {};
+                rawBuffer.resize(frames);
+
+                AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
+
+                size_t i = 0;
+
+                for (auto& e : rawBuffer) {
+                    sampleBuffer[i++] = getData(e, bigEndian);
                 }
             }
 
