@@ -16,8 +16,8 @@ class RNBOAudioEngine {
     
     private func initInput() {
         let input = self.engine.inputNode
-        //let format = input.inputFormat(forBus: 0)
-        let format = avAudioUnit!.inputFormat(forBus: 0)
+        let format = input.inputFormat(forBus: 0)
+//        let format = avAudioUnit!.inputFormat(forBus: 0)
         
         if (format.channelCount > 0) {
            engine.connect(input, to: avAudioUnit!, format: format)
