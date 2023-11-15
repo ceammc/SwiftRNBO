@@ -123,4 +123,4 @@ If you already have a `media` folder as a group as a result of adding of the who
 
 ## Credits
 
-We say a big thank you to composer, media artist and audio developer [Alex Nadzharov](https://github.com/njazz), who actually made RNBO interact with Swift and Apple's audio API. His knowledge of audio development and C++ allowed this project to exist. All the changes that are in any way connected to bridging C++ and Swift continue to happen only because of his invaluable contribution.
+We say a big thank you to composer, media artist and audio developer [Alex Nadzharov](https://github.com/njazz), who actually made RNBO interact with Swift and Apple's audio API. His knowledge of audio development and C++ allowed this project to exist.
