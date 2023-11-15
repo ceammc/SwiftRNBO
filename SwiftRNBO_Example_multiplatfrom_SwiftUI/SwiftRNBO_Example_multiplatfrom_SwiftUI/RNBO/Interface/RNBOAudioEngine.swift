@@ -28,6 +28,14 @@ class RNBOAudioEngine {
     }
 
     init() {
+        #if os(iOS)
+            do {
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothA2DP])
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Error setting up audio session: \(error.localizedDescription)")
+            }
+        #endif
         distortionEffect = AVAudioUnitDistortion()
         distortionEffect.loadFactoryPreset(.multiEcho1)
         if let audioFileURL = Bundle.main.url(forResource: "Synth", withExtension: "aif") {
