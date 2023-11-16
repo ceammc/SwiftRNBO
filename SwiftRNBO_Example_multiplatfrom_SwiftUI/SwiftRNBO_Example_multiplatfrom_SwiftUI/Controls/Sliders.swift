@@ -16,7 +16,7 @@
                 ForEach(rnbo.parameters.list.indices, id: \.self) { i in
                     HStack {
                         #if os(iOS)
-                            SliderNameLabel(name: rnbo.parameters[i].displayName)
+                            SliderNameLabel(name: rnbo.parameters.list[i].displayName)
                         #endif
                         Slider(value: $rnbo.parameters.list[i].valueNormalized) {
                             SliderNameLabel(name: rnbo.parameters.list[i].displayName)
