@@ -75,17 +75,17 @@ namespace RNBO {
 class rnbomatic : public PatcherInterfaceImpl {
 public:
 
-class RNBOSubpatcher_65 : public PatcherInterfaceImpl {
+class RNBOSubpatcher_72 : public PatcherInterfaceImpl {
     
     friend class rnbomatic;
     
     public:
     
-    RNBOSubpatcher_65()
+    RNBOSubpatcher_72()
     {
     }
     
-    ~RNBOSubpatcher_65()
+    ~RNBOSubpatcher_72()
     {
     }
     
@@ -1314,7 +1314,7 @@ Index getPatcherSerial() const {
 void getState(PatcherStateInterface& ) {}
 
 void setState() {
-    this->p_01 = new RNBOSubpatcher_65();
+    this->p_01 = new RNBOSubpatcher_72();
     this->p_01->setEngineAndPatcher(this->getEngine(), this);
     this->p_01->initialize();
     this->p_01->setParameterOffset(this->getParameterOffset(this->p_01));
@@ -2532,20 +2532,19 @@ void trigger_03_out3_set(number v) {
     this->noteout_01_channel_set(v);
 }
 
-void noteout_01_releasevelocity_set(number v) {
-    this->noteout_01_releasevelocity = v;
-}
-
 void noteout_01_velocity_set(number v) {
     this->noteout_01_velocity = v;
 }
 
 void trigger_03_out2_set(number v) {
-    this->noteout_01_releasevelocity_set(v);
     this->noteout_01_velocity_set(v);
 }
 
 void noteout_01_midiout_set(number ) {}
+
+void noteout_01_releasevelocity_set(number v) {
+    this->noteout_01_releasevelocity = v;
+}
 
 void noteout_01_notenumber_set(number v) {
     number off = this->noteout_01_releasevelocity > 0;
@@ -2595,9 +2594,7 @@ void notein_01_outchannel_set(number v) {
     this->noteout_01_channel_set(v);
 }
 
-void notein_01_releasevelocity_set(number v) {
-    this->noteout_01_releasevelocity_set(v);
-}
+void notein_01_releasevelocity_set(number ) {}
 
 void notein_01_velocity_set(number v) {
     this->noteout_01_velocity_set(v);
@@ -4003,7 +4000,7 @@ void assign_defaults()
     Index isMuted;
     indexlist paramInitIndices;
     indexlist paramInitOrder;
-    RNBOSubpatcher_65* p_01;
+    RNBOSubpatcher_72* p_01;
 
 };
 
