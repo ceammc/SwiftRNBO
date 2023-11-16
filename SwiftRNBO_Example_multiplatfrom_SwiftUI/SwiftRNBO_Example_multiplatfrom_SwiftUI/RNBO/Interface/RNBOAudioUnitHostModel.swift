@@ -12,6 +12,7 @@ typealias RNBOContext = RNBOAudioUnitHostModel
 class RNBOAudioUnitHostModel: ObservableObject {
     private let audioEngine: RNBOAudioEngine
     private let audioUnit: RNBOAudioUnit
+    private let eventHandler: RNBOEventHandler
     @Published var parameters: [RNBOParameter]
     //    @Published var description: RNBODescription
 
@@ -19,8 +20,10 @@ class RNBOAudioUnitHostModel: ObservableObject {
         audioEngine = RNBOAudioEngine()
         audioUnit = audioEngine.getAudioUnit()
         parameters = audioUnit.getParametersArray()
+        eventHandler = RNBOEventHandler()
+        audioUnit.setEventHandler(eventHandler)
     }
-    
+
     func play() {
         audioEngine.play()
     }
@@ -33,6 +36,10 @@ class RNBOAudioUnitHostModel: ObservableObject {
     func setParameterValueNormalized(to valueNormalized: Double, at parameterIndex: Int) {
         audioUnit.setParameterValueNormalized(parameterIndex, valueNormalized: Float(valueNormalized))
         parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
+    }
+
+    func sendMessage(_ message: [Double]) {
+        audioUnit.sendMessage("foo", list: message)
     }
 }
 
