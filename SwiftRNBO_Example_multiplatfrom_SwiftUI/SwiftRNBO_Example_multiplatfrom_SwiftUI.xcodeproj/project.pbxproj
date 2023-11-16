@@ -11,6 +11,7 @@
 		AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408F2B061DDD00FAACBF /* RNBOList.mm */; };
 		AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */; };
 		AF4B40952B06513600FAACBF /* MessageTestButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4B40942B06513600FAACBF /* MessageTestButtons.swift */; };
+		AF4B409B2B06C4B100FAACBF /* Keyboard in Frameworks */ = {isa = PBXBuildFile; productRef = AF4B409A2B06C4B100FAACBF /* Keyboard */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
 		AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41F29A2090200068DD0 /* ContentView.swift */; };
 		AFF2B42229A2090300068DD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42129A2090300068DD0 /* Assets.xcassets */; };
@@ -217,6 +218,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF4B409B2B06C4B100FAACBF /* Keyboard in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -664,6 +666,9 @@
 			dependencies = (
 			);
 			name = SwiftRNBO_Example_multiplatfrom_SwiftUI;
+			packageProductDependencies = (
+				AF4B409A2B06C4B100FAACBF /* Keyboard */,
+			);
 			productName = SwiftRNBO_Example_multiplatfrom_SwiftUI;
 			productReference = AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */;
 			productType = "com.apple.product-type.application";
@@ -692,6 +697,9 @@
 				Base,
 			);
 			mainGroup = AFF2B41129A2090200068DD0;
+			packageReferences = (
+				AF4B40992B06C4B100FAACBF /* XCRemoteSwiftPackageReference "Keyboard" */,
+			);
 			productRefGroup = AFF2B41B29A2090200068DD0 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -970,6 +978,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AF4B40992B06C4B100FAACBF /* XCRemoteSwiftPackageReference "Keyboard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/Keyboard.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AF4B409A2B06C4B100FAACBF /* Keyboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AF4B40992B06C4B100FAACBF /* XCRemoteSwiftPackageReference "Keyboard" */;
+			productName = Keyboard;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AFF2B41229A2090200068DD0 /* Project object */;
 }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Keyboard
 
 struct ContentView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
@@ -24,28 +25,12 @@ struct ContentView: View {
                 rnbo.play()
             }
             Spacer()
-            HStack {
-                Button(action: {
-                    rnbo.sendMIDINote(60, velocity: 127)
-                }, label: {
-                    Text("60")
-                })
-                Button(action: {
-                    rnbo.sendMIDINote(70, velocity: 127)
-                }, label: {
-                    Text("70")
-                })
-                Button(action: {
-                    rnbo.sendMIDINote(40, velocity: 127)
-                }, label: {
-                    Text("40")
-                })
-                Button(action: {
-                    rnbo.sendMIDINote(50, velocity: 127)
-                }, label: {
-                    Text("50")
-                })
+            Keyboard(layout: .piano(pitchRange: Pitch(48) ... Pitch(72), initialSpacerRatio: PianoSpacer.defaultInitialSpacerRatio, spacerRatio: PianoSpacer.defaultSpacerRatio, relativeBlackKeyWidth: PianoSpacer.defaultRelativeBlackKeyWidth, relativeBlackKeyHeight: PianoSpacer.defaultRelativeBlackKeyHeight), latching: false) { pitch, point in
+                rnbo.sendMIDINote(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
+            } noteOff: { pitch in
+                rnbo.sendMIDINote(UInt8(pitch.midiNoteNumber), velocity: 0)
             }
+            .frame(minWidth: 600, minHeight: 200)
         }
         .padding()
     }
