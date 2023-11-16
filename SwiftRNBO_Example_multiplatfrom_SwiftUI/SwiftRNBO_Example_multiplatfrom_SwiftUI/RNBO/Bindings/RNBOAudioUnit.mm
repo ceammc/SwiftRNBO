@@ -424,57 +424,56 @@ std::string _getStringFrom(CFURLRef cfUrl) {
             // Make space to store the file
             const uint32_t sampleBufferSize = sizeof(float) * frames * channels;
             float *sampleBuffer = (float *)malloc(sampleBufferSize);
-
-            if (sampleFormat == 16) {
-                struct Data {
-                    char b1 { 0 };
-                    char b2 { 0 };
+            
+            // 11.2023: replaced converter code
+            auto byteCount = sampleFormat / 8;
+            
+            // float32 with endianness support
+            if (byteCount == 4){
+                const auto getData = [](uint8_t* d, const size_t& byteCount, const bool& b)->float {
+                    uint8_t bytes[4];
+                    
+                    for (int i=0;i < 4;i++)
+                        // swapping bytes if needed
+                        bytes[i] = d [(!b ? (i) : (byteCount - i - 1))];
+                    return *reinterpret_cast<float*>(bytes);
                 };
-                const auto getData = [](const Data& d, const bool& b)->float {
-                    if (!b) {
-                        return float(d.b1 + (d.b2 << 8)) / 32768.;
-                    } else {
-                        return float(d.b2 + (d.b1 << 8)) / 32768.;
-                    }
-                };
-
-                std::vector<Data> rawBuffer {};
-                rawBuffer.resize(frames);
-
+                
+                std::vector<uint8_t> rawBuffer {};
+                rawBuffer.resize(frames * byteCount);
+                
                 AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
 
-                size_t i = 0;
-
-                for (auto& e : rawBuffer) {
-                    sampleBuffer[i++] = getData(e, bigEndian);
+                for (int i=0;i<frames;i++) {
+                    auto rawIndex = i * byteCount;
+                    sampleBuffer[i] = getData(rawBuffer.data() + rawIndex, byteCount, bigEndian);
                 }
             }
-            else if (sampleFormat == 24) {
-                struct Data {
-                    char b1 { 0 };
-                    char b2 { 0 };
-                    char b3 { 0 };
+            
+            // int8, int16, int24
+            if (byteCount && byteCount < 4){
+                const auto getData = [](uint8_t* d, const size_t& byteCount, const bool& b)->float {
+                    float divCoeff = 1.0f / pow(2, byteCount * 8);
+                    float ret {0};
+                    for (int i=0;i < byteCount;i++)
+                        // first byte must be signed, others are unsigned chars
+                        // value for bit shift is calculated depending on endianness value
+                        ret += (i==0 ? static_cast<int8_t>(d[i]) : d[i]) << (!b ? (i * 8) : (byteCount - i - 1) * 8);
+                    ret *= divCoeff;
+                    return ret;
                 };
-                const auto getData = [](const Data& d, const bool& b)->float {
-                    if (!b) {
-                        return float(d.b1 + (d.b2 << 8) + (d.b3 << 16)) / 8388608.;
-                    } else {
-                        return float(d.b3 + (d.b2 << 8) + (d.b1 << 16)) / 8388608.;
-                    }
-                };
-
-                std::vector<Data> rawBuffer {};
-                rawBuffer.resize(frames);
-
+                
+                std::vector<uint8_t> rawBuffer {};
+                rawBuffer.resize(frames * byteCount);
+                
                 AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
 
-                size_t i = 0;
-
-                for (auto& e : rawBuffer) {
-                    sampleBuffer[i++] = getData(e, bigEndian);
+                for (int i=0;i<frames;i++) {
+                    auto rawIndex = i * byteCount;
+                    sampleBuffer[i] = getData(rawBuffer.data() + rawIndex, byteCount, bigEndian);
                 }
             }
-
+            
             AudioFileClose(audioFile);
 
             _object->setExternalData(
