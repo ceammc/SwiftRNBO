@@ -17,10 +17,8 @@ struct RandomizeButton: View {
     }
 
     var body: some View {
-        Button {
+        Button("Randomize") {
             randomize()
-        } label: {
-            Image(systemName: "dice")
         }
     }
 }
