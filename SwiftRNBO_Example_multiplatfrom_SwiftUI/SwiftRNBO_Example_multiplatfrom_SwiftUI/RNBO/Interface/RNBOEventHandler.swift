@@ -26,7 +26,7 @@ class RNBOEventHandler: NSObject, RNBOEventHandlerProtocol {
     }
 
     func handle(_ event: RNBOMessageEvent) {
-        print("Message from outport: \(event.tag): \(event.numValue)")
+//        print("Message from outport: \(event.tag): \(event.numValue)")
         // TODO:
     }
 
