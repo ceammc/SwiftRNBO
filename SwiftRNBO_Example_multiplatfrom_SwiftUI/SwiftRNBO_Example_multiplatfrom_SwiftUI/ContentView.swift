@@ -18,6 +18,7 @@ struct ContentView: View {
             Spacer()
             RandomizeButton()
             Spacer()
+            MessageTestButtons()
             Button("Play") {
                 rnbo.play()
             }
