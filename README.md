@@ -113,13 +113,25 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 
 If you already have a `media` folder as a group as a result of adding of the whole `Export` folder to your project, you can right click on it and choose '_Show in Finder_', then drag and drop it into the same group this time with the '_Create folder references'_ option enabled. At this point you can delete the `media` group (gray icon) and leave only the `media` folder reference (blue icon). Just make sure to choose '_Remove References_' instead of '_Move to trash_' while deleting the group.
 
+### Supported formats: 
+`wav` and `aiff`
+
+### Supported bit depths: 
+`8`, `16` and `24`-bit integer as well as `32`-bit float
+
+### Supported file sizes:
+You can only import the first **4GB** of an audio file. If the file size exceeds this limit, the rest will be omitted.
+
 ## Current limitations
 
-- Only **16 and 24 bit** `wav` and `aiff` files **under 4Gb** in size are allowed as sample dependencies;
 - Only parameter changes are currently supported. MIDI functionality, messages, outports, inports, multichannel audio and other such things will be added during the ongoing development;
 - Only SwiftUI multiplatform sample project currently exists. UIKit and Objective-C examples will be added in the future;
 - Only a fraction of methods is currently implemented;
 - SwiftRNBO is currently available only as an example Xcode project, not a package. There are many inconveniences because of that. We are looking forward to fix that as soon as possible.
+
+## Contribution
+
+Please feel free to create forks and pull requests, any help and/or suggestions would be greatly appreciated.
 
 ## Credits
 
