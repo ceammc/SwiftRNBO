@@ -15,6 +15,7 @@
 
 #import <AudioToolbox/AudioToolbox.h>
 #import "RNBOExtensionBufferedAudioBus.hpp"
+#include "RNBOEventHandler.hpp"
 
 long int toneCount = 1;
 float testFrequency = 880.0; // an audio frequency in Hz
@@ -30,6 +31,7 @@ double sampleRateHz = 44100.0;
 @implementation RNBOAudioUnit {
     BufferedInputBus _inputBus;
     std::unique_ptr<RNBO::CoreObject> _object;
+    std::unique_ptr<RNBOEventHandler> _eventHandler;
 }
 
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
@@ -288,6 +290,37 @@ double sampleRateHz = 44100.0;
         self->_object->getParameterInfo(number, &info);
         return [NSString stringWithFormat:@"%s", info.displayName];
     }
+}
+
+#pragma mark -
+
+- (void)sendMessage:(NSString *)tag {
+    self->_object->sendMessage(RNBO::TAG([tag UTF8String]));
+}
+
+- (void)sendMessage:(NSString *)tag number:(float)number {
+    self->_object->sendMessage(RNBO::TAG([tag UTF8String]), number);
+}
+
+- (void)sendMessage:(NSString *)tag list:(NSArray *)list {
+    auto converted = new RNBO::list();
+
+    for (NSNumber *e in list) {
+        converted->push([e doubleValue]);
+    }
+
+    self->_object->sendMessage(RNBO::TAG([tag UTF8String]), std::unique_ptr<RNBO::list>(converted));
+}
+
+#pragma mark -
+
+-(void) setEventHandler:(NSObject<RNBOEventHandlerProtocol>*) handler{
+    _eventHandler->setEventHandler(handler);
+}
+
+- (void)eventHandlerEventsAvailable {
+    _eventHandler->eventsAvailable();
+    
 }
 
 #pragma mark -

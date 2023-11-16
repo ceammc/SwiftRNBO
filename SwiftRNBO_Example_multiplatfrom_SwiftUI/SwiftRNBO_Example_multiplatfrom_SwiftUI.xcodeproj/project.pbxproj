@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */; };
+		AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408F2B061DDD00FAACBF /* RNBOList.mm */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
 		AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41F29A2090200068DD0 /* ContentView.swift */; };
 		AFF2B42229A2090300068DD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42129A2090300068DD0 /* Assets.xcassets */; };
@@ -27,6 +29,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AF4B408B2B061DDD00FAACBF /* RNBOEventHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOEventHandler.hpp; sourceTree = "<group>"; };
+		AF4B408C2B061DDD00FAACBF /* RNBOList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNBOList.h; sourceTree = "<group>"; };
+		AF4B408D2B061DDD00FAACBF /* RNBOEventHandlerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNBOEventHandlerProtocol.h; sourceTree = "<group>"; };
+		AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOEventHandler.mm; sourceTree = "<group>"; };
+		AF4B408F2B061DDD00FAACBF /* RNBOList.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOList.mm; sourceTree = "<group>"; };
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift; sourceTree = "<group>"; };
 		AFF2B41F29A2090200068DD0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -278,6 +285,11 @@
 				AFF2B43629A2093F00068DD0 /* RNBOAudioUnit.h */,
 				AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */,
 				AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */,
+				AF4B408B2B061DDD00FAACBF /* RNBOEventHandler.hpp */,
+				AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */,
+				AF4B408D2B061DDD00FAACBF /* RNBOEventHandlerProtocol.h */,
+				AF4B408C2B061DDD00FAACBF /* RNBOList.h */,
+				AF4B408F2B061DDD00FAACBF /* RNBOList.mm */,
 			);
 			path = Bindings;
 			sourceTree = "<group>";
@@ -707,11 +719,13 @@
 			files = (
 				AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */,
 				AFF2B4ED29A2094600068DD0 /* RNBOAudioUnitHostModel.swift in Sources */,
+				AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */,
 				AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */,
 				AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */,
 				AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */,
 				AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */,
 				AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */,
+				AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */,
 				AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */,
 				AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */,
 				AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */,

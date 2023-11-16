@@ -9,6 +9,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Foundation/Foundation.h>
 
+#import "RNBOEventHandlerProtocol.h"
+
 extern long int toneCount;
 extern double sampleRateHz;
 extern float testFrequency;
@@ -20,6 +22,7 @@ extern void processBuffer(float *p, int len);
 @interface RNBOAudioUnit : AUAudioUnit {
 //    AUAudioUnitBusArray *outputBusArray;
 //    AUAudioUnitBusArray *inputBusArray;
+    NSObject<RNBOEventHandlerProtocol>* _handler;
 }
 
 - (void)setParameterValue:(size_t)number value:(float)v;
@@ -36,4 +39,10 @@ extern void processBuffer(float *p, int len);
 - (NSString *)getParameterUnit:(size_t)number;
 - (NSString *)getParameterDisplayName:(size_t)number;
 
+- (void)sendMessage:(NSString *)tag;
+- (void)sendMessage:(NSString *)tag number:(float)number;
+- (void)sendMessage:(NSString *)tag list:(NSArray *)list;
+
+-(void) setEventHandler:(NSObject<RNBOEventHandlerProtocol>*) handler;
+- (void)eventHandlerEventsAvailable;
 @end
