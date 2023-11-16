@@ -25,7 +25,7 @@ struct ContentView: View {
                 rnbo.play()
             }
             Spacer()
-            Keyboard(layout: .piano(pitchRange: Pitch(48) ... Pitch(72), initialSpacerRatio: PianoSpacer.defaultInitialSpacerRatio, spacerRatio: PianoSpacer.defaultSpacerRatio, relativeBlackKeyWidth: PianoSpacer.defaultRelativeBlackKeyWidth, relativeBlackKeyHeight: PianoSpacer.defaultRelativeBlackKeyHeight), latching: false) { pitch, point in
+            Keyboard { pitch, point in
                 rnbo.sendMIDINote(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
             } noteOff: { pitch in
                 rnbo.sendMIDINote(UInt8(pitch.midiNoteNumber), velocity: 0)
@@ -33,5 +33,6 @@ struct ContentView: View {
             .frame(minWidth: 600, minHeight: 200)
         }
         .padding()
+        .background()
     }
 }
