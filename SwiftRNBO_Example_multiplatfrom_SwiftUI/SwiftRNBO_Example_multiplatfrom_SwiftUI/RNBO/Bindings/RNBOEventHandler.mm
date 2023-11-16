@@ -8,8 +8,6 @@
 #import "RNBOEventHandler.hpp"
 #include "RNBOEventHandlerProtocol.h"
 
-
-
 RNBOParameterEvent convertEvent(const RNBO::ParameterEvent& event) {
     RNBOParameterEvent ret {};
 
@@ -115,7 +113,6 @@ void RNBOEventHandler::handleMidiEvent(const RNBO::MidiEvent& event) {
     [_obj handleMidiEvent:convertEvent(event)];
 }
 
-///> @deprecated
 void RNBOEventHandler::handleMessageEvent(const RNBO::MessageEvent& event) {
     [_obj handleMessageEvent:convertEvent(event)];
 }
