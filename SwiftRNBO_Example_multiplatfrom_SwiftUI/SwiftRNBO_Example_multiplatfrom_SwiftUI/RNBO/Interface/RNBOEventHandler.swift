@@ -22,10 +22,12 @@ class RNBOEventHandler: NSObject, RNBOEventHandlerProtocol {
     }
 
     func handle(_ event: RNBOMidiEvent) {
-        // TODO:
+        print("Received MIDI:")
+        print(event.midiData)
     }
 
     func handle(_ event: RNBOMessageEvent) {
+        print("Message from outport: \(event.tag): \(event.numValue)")
         // TODO:
     }
 

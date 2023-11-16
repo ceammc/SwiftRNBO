@@ -34,13 +34,13 @@ typedef enum RNBOPresetEventType {
 
 typedef struct RNBOParameterEvent {
     bool isValid;
-
     size_t index;
     double timeMilliseconds;
     double value;
     const void *source;
     // patchereventtarget
 } RNBOParameterEvent;
+
 typedef struct RNBOMidiEvent {
     double timeMilliseconds;
     int portIndex;
@@ -48,7 +48,7 @@ typedef struct RNBOMidiEvent {
     uint8_t midiData[3];
     // patchereventtarget
 } RNBOMidiEvent;
-///> @deprecated
+
 typedef struct RNBOMessageEvent {
     uint32_t tag;
     uint32_t objectId;
@@ -57,17 +57,23 @@ typedef struct RNBOMessageEvent {
 
     double numValue;
 } RNBOMessageEvent;
+
 typedef struct RNBOPresetEvent {
     double eventTime;
 } RNBOPresetEvent;
+
 typedef struct RNBOTempoEvent {
 } RNBOTempoEvent;
+
 typedef struct RNBOTransportEvent {
 } RNBOTransportEvent;
+
 typedef struct RNBOBeatTimeEvent {
 } RNBOBeatTimeEvent;
+
 typedef struct RNBOTimeSignatureEvent {
 } RNBOTimeSignatureEvent;
+
 typedef struct RNBOStartupEvent {
 } RNBOStartupEvent;
 
@@ -84,7 +90,6 @@ typedef struct RNBOMessageEventBase {
 
 - (void)handleParameterEvent:(RNBOParameterEvent)event;
 - (void)handleMidiEvent:(RNBOMidiEvent)event;
-///> @deprecated
 - (void)handleMessageEvent:(RNBOMessageEvent)event;
 - (void)handlePresetEvent:(RNBOPresetEvent)event;
 - (void)handleTempoEvent:(RNBOTempoEvent)event;

@@ -23,12 +23,21 @@ RNBOParameterEvent convertEvent(const RNBO::ParameterEvent& event) {
 
 RNBOMidiEvent convertEvent(const RNBO::MidiEvent& event) {
     RNBOMidiEvent ret {};
+    ret.length = event.getLength();
+    ret.midiData[0] = event.getData()[0];
+    ret.midiData[1] = event.getData()[1];
+    ret.midiData[2] = event.getData()[2];
+    ret.portIndex = event.getPortIndex();
+    ret.timeMilliseconds = event.getTime();
 
     return ret;
 }
 
 RNBOMessageEvent convertEvent(const RNBO::MessageEvent& event) {
     RNBOMessageEvent ret {};
+    ret.tag = event.getTag();
+    ret.eventTime = event.getTime();
+    ret.objectId = event.getObjectId();
 
     RNBOMessageEventBase base {};
 
