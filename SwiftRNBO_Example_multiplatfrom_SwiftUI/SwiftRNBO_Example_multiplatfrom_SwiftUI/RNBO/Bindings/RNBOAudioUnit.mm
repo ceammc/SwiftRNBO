@@ -14,8 +14,8 @@
 #include <memory>
 
 #import <AudioToolbox/AudioToolbox.h>
-#import "RNBOExtensionBufferedAudioBus.hpp"
 #include "RNBOEventHandler.hpp"
+#import "RNBOExtensionBufferedAudioBus.hpp"
 
 long int toneCount = 1;
 float testFrequency = 880.0; // an audio frequency in Hz
@@ -47,12 +47,12 @@ double sampleRateHz = 44100.0;
 #pragma mark -
 
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
-                options						:(AudioComponentInstantiationOptions)options
-                error						:(NSError **)outError
+                                     options:(AudioComponentInstantiationOptions)options
+                                       error:(NSError **)outError
 {
-    self = [super	initWithComponentDescription:componentDescription
-                    options						:options
-                    error						:outError];
+    self = [super initWithComponentDescription:componentDescription
+                                       options:options
+                                         error:outError];
 
     if (self == nil) {
         return nil;
@@ -68,18 +68,18 @@ double sampleRateHz = 44100.0;
     _inputBus.init(format, maxChannels);
 
     // Create the input and output bus arrays.
-    _inputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
-                                                    busType				:AUAudioUnitBusTypeInput
-                                                    busses				:@[_inputBus.bus]];
+    _inputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
+                                                            busType:AUAudioUnitBusTypeInput
+                                                             busses:@[_inputBus.bus]];
     // then an array with it
-    _outputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
-                                                    busType				:AUAudioUnitBusTypeOutput
-                                                    busses				:@[_outputBus]];
+    _outputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
+                                                             busType:AUAudioUnitBusTypeOutput
+                                                              busses:@[_outputBus]];
 
     self.maximumFramesToRender = 512;
-    
+
     _eventHandler.reset(new RNBOEventHandler());
-    
+
     // our
     _object.reset(new RNBO::CoreObject(_eventHandler.get()));
     _object->prepareToProcess(_outputBusArray[0].format.sampleRate, 64);
@@ -328,13 +328,26 @@ double sampleRateHz = 44100.0;
 
 #pragma mark -
 
--(void) setEventHandler:(NSObject<RNBOEventHandlerProtocol>*) handler{
+- (void)sendMIDINote:(uint8_t)pitch velocity:(uint8_t)velocity {
+    const uint8_t noteOn = 0x90;
+    const uint8_t midiChannel = 0;
+
+    const uint8_t noteOnLeadByte = noteOn | midiChannel;
+    const uint8_t midiBytes[3] = {
+        noteOnLeadByte, pitch, velocity
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+}
+
+#pragma mark -
+
+- (void)setEventHandler:(NSObject<RNBOEventHandlerProtocol> *)handler {
     _eventHandler->setEventHandler(handler);
 }
 
 - (void)eventHandlerEventsAvailable {
     _eventHandler->eventsAvailable();
-    
 }
 
 #pragma mark -
@@ -438,56 +451,63 @@ std::string _getStringFrom(CFURLRef cfUrl) {
             // Make space to store the file
             const uint32_t sampleBufferSize = sizeof(float) * frames * channels;
             float *sampleBuffer = (float *)malloc(sampleBufferSize);
-            
+
             // 11.2023: replaced converter code
             auto byteCount = sampleFormat / 8;
-            
+
             // float32 with endianness support
-            if (byteCount == 4){
-                const auto getData = [](uint8_t* d, const size_t& byteCount, const bool& b)->float {
+            if (byteCount == 4) {
+                const auto getData = [](uint8_t * d, const size_t& byteCount, const bool& b)->float {
                     uint8_t bytes[4];
-                    
-                    for (int i=0;i < 4;i++)
+
+                    for (int i = 0; i < 4; i++) {
                         // swapping bytes if needed
                         bytes[i] = d [(!b ? (i) : (byteCount - i - 1))];
-                    return *reinterpret_cast<float*>(bytes);
+                    }
+
+                    return *reinterpret_cast<float *>(bytes);
                 };
-                
+
                 std::vector<uint8_t> rawBuffer {};
                 rawBuffer.resize(frames * byteCount);
-                
+
                 AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
 
-                for (int i=0;i<frames;i++) {
+                for (int i = 0; i < frames; i++) {
                     auto rawIndex = i * byteCount;
                     sampleBuffer[i] = getData(rawBuffer.data() + rawIndex, byteCount, bigEndian);
                 }
             }
-            
+
             // int8, int16, int24
-            if (byteCount && byteCount < 4){
-                const auto getData = [](uint8_t* d, const size_t& byteCount, const bool& b)->float {
+            if (byteCount && byteCount < 4) {
+                const auto getData = [](uint8_t * d, const size_t& byteCount, const bool& b)->float {
                     float divCoeff = 1.0f / pow(2, byteCount * 8);
-                    float ret {0};
-                    for (int i=0;i < byteCount;i++)
+                    float ret {
+                        0
+                    };
+
+                    for (int i = 0; i < byteCount; i++) {
                         // first byte must be signed, others are unsigned chars
                         // value for bit shift is calculated depending on endianness value
-                        ret += (i==0 ? static_cast<int8_t>(d[i]) : d[i]) << (!b ? (i * 8) : (byteCount - i - 1) * 8);
+                        ret += (i == 0 ? static_cast<int8_t>(d[i]) : d[i]) << (!b ? (i * 8) : (byteCount - i - 1) * 8);
+                    }
+
                     ret *= divCoeff;
                     return ret;
                 };
-                
+
                 std::vector<uint8_t> rawBuffer {};
                 rawBuffer.resize(frames * byteCount);
-                
+
                 AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
 
-                for (int i=0;i<frames;i++) {
+                for (int i = 0; i < frames; i++) {
                     auto rawIndex = i * byteCount;
                     sampleBuffer[i] = getData(rawBuffer.data() + rawIndex, byteCount, bigEndian);
                 }
             }
-            
+
             AudioFileClose(audioFile);
 
             _object->setExternalData(
@@ -496,8 +516,8 @@ std::string _getStringFrom(CFURLRef cfUrl) {
                 frames * sizeof(float) / sizeof(char),
                 bufferType,
                 [](RNBO::ExternalDataId id, char *data) {
-                std::cout	<< "--- Buffer freed"
-                            << "\n";
+                std::cout << "--- Buffer freed"
+                          << "\n";
                 free(data);
             });
             std::cout << "--- Success: Read " << frames << " samples (" << dataSize << ") from file " << filepath << "\n";

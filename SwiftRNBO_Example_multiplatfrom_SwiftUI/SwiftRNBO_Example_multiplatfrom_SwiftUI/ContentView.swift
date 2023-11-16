@@ -19,8 +19,32 @@ struct ContentView: View {
             RandomizeButton()
             Spacer()
             MessageTestButtons()
+            Spacer()
             Button("Play") {
                 rnbo.play()
+            }
+            Spacer()
+            HStack {
+                Button(action: {
+                    rnbo.sendMIDINote(60, velocity: 127)
+                }, label: {
+                    Text("60")
+                })
+                Button(action: {
+                    rnbo.sendMIDINote(70, velocity: 127)
+                }, label: {
+                    Text("70")
+                })
+                Button(action: {
+                    rnbo.sendMIDINote(40, velocity: 127)
+                }, label: {
+                    Text("40")
+                })
+                Button(action: {
+                    rnbo.sendMIDINote(50, velocity: 127)
+                }, label: {
+                    Text("50")
+                })
             }
         }
         .padding()

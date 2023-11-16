@@ -22,7 +22,7 @@ extern void processBuffer(float *p, int len);
 @interface RNBOAudioUnit : AUAudioUnit {
 //    AUAudioUnitBusArray *outputBusArray;
 //    AUAudioUnitBusArray *inputBusArray;
-    NSObject<RNBOEventHandlerProtocol>* _handler;
+    NSObject<RNBOEventHandlerProtocol> *_handler;
 }
 
 - (void)setParameterValue:(size_t)number value:(float)v;
@@ -42,7 +42,8 @@ extern void processBuffer(float *p, int len);
 - (void)sendMessage:(NSString *)tag;
 - (void)sendMessage:(NSString *)tag number:(float)number;
 - (void)sendMessage:(NSString *)tag list:(NSArray *)list;
+- (void)sendMIDINote:(uint8_t)pitch velocity:(uint8_t)velocity;
 
--(void) setEventHandler:(NSObject<RNBOEventHandlerProtocol>*) handler;
+- (void)setEventHandler:(NSObject<RNBOEventHandlerProtocol> *)handler;
 - (void)eventHandlerEventsAvailable;
 @end
