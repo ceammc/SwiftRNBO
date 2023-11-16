@@ -163,7 +163,12 @@
       "meta": ""
     }
   ],
-  "outports": [],
+  "outports": [
+    {
+      "tag": "bar",
+      "meta": ""
+    }
+  ],
   "inlets": [
     {
       "type": "signal",

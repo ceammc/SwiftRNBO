@@ -75,17 +75,17 @@ namespace RNBO {
 class rnbomatic : public PatcherInterfaceImpl {
 public:
 
-class RNBOSubpatcher_33 : public PatcherInterfaceImpl {
+class RNBOSubpatcher_49 : public PatcherInterfaceImpl {
     
     friend class rnbomatic;
     
     public:
     
-    RNBOSubpatcher_33()
+    RNBOSubpatcher_49()
     {
     }
     
-    ~RNBOSubpatcher_33()
+    ~RNBOSubpatcher_49()
     {
     }
     
@@ -978,6 +978,8 @@ rnbomatic* getTopLevelPatcher() {
 
 void cancelClockEvents()
 {
+    getEngine()->flushClockEvents(this, -834257525, false);
+    getEngine()->flushClockEvents(this, -871642103, false);
 }
 
 template <typename T> void listquicksort(T& arr, T& sortindices, Int l, Int h, bool ascending) {
@@ -1313,7 +1315,7 @@ Index getPatcherSerial() const {
 void getState(PatcherStateInterface& ) {}
 
 void setState() {
-    this->p_01 = new RNBOSubpatcher_33();
+    this->p_01 = new RNBOSubpatcher_49();
     this->p_01->setEngineAndPatcher(this->getEngine(), this);
     this->p_01->initialize();
     this->p_01->setParameterOffset(this->getParameterOffset(this->p_01));
@@ -1941,7 +1943,24 @@ void processParamInitEvents() {
     }
 }
 
-void processClockEvent(MillisecondTime , ClockId , bool , ParameterValue ) {}
+void processClockEvent(MillisecondTime time, ClockId index, bool hasValue, ParameterValue value) {
+    RNBO_UNUSED(value);
+    RNBO_UNUSED(hasValue);
+    this->updateTime(time);
+
+    switch (index) {
+    case -834257525:
+        {
+        this->loadmess_01_startupbang_bang();
+        break;
+        }
+    case -871642103:
+        {
+        this->loadbang_01_startupbang_bang();
+        break;
+        }
+    }
+}
 
 void processOutletAtCurrentTime(EngineLink* , OutletIndex , ParameterValue ) {}
 
@@ -1991,10 +2010,19 @@ void processListMessage(
 }
 
 void processBangMessage(MessageTag tag, MessageTag objectId, MillisecondTime time) {
-    RNBO_UNUSED(objectId);
     this->updateTime(time);
 
     switch (tag) {
+    case TAG("startupbang"):
+        {
+        if (TAG("loadmess_obj-58") == objectId)
+            this->loadmess_01_startupbang_bang();
+
+        if (TAG("loadbang_obj-59") == objectId)
+            this->loadbang_01_startupbang_bang();
+
+        break;
+        }
     case TAG("foo"):
         {
         this->inport_01_value_bang_bang();
@@ -2007,13 +2035,29 @@ void processBangMessage(MessageTag tag, MessageTag objectId, MillisecondTime tim
 
 MessageTagInfo resolveTag(MessageTag tag) const {
     switch (tag) {
-    case TAG("foo"):
+    case TAG("bar"):
         {
-        return "foo";
+        return "bar";
         }
     case TAG(""):
         {
         return "";
+        }
+    case TAG("startupbang"):
+        {
+        return "startupbang";
+        }
+    case TAG("loadmess_obj-58"):
+        {
+        return "loadmess_obj-58";
+        }
+    case TAG("foo"):
+        {
+        return "foo";
+        }
+    case TAG("loadbang_obj-59"):
+        {
+        return "loadbang_obj-59";
         }
     }
 
@@ -2026,7 +2070,7 @@ MessageTagInfo resolveTag(MessageTag tag) const {
 }
 
 MessageIndex getNumMessages() const {
-    return 1;
+    return 2;
 }
 
 const MessageInfo& getMessageInfo(MessageIndex index) const {
@@ -2034,11 +2078,20 @@ const MessageInfo& getMessageInfo(MessageIndex index) const {
     case 0:
         {
         static const MessageInfo r0 = {
+            "bar",
+            Outport
+        };
+
+        return r0;
+        }
+    case 1:
+        {
+        static const MessageInfo r1 = {
             "foo",
             Inport
         };
 
-        return r0;
+        return r1;
         }
     }
 
@@ -2138,6 +2191,10 @@ void param_07_value_set(number v) {
     this->p_01_in4_number_set(v);
 }
 
+void loadmess_01_startupbang_bang() {
+    this->loadmess_01_message_bang();
+}
+
 void inport_01_value_bang_bang() {
     this->inport_01_out_bang_bang();
 }
@@ -2148,6 +2205,10 @@ void inport_01_value_number_set(number v) {
 
 void inport_01_value_list_set(const list& v) {
     this->inport_01_out_list_set(v);
+}
+
+void loadbang_01_startupbang_bang() {
+    this->loadbang_01_output_bang();
 }
 
 number msToSamps(MillisecondTime ms, number sampleRate) {
@@ -2217,6 +2278,8 @@ void sendOutlet(OutletIndex index, ParameterValue value) {
 void startup() {
     this->updateTime(this->getEngine()->getCurrentTime());
     this->p_01->startup();
+    this->getEngine()->scheduleClockEvent(this, -834257525, 0 + this->_currentTime);;
+    this->getEngine()->scheduleClockEvent(this, -871642103, 0 + this->_currentTime);;
 
     {
         this->scheduleParamInit(0, 0);
@@ -2328,6 +2391,15 @@ void p_01_in4_number_set(number v) {
     this->p_01->eventinlet_02_out1_number_set(v);
 }
 
+void outport_01_input_list_set(const list& v) {
+    this->getEngine()->sendListMessage(TAG("bar"), TAG(""), v, this->_currentTime);
+}
+
+void loadmess_01_message_bang() {
+    list v = this->loadmess_01_message;
+    this->outport_01_input_list_set(v);
+}
+
 void unpack_01_out5_bang() {
     number v = this->unpack_01_out5;
     this->param_05_value_set(v);
@@ -2422,7 +2494,7 @@ void noteout_01_channel_set(number v) {
     this->noteout_01_channel = v;
 }
 
-void notein_01_outchannel_set(number v) {
+void trigger_02_out3_set(number v) {
     this->noteout_01_channel_set(v);
 }
 
@@ -2430,15 +2502,12 @@ void noteout_01_releasevelocity_set(number v) {
     this->noteout_01_releasevelocity = v;
 }
 
-void notein_01_releasevelocity_set(number v) {
-    this->noteout_01_releasevelocity_set(v);
-}
-
 void noteout_01_velocity_set(number v) {
     this->noteout_01_velocity = v;
 }
 
-void notein_01_velocity_set(number v) {
+void trigger_02_out2_set(number v) {
+    this->noteout_01_releasevelocity_set(v);
     this->noteout_01_velocity_set(v);
 }
 
@@ -2459,6 +2528,32 @@ void noteout_01_notenumber_set(number v) {
     if ((bool)(off)) {
         this->noteout_01_releasevelocity_set(0);
     }
+}
+
+void trigger_02_out1_set(number v) {
+    this->noteout_01_notenumber_set(v);
+}
+
+void trigger_02_input_bang_bang() {
+    this->trigger_02_out3_set(1);
+    this->trigger_02_out2_set(127);
+    this->trigger_02_out1_set(60);
+}
+
+void loadbang_01_output_bang() {
+    this->trigger_02_input_bang_bang();
+}
+
+void notein_01_outchannel_set(number v) {
+    this->noteout_01_channel_set(v);
+}
+
+void notein_01_releasevelocity_set(number v) {
+    this->noteout_01_releasevelocity_set(v);
+}
+
+void notein_01_velocity_set(number v) {
+    this->noteout_01_velocity_set(v);
 }
 
 void notein_01_notenumber_set(number v) {
@@ -3203,6 +3298,17 @@ void groove_01_dspsetup(bool force) {
     this->groove_01_setupDone = true;
 }
 
+void param_06_getPresetValue(PatcherStateInterface& preset) {
+    preset["value"] = this->param_06_value;
+}
+
+void param_06_setPresetValue(PatcherStateInterface& preset) {
+    if ((bool)(stateIsEmpty(preset)))
+        return;
+
+    this->param_06_value_set(preset["value"]);
+}
+
 void lores_03_reset() {
     this->lores_03_y_1 = 0;
     this->lores_03_y_2 = 0;
@@ -3359,17 +3465,6 @@ array<number, 2> noteout_01_innerFormat_aftertouch(number value, number channel)
 }
 
 void noteout_01_innerFormat_reset() {}
-
-void param_06_getPresetValue(PatcherStateInterface& preset) {
-    preset["value"] = this->param_06_value;
-}
-
-void param_06_setPresetValue(PatcherStateInterface& preset) {
-    if ((bool)(stateIsEmpty(preset)))
-        return;
-
-    this->param_06_value_set(preset["value"]);
-}
 
 void param_07_getPresetValue(PatcherStateInterface& preset) {
     preset["value"] = this->param_07_value;
@@ -3608,6 +3703,7 @@ void updateTime(MillisecondTime time) {
 
 void assign_defaults()
 {
+    loadmess_01_message = { 42, 69 };
     unpack_01_out1 = 0;
     unpack_01_out2 = 0;
     unpack_01_out3 = 0;
@@ -3651,6 +3747,7 @@ void assign_defaults()
     groove_01_loop = 0;
     groove_01_crossfade = 0;
     p_01_target = 0;
+    param_06_value = 0;
     lores_03_cutoff = 0;
     lores_03_resonance = 0;
     lores_03_resonance_setter(lores_03_resonance);
@@ -3659,7 +3756,6 @@ void assign_defaults()
     noteout_01_channel = 1;
     noteout_01_port = 0;
     notein_01_channel = 0;
-    param_06_value = 0;
     param_07_value = 0.5;
     _currentTime = 0;
     audioProcessSampleCount = 0;
@@ -3700,12 +3796,12 @@ void assign_defaults()
     groove_01_incomingChange = 2;
     groove_01_crossfadeInSamples = 0;
     groove_01_setupDone = false;
+    param_06_lastValue = 0;
     lores_03_setupDone = false;
     noteout_01_midioutput = 1;
     notein_01_status = 0;
     notein_01_byte1 = -1;
     notein_01_inchan = 0;
-    param_06_lastValue = 0;
     param_07_lastValue = 0;
     globaltransport_tempo = nullptr;
     globaltransport_tempoNeedsReset = false;
@@ -3725,6 +3821,7 @@ void assign_defaults()
 
 // member variables
 
+    list loadmess_01_message;
     number unpack_01_out1;
     number unpack_01_out2;
     number unpack_01_out3;
@@ -3768,6 +3865,7 @@ void assign_defaults()
     number groove_01_loop;
     number groove_01_crossfade;
     number p_01_target;
+    number param_06_value;
     number lores_03_cutoff;
     number lores_03_resonance;
     number noteout_01_velocity;
@@ -3775,7 +3873,6 @@ void assign_defaults()
     number noteout_01_channel;
     number noteout_01_port;
     number notein_01_channel;
-    number param_06_value;
     number param_07_value;
     MillisecondTime _currentTime;
     SampleIndex audioProcessSampleCount;
@@ -3821,6 +3918,7 @@ void assign_defaults()
     Int groove_01_incomingChange;
     SampleIndex groove_01_crossfadeInSamples;
     bool groove_01_setupDone;
+    number param_06_lastValue;
     number lores_03_b_0;
     number lores_03_a_1;
     number lores_03_a_2;
@@ -3836,7 +3934,6 @@ void assign_defaults()
     int notein_01_status;
     int notein_01_byte1;
     int notein_01_inchan;
-    number param_06_lastValue;
     number param_07_lastValue;
     signal globaltransport_tempo;
     bool globaltransport_tempoNeedsReset;
@@ -3856,7 +3953,7 @@ void assign_defaults()
     Index isMuted;
     indexlist paramInitIndices;
     indexlist paramInitOrder;
-    RNBOSubpatcher_33* p_01;
+    RNBOSubpatcher_49* p_01;
 
 };
 
