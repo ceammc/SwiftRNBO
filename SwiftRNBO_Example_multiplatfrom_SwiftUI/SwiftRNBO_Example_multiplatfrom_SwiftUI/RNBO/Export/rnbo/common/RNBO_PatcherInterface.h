@@ -73,7 +73,7 @@ namespace RNBO {
 		virtual Index getMaxBlockSize() const = 0;
 		virtual number getSampleRate() const = 0;
 		virtual bool hasFixedVectorSize() const = 0;
-		virtual void sendParameter(ParameterIndex) {}
+		virtual void sendParameter(ParameterIndex, bool) {}
 
 		virtual ParameterValue getPolyParameterValue(PatcherInterface**, ParameterIndex index) {
 			return getParameterValue(index);

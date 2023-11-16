@@ -12,30 +12,10 @@
 #include "commonsyms.h"
 
 extern "C" {
-
-	typedef struct _audio_info {
-		long	channels;
-		long	samplerate;
-		long	frames;
-	} t_audio_info;
-
-	// Simplified "loader" object that can load audio data from a file or URL
-	// without using a Max buffer.
-	typedef struct _rnbo_data_loader {
-		t_object 				obj;
-		RNBO::DataType::Type	_type;
-		bool					_ready;
-		t_symbol				*_last_requested;
-		t_audio_info			_info;
-		char					*_data;
-		t_object				*_remote_resource;
-		t_systhread_mutex 		_mutex;
-	} t_rnbo_data_loader;
+	typedef struct _rnbo_data_loader t_rnbo_data_loader;
 
 	void rnbo_data_loader_register();
-	t_rnbo_data_loader *rnbo_data_loader_new(RNBO::DataType::Type type);
-	bool rnbo_data_loader_ready(t_rnbo_data_loader *x);
-	void rnbo_data_loader_free(t_rnbo_data_loader *x);
+
 	//path or url, it handles it
 	void rnbo_data_loader_load(t_rnbo_data_loader *x, const char *pathorurl);
 	t_symbol *rnbo_data_loader_get_last_requested(t_rnbo_data_loader *x);

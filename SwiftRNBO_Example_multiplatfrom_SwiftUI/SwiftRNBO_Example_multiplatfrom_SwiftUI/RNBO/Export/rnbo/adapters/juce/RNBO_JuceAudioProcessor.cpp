@@ -18,148 +18,15 @@
 //TODO get rid of this
 using namespace juce;
 
-namespace {
-
-	//RNBO parameter ID's can be too long for some hosts, so we hash the ID and render a string from the hash instead
-	juce::ParameterID paramIdForRNBOParam(RNBO::CoreObject& rnboObject, RNBO::ParameterIndex index, int versionHint) {
-		RNBO::MessageTag t = RNBO::TAG(rnboObject.getParameterId(index));
-		std::stringstream s;
-		s << std::string("hashed_0x") << std::hex << std::setfill('0') << std::setw(8) << t;
-		return juce::ParameterID(s.str(), versionHint);
-	}
-}
-
 namespace RNBO {
 
-class FloatParameter : public juce::RangedAudioParameter
-{
-	using String = juce::String;
-public:
-
-	FloatParameter (ParameterIndex index, const ParameterInfo& info, CoreObject& rnboObject, int versionHint = 0)
-	:
-		juce::RangedAudioParameter(
-				paramIdForRNBOParam(rnboObject, index, versionHint),
-				String(rnboObject.getParameterName(index))
-		)
-	, _index(index)
-	, _rnboObject(rnboObject)
-	{
-
-		if (info.unit) {
-			_unitName = String(info.unit);
-		}
-
-		_name = String(info.displayName);
-		if (_name.isEmpty()) {
-			_name = String(_rnboObject.getParameterId(_index));
-		}
-
-		_defaultValue = static_cast<float>(_rnboObject.convertToNormalizedParameterValue(_index, info.initialValue));
-
-		auto min = static_cast<float>(info.min);
-		auto max = static_cast<float>(info.max);
-		if (info.steps) {
-			_normRange = NormalisableRange<float>(min, max, 1.0f);
-		} else {
-			_normRange = NormalisableRange<float>(min, max);
-		}
-	}
-
-	float getValue() const override
-	{
-		// getValue wants the value between 0 and 1
-		float normalizedValue = (float)_rnboObject.getParameterNormalized(_index);
-		return normalizedValue;
-	}
-
-	void setValue (float newValue) override
-	{
-		jassert(newValue >= 0 && newValue <= 1.);	// should be getting normalized values
-		float oldValue = getValue();
-		if (newValue != oldValue) {
-			_rnboObject.setParameterValueNormalized(_index, newValue);
-		}
-	}
-
-	float getDefaultValue() const override
-	{
-		return _defaultValue;
-	}
-
-	String getParameterID() const override
-	{
-		return String(_rnboObject.getParameterId(_index));
-	}
-
-	String getName (int maximumStringLength) const override
-	{
-		return _name.substring(0, maximumStringLength);
-	}
-
-	String getLabel() const override
-	{
-		return _unitName;
-	}
-
-	float getValueForText (const String& text) const override
-	{
-		// this is never called
-		// does it want the normalized value or not?
-		// we probably should convert to normalized since getText() expects to get a normalized value
-		// but I guess it doesn't matter if this is never called.
-		return text.getFloatValue();
-	}
-
-	String getText (float value, int maximumStringLength) const override
-	{
-		// we want to print the normalized value
-		float displayValue = (float)_rnboObject.convertFromNormalizedParameterValue(_index, value);
-		return AudioProcessorParameter::getText(displayValue, maximumStringLength);
-	}
-
-	const NormalisableRange<float>& getNormalisableRange () const override
-	{
-		return _normRange;
-	}
-
-protected:
-	ParameterIndex			_index;
-	CoreObject&				_rnboObject;
-	String _unitName;
-	String _name;
-	float _defaultValue;
-	juce::NormalisableRange<float> _normRange;
-};
-
-class EnumParameter : public FloatParameter
-{
-	using String = juce::String;
-public:
-
-	EnumParameter (ParameterIndex index, const ParameterInfo& info, CoreObject& rnboObject, int versionHint = 0)
-	: FloatParameter(index, info, rnboObject, versionHint)
-	{
-		for (Index i = 0; i < static_cast<Index>(info.steps); i++) {
-			_enumValues.push_back(info.enumValues[i]);
-		}
-	}
-
-	String getText (float value, int maximumStringLength) const override
-	{
-		RNBO_UNUSED(maximumStringLength)
-		// we want to print the normalized value
-		long displayValue = (long)_rnboObject.convertFromNormalizedParameterValue(_index, value);
-		String v;
-		if (displayValue >= 0 && static_cast<Index>(displayValue) < _enumValues.size()) {
-			v = _enumValues[static_cast<Index>(displayValue)];
-		}
-		return v.substring(0, maximumStringLength);
-	}
-
-private:
-	Vector<String>		_enumValues;
-};
+//RNBO parameter ID's can be too long for some hosts, so we hash the ID and render a string from the hash instead
+juce::ParameterID paramIdForRNBOParam(RNBO::CoreObject& rnboObject, RNBO::ParameterIndex index, int versionHint) {
+	RNBO::MessageTag t = RNBO::TAG(rnboObject.getParameterId(index));
+	std::stringstream s;
+	s << std::string("hashed_0x") << std::hex << std::setfill('0') << std::setw(8) << t;
+	return juce::ParameterID(s.str(), versionHint);
+}
 
 //==============================================================================
 
@@ -231,7 +98,8 @@ JuceAudioProcessor::BusesProperties JuceAudioProcessor::makeBusesPropertiesForRN
 JuceAudioProcessor::JuceAudioProcessor(
 		const nlohmann::json& patcher_desc,
 		const nlohmann::json& presets,
-		const RNBO::BinaryData& data
+		const RNBO::BinaryData& data,
+		JuceAudioParameterFactory* paramFactory
 		)
 	: CoreObjectHolder(this)
 	, AudioProcessor(
@@ -250,44 +118,46 @@ JuceAudioProcessor::JuceAudioProcessor(
 
 	_formatManager.registerBasicFormats();
 
-	//parse metadata for version hints
-	std::unordered_map<RNBO::ParameterIndex, int> paramVersionHints;
-	try {
+	//create default param factory if one isn't passed in
+	std::unique_ptr<JuceAudioParameterFactory> fact;
+	if (paramFactory == nullptr) {
+		fact = std::make_unique<JuceAudioParameterFactory>(patcher_desc);
+		paramFactory = fact.get();
+	}
+
+	//get parameter desc
+	nlohmann::json paramdesc;
+	{
 		const std::string key = "parameters";
-		const std::string vkey = "versionhint";
 		if (patcher_desc.contains(key) && patcher_desc[key].is_array()) {
-			for (auto p: patcher_desc[key]) {
-				if (
-						p.is_object() &&
-						p.contains("index") && p["index"].is_number() &&
-						p.contains("meta") && p["meta"].is_object() &&
-						p["meta"].contains(vkey) && p["meta"][vkey].is_number()) {
-					ParameterIndex id = static_cast<ParameterIndex>(p["index"].get<int>());
-					int versionHint = p[vkey].get<int>();
-					paramVersionHints[id] = versionHint;
-				}
-			}
+			paramdesc = patcher_desc[key];
 		}
-	} catch (std::exception& e) {
-		std::cerr << "exception reading parameters json " << e.what() << std::endl;
 	}
 
 	int juceIndex = 0;
 	for (ParameterIndex i = 0; i < _rnboObject.getNumParameters(); i++) {
-		ParameterInfo info;
-		_rnboObject.getParameterInfo(i, &info);
-		if (info.visible) {
+		//create can return nullptr
+		juce::AudioProcessorParameter * p = paramFactory->create(_rnboObject, i);
+		if (p) {
 			_rnboParamIndexToJuceParamIndex.insert({i, juceIndex++});
-
-			//find version hint, if we have one
-			auto it = paramVersionHints.find(i);
-			int versionHint = it != paramVersionHints.end() ? it->second : 1;
-
-			if (info.enumValues && info.steps > 0) {
-				addParameter(new EnumParameter(i, info, _rnboObject, versionHint));
+			addParameter(p);
+#if RNBO_JUCE_PARAM_DEFAULT_NOTIFY
+			bool notify = true;
+#else
+			bool notify = false;
+#endif
+			//see if we have the notify meta
+			if (paramdesc.size() > i) {
+				const std::string meta = "meta";
+				const std::string key = "notify";
+				auto desc = paramdesc[i];
+				if (desc.contains(meta) && desc[meta].is_object() && desc[meta].contains(key) && desc[meta][key].is_boolean()) {
+					notify = desc[meta][key].get<bool>();
+				}
 			}
-			else {
-				addParameter(new FloatParameter(i, info, _rnboObject, versionHint));
+
+			if (notify) {
+				_notifyingParameters.insert(i);
 			}
 		}
 	}
@@ -368,7 +238,7 @@ void JuceAudioProcessor::handleParameterEvent(const ParameterEvent& event)
 		if (_isInStartup || _isSettingPresetAsync) {
 			param->setValue((float)normalizedValue);
 		}
-		else {
+		else if (_notifyingParameters.count(event.getIndex()) != 0) {
 			param->beginChangeGesture();
 			param->setValueNotifyingHost((float)normalizedValue);
 			param->endChangeGesture();
@@ -591,32 +461,30 @@ bool JuceAudioProcessor::isBusesLayoutSupported (const BusesLayout& /*layouts*/)
 void JuceAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
 	auto samples = static_cast<Index>(buffer.getNumSamples());
-	wrapProcess(samples, midiMessages, [this, samples, &buffer]() {
-			_rnboObject.process(
-					buffer.getArrayOfReadPointers(), static_cast<Index>(buffer.getNumChannels()),
-					buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
-					samples,
-					&_midiInput, &_midiOutput
-					);
-			}
+	auto tc = preProcess(midiMessages);
+	_rnboObject.process(
+			buffer.getArrayOfReadPointers(), static_cast<Index>(buffer.getNumChannels()),
+			buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
+			samples,
+			&_midiInput, &_midiOutput
 			);
+	postProcess(tc, midiMessages);
 }
 
 void JuceAudioProcessor::processBlock (juce::AudioBuffer<double>& buffer, juce::MidiBuffer& midiMessages)
 {
 	auto samples = static_cast<Index>(buffer.getNumSamples());
-	wrapProcess(samples, midiMessages, [this, samples, &buffer]() {
-			_rnboObject.process(
-					buffer.getArrayOfReadPointers(), static_cast<Index>(buffer.getNumChannels()),
-					buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
-					samples,
-					&_midiInput, &_midiOutput
-					);
-			}
+	auto tc = preProcess(midiMessages);
+	_rnboObject.process(
+			buffer.getArrayOfReadPointers(), static_cast<Index>(buffer.getNumChannels()),
+			buffer.getArrayOfWritePointers(), static_cast<Index>(buffer.getNumChannels()),
+			samples,
+			&_midiInput, &_midiOutput
 			);
+	postProcess(tc, midiMessages);
 }
 
-void JuceAudioProcessor::wrapProcess(Index numSamples, juce::MidiBuffer& midiMessages, std::function<void(void)> process) {
+TimeConverter JuceAudioProcessor::preProcess(juce::MidiBuffer& midiMessages) {
 	RNBO::MillisecondTime time = _rnboObject.getCurrentTime();
 
 	//transport
@@ -657,28 +525,27 @@ void JuceAudioProcessor::wrapProcess(Index numSamples, juce::MidiBuffer& midiMes
 		}
 	}
 
-	// fill midi input
 	TimeConverter timeConverter(_rnboObject.getSampleRate(), time);
 
+	// fill midi input
 	_midiInput.clear();  // make sure midi input starts clear
 	for (auto meta: midiMessages)
 	{
 		MillisecondTime t = timeConverter.convertSampleOffsetToMilliseconds(meta.samplePosition);
 		_midiInput.addEvent(MidiEvent(t, 0, meta.data, (Index)meta.numBytes));
 	}
-
-	process();
-
-	// consume midi output
 	midiMessages.clear();		// clear the input that we consumed above so juce doesn't get confused
+	return timeConverter;
+}
+
+void JuceAudioProcessor::postProcess(TimeConverter& timeConverter, juce::MidiBuffer& midiMessages) {
+	// consume midi output
 	if (!_midiOutput.empty()) {
-		std::for_each(_midiOutput.begin(),
-					  _midiOutput.end(),
-					  [&timeConverter, &midiMessages](const MidiEvent& ev) {
-						  int sampleNumber = static_cast<int>(timeConverter.convertMillisecondsToSampleOffset(ev.getTime()));
-						  auto midiMessage = MidiMessage(ev.getData(), (int)ev.getLength());
-						  midiMessages.addEvent(midiMessage, sampleNumber);
-					  });
+		for (const auto& ev: _midiOutput) {
+			int sampleNumber = static_cast<int>(timeConverter.convertMillisecondsToSampleOffset(ev.getTime()));
+			auto midiMessage = MidiMessage(ev.getData(), (int)ev.getLength());
+			midiMessages.addEvent(midiMessage, sampleNumber);
+		}
 		_midiOutput.clear();
 	}
 }
@@ -733,6 +600,81 @@ void JuceAudioProcessor::SyncEventHandler::handlePresetEvent(const PresetEvent& 
 }
 
 
+JuceAudioParameterFactory::JuceAudioParameterFactory(
+		const nlohmann::json& patcherdesc
+		)
+	: _patcherDesc(patcherdesc)
+{
+	try {
+		const std::string key = "parameters";
+		if (_patcherDesc.contains(key) && _patcherDesc[key].is_array()) {
+			for (auto p: _patcherDesc[key]) {
+				if (
+						p.is_object() &&
+						p.contains("index") && p["index"].is_number() &&
+						p.contains("meta") && p["meta"].is_object()
+					 )
+				{
+					ParameterIndex id = static_cast<ParameterIndex>(p["index"].get<int>());
+					_paramMeta[id] = p["meta"];
+				}
+			}
+		}
+	} catch (std::exception& e) {
+		std::cerr << "exception reading parameters json " << e.what() << std::endl;
+	}
+}
+
+AudioProcessorParameter* JuceAudioParameterFactory::create(RNBO::CoreObject& rnboObject, ParameterIndex index) {
+	ParameterInfo info;
+	rnboObject.getParameterInfo(index, &info);
+
+	if (!info.visible) {
+		return nullptr;
+	}
+
+	//get meta
+	nlohmann::json meta;
+
+	auto it = _paramMeta.find(index);
+	int versionHint = 1;
+	if (it != _paramMeta.end()) {
+		meta = it->second;
+
+		//find version hint, if we have one
+		const std::string vkey = "versionhint";
+		if (meta.contains(vkey) && meta[vkey].is_number())
+		{
+			versionHint = meta[vkey].get<int>();
+		}
+	}
+	return create(rnboObject, index, info, versionHint, meta);
+}
+
+juce::AudioProcessorParameter* JuceAudioParameterFactory::create(RNBO::CoreObject& rnboObject, ParameterIndex index, const ParameterInfo& info, int versionHint, const nlohmann::json& meta) {
+	if (info.enumValues && info.steps > 0) {
+		return createEnum(rnboObject, index, info, versionHint, meta);
+	} else {
+		return createFloat(rnboObject, index, info, versionHint, meta);
+	}
+}
+
+AudioProcessorParameter* JuceAudioParameterFactory::createEnum(RNBO::CoreObject& rnboObject, ParameterIndex index, const ParameterInfo& info, int versionHint, const nlohmann::json& meta) {
+	return new EnumParameter(index, info, rnboObject, versionHint, automate(meta));
+}
+
+AudioProcessorParameter* JuceAudioParameterFactory::createFloat(RNBO::CoreObject& rnboObject, ParameterIndex index, const ParameterInfo& info, int versionHint, const nlohmann::json& meta) {
+	return new FloatParameter(index, info, rnboObject, versionHint, automate(meta));
+}
+
+bool JuceAudioParameterFactory::automate(const nlohmann::json& meta) {
+	const std::string key = "automate";
+	if (meta.contains(key) && meta[key].is_boolean())
+		return meta[key].get<bool>();
+	return true;
+}
+
+
 } // namespace RNBO
 
 #ifdef RNBO_INCLUDE_DESCRIPTION_FILE
@@ -747,6 +689,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
 	nlohmann::json patcher_desc, presets;
 
+
 #ifdef RNBO_BINARY_DATA_STORAGE_NAME
 	extern RNBO::BinaryDataImpl::Storage RNBO_BINARY_DATA_STORAGE_NAME;
 	RNBO::BinaryDataImpl::Storage dataStorage = RNBO_BINARY_DATA_STORAGE_NAME;
@@ -760,6 +703,8 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 	presets = RNBO::patcher_presets;
 #endif
 
-	return new RNBO::JuceAudioProcessor(patcher_desc, presets, data);
+	RNBO::JuceAudioParameterFactory factory(patcher_desc);
+
+	return new RNBO::JuceAudioProcessor(patcher_desc, presets, data, &factory);
 }
 #endif

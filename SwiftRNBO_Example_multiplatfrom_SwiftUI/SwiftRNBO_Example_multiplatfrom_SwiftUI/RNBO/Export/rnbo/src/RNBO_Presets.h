@@ -264,18 +264,22 @@ namespace RNBO {
 							}
 							break;
 						}
+						case ValueHolder::STRING:
+							//presetid
+							RNBO_ASSERT(strcmp(key, "__presetid") == 0);
+							break;
 						case ValueHolder::NONE:
 						case ValueHolder::EXTERNAL:
 						case ValueHolder::EVENTTARGET:
 						case ValueHolder::DATAREF:
 						case ValueHolder::MULTIREF:
 						case ValueHolder::SIGNAL:
-						case ValueHolder::STRING:
 						case ValueHolder::BOOLEAN:
 						case ValueHolder::INTVALUE:
 						default:
 							// we do only support numbers, lists and substates
 							RNBO_ASSERT(false);
+							break;
 					}
 			}
 	}

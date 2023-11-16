@@ -62,7 +62,7 @@ Details of the GPLv3 license can be found at: https://www.gnu.org/licenses/gpl-3
 namespace RNBO {
 
 
-#define floor(x) ((long)(x))
+#define trunc(x) ((Int)(x))
 
 #if defined(__GNUC__) || defined(__clang__)
     #define RNBO_RESTRICT __restrict__
@@ -75,12 +75,901 @@ namespace RNBO {
 class rnbomatic : public PatcherInterfaceImpl {
 public:
 
+class RNBOSubpatcher_33 : public PatcherInterfaceImpl {
+    
+    friend class rnbomatic;
+    
+    public:
+    
+    RNBOSubpatcher_33()
+    {
+    }
+    
+    ~RNBOSubpatcher_33()
+    {
+    }
+    
+    virtual rnbomatic* getPatcher() const {
+        return static_cast<rnbomatic *>(_parentPatcher);
+    }
+    
+    rnbomatic* getTopLevelPatcher() {
+        return this->getPatcher()->getTopLevelPatcher();
+    }
+    
+    void cancelClockEvents()
+    {
+    }
+    
+    Index getNumMidiInputPorts() const {
+        return 0;
+    }
+    
+    void processMidiEvent(MillisecondTime , int , ConstByteArray , Index ) {}
+    
+    Index getNumMidiOutputPorts() const {
+        return 0;
+    }
+    
+    void process(
+        const SampleValue * const* inputs,
+        Index numInputs,
+        SampleValue * const* outputs,
+        Index numOutputs,
+        Index n
+    ) {
+        this->vs = n;
+        this->updateTime(this->getEngine()->getCurrentTime());
+        SampleValue * out1 = (numOutputs >= 1 && outputs[0] ? outputs[0] : this->dummyBuffer);
+        SampleValue * out2 = (numOutputs >= 2 && outputs[1] ? outputs[1] : this->dummyBuffer);
+        const SampleValue * in1 = (numInputs >= 1 && inputs[0] ? inputs[0] : this->zeroBuffer);
+        const SampleValue * in2 = (numInputs >= 2 && inputs[1] ? inputs[1] : this->zeroBuffer);
+        this->lores_01_perform(this->lores_01_cutoff, this->lores_01_resonance, in1, out1, n);
+        this->lores_02_perform(this->lores_02_cutoff, this->lores_02_resonance, in2, out2, n);
+        this->stackprotect_perform(n);
+        this->audioProcessSampleCount += this->vs;
+    }
+    
+    void prepareToProcess(number sampleRate, Index maxBlockSize, bool force) {
+        if (this->maxvs < maxBlockSize || !this->didAllocateSignals) {
+            this->zeroBuffer = resizeSignal(this->zeroBuffer, this->maxvs, maxBlockSize);
+            this->dummyBuffer = resizeSignal(this->dummyBuffer, this->maxvs, maxBlockSize);
+            this->didAllocateSignals = true;
+        }
+    
+        const bool sampleRateChanged = sampleRate != this->sr;
+        const bool maxvsChanged = maxBlockSize != this->maxvs;
+        const bool forceDSPSetup = sampleRateChanged || maxvsChanged || force;
+    
+        if (sampleRateChanged || maxvsChanged) {
+            this->vs = maxBlockSize;
+            this->maxvs = maxBlockSize;
+            this->sr = sampleRate;
+            this->invsr = 1 / sampleRate;
+        }
+    
+        this->lores_01_dspsetup(forceDSPSetup);
+        this->lores_02_dspsetup(forceDSPSetup);
+    
+        if (sampleRateChanged)
+            this->onSampleRateChanged(sampleRate);
+    }
+    
+    void setProbingTarget(MessageTag id) {
+        switch (id) {
+        default:
+            {
+            this->setProbingIndex(-1);
+            break;
+            }
+        }
+    }
+    
+    void setProbingIndex(ProbingIndex ) {}
+    
+    Index getProbingChannels(MessageTag outletId) const {
+        RNBO_UNUSED(outletId);
+        return 0;
+    }
+    
+    Index getIsMuted()  {
+        return this->isMuted;
+    }
+    
+    void setIsMuted(Index v)  {
+        this->isMuted = v;
+    }
+    
+    Index getPatcherSerial() const {
+        return 0;
+    }
+    
+    void getState(PatcherStateInterface& ) {}
+    
+    void setState() {}
+    
+    void getPreset(PatcherStateInterface& ) {}
+    
+    void processTempoEvent(MillisecondTime , Tempo ) {}
+    
+    void processTransportEvent(MillisecondTime , TransportState ) {}
+    
+    void processBeatTimeEvent(MillisecondTime , BeatTime ) {}
+    
+    void onSampleRateChanged(double ) {}
+    
+    void processTimeSignatureEvent(MillisecondTime , int , int ) {}
+    
+    void setParameterValue(ParameterIndex , ParameterValue , MillisecondTime ) {}
+    
+    void processParameterEvent(ParameterIndex index, ParameterValue value, MillisecondTime time) {
+        this->setParameterValue(index, value, time);
+    }
+    
+    void processNormalizedParameterEvent(ParameterIndex index, ParameterValue value, MillisecondTime time) {
+        this->setParameterValueNormalized(index, value, time);
+    }
+    
+    ParameterValue getParameterValue(ParameterIndex index)  {
+        switch (index) {
+        default:
+            {
+            return 0;
+            }
+        }
+    }
+    
+    ParameterIndex getNumSignalInParameters() const {
+        return 0;
+    }
+    
+    ParameterIndex getNumSignalOutParameters() const {
+        return 0;
+    }
+    
+    ParameterIndex getNumParameters() const {
+        return 0;
+    }
+    
+    ConstCharPointer getParameterName(ParameterIndex index) const {
+        switch (index) {
+        default:
+            {
+            return "bogus";
+            }
+        }
+    }
+    
+    ConstCharPointer getParameterId(ParameterIndex index) const {
+        switch (index) {
+        default:
+            {
+            return "bogus";
+            }
+        }
+    }
+    
+    void getParameterInfo(ParameterIndex , ParameterInfo * ) const {}
+    
+    void sendParameter(ParameterIndex index, bool ignoreValue) {
+        this->getPatcher()->sendParameter(index + this->parameterOffset, ignoreValue);
+    }
+    
+    void setParameterOffset(ParameterIndex offset) {
+        this->parameterOffset = offset;
+    }
+    
+    ParameterValue applyStepsToNormalizedParameterValue(ParameterValue normalizedValue, int steps) const {
+        if (steps == 1) {
+            if (normalizedValue > 0) {
+                normalizedValue = 1.;
+            }
+        } else {
+            ParameterValue oneStep = (number)1. / (steps - 1);
+            ParameterValue numberOfSteps = rnbo_fround(normalizedValue / oneStep * 1 / (number)1) * (number)1;
+            normalizedValue = numberOfSteps * oneStep;
+        }
+    
+        return normalizedValue;
+    }
+    
+    ParameterValue convertToNormalizedParameterValue(ParameterIndex index, ParameterValue value) const {
+        switch (index) {
+        default:
+            {
+            return value;
+            }
+        }
+    }
+    
+    ParameterValue convertFromNormalizedParameterValue(ParameterIndex index, ParameterValue value) const {
+        value = (value < 0 ? 0 : (value > 1 ? 1 : value));
+    
+        switch (index) {
+        default:
+            {
+            return value;
+            }
+        }
+    }
+    
+    ParameterValue constrainParameterValue(ParameterIndex index, ParameterValue value) const {
+        switch (index) {
+        default:
+            {
+            return value;
+            }
+        }
+    }
+    
+    void scheduleParamInit(ParameterIndex index, Index order) {
+        this->getPatcher()->scheduleParamInit(index + this->parameterOffset, order);
+    }
+    
+    void processClockEvent(MillisecondTime , ClockId , bool , ParameterValue ) {}
+    
+    void processOutletAtCurrentTime(EngineLink* , OutletIndex , ParameterValue ) {}
+    
+    void processOutletEvent(
+        EngineLink* sender,
+        OutletIndex index,
+        ParameterValue value,
+        MillisecondTime time
+    ) {
+        this->updateTime(time);
+        this->processOutletAtCurrentTime(sender, index, value);
+    }
+    
+    void processNumMessage(MessageTag tag, MessageTag objectId, MillisecondTime time, number payload) {
+        this->updateTime(time);
+    
+        switch (tag) {
+        case TAG("valin"):
+            {
+            if (TAG("filters/number_obj-45") == objectId)
+                this->numberobj_01_valin_set(payload);
+    
+            if (TAG("filters/number_obj-40") == objectId)
+                this->numberobj_02_valin_set(payload);
+    
+            break;
+            }
+        case TAG("format"):
+            {
+            if (TAG("filters/number_obj-45") == objectId)
+                this->numberobj_01_format_set(payload);
+    
+            if (TAG("filters/number_obj-40") == objectId)
+                this->numberobj_02_format_set(payload);
+    
+            break;
+            }
+        }
+    }
+    
+    void processListMessage(MessageTag , MessageTag , MillisecondTime , const list& ) {}
+    
+    void processBangMessage(MessageTag tag, MessageTag objectId, MillisecondTime time) {
+        this->updateTime(time);
+    
+        switch (tag) {
+        case TAG("bangin"):
+            {
+            if (TAG("filters/button_obj-38") == objectId)
+                this->button_01_bangin_bang();
+    
+            break;
+            }
+        }
+    }
+    
+    MessageTagInfo resolveTag(MessageTag tag) const {
+        switch (tag) {
+        case TAG("valout"):
+            {
+            return "valout";
+            }
+        case TAG("filters/number_obj-45"):
+            {
+            return "filters/number_obj-45";
+            }
+        case TAG("setup"):
+            {
+            return "setup";
+            }
+        case TAG("filters/number_obj-40"):
+            {
+            return "filters/number_obj-40";
+            }
+        case TAG("bangout"):
+            {
+            return "bangout";
+            }
+        case TAG("filters/button_obj-38"):
+            {
+            return "filters/button_obj-38";
+            }
+        case TAG("valin"):
+            {
+            return "valin";
+            }
+        case TAG("format"):
+            {
+            return "format";
+            }
+        case TAG("bangin"):
+            {
+            return "bangin";
+            }
+        }
+    
+        return nullptr;
+    }
+    
+    DataRef* getDataRef(DataRefIndex index)  {
+        switch (index) {
+        default:
+            {
+            return nullptr;
+            }
+        }
+    }
+    
+    DataRefIndex getNumDataRefs() const {
+        return 0;
+    }
+    
+    void fillDataRef(DataRefIndex , DataRef& ) {}
+    
+    void processDataViewUpdate(DataRefIndex , MillisecondTime ) {}
+    
+    void initialize() {
+        this->assign_defaults();
+        this->setState();
+    }
+    
+    protected:
+    
+    void numberobj_01_valin_set(number v) {
+        this->numberobj_01_value_set(v);
+    }
+    
+    void numberobj_01_format_set(number v) {
+        this->numberobj_01_currentFormat = trunc((v > 6 ? 6 : (v < 0 ? 0 : v)));
+    }
+    
+    void eventinlet_01_out1_bang_bang() {
+        this->numberobj_01_value_bang();
+    }
+    
+    void eventinlet_01_out1_list_set(const list& v) {
+        {
+            number converted = (v->length > 0 ? v[0] : 0);
+            this->numberobj_01_value_set(converted);
+        }
+    }
+    
+    void numberobj_02_valin_set(number v) {
+        this->numberobj_02_value_set(v);
+    }
+    
+    void numberobj_02_format_set(number v) {
+        this->numberobj_02_currentFormat = trunc((v > 6 ? 6 : (v < 0 ? 0 : v)));
+    }
+    
+    void eventinlet_02_out1_bang_bang() {
+        this->numberobj_02_value_bang();
+    }
+    
+    void eventinlet_02_out1_list_set(const list& v) {
+        {
+            number converted = (v->length > 0 ? v[0] : 0);
+            this->numberobj_02_value_set(converted);
+        }
+    }
+    
+    void button_01_bangin_bang() {
+        this->button_01_bangval_bang();
+    }
+    
+    number msToSamps(MillisecondTime ms, number sampleRate) {
+        return ms * sampleRate * 0.001;
+    }
+    
+    MillisecondTime sampsToMs(SampleIndex samps) {
+        return samps * (this->invsr * 1000);
+    }
+    
+    Index getMaxBlockSize() const {
+        return this->maxvs;
+    }
+    
+    number getSampleRate() const {
+        return this->sr;
+    }
+    
+    bool hasFixedVectorSize() const {
+        return false;
+    }
+    
+    Index getNumInputChannels() const {
+        return 2;
+    }
+    
+    Index getNumOutputChannels() const {
+        return 2;
+    }
+    
+    void initializeObjects() {
+        this->numberobj_01_init();
+        this->numberobj_02_init();
+    }
+    
+    void sendOutlet(OutletIndex index, ParameterValue value) {
+        this->getEngine()->sendOutlet(this, index, value);
+    }
+    
+    void startup() {}
+    
+    void allocateDataRefs() {}
+    
+    void lores_02_cutoff_set(number v) {
+        this->lores_02_cutoff = v;
+    }
+    
+    void lores_01_cutoff_set(number v) {
+        this->lores_01_cutoff = v;
+    }
+    
+    void numberobj_01_output_set(number v) {
+        this->lores_02_cutoff_set(v);
+        this->lores_01_cutoff_set(v);
+    }
+    
+    void numberobj_01_value_set(number v) {
+        this->numberobj_01_value_setter(v);
+        v = this->numberobj_01_value;
+        number localvalue = v;
+    
+        if (this->numberobj_01_currentFormat != 6) {
+            localvalue = trunc(localvalue);
+        }
+    
+        this->getEngine()->sendNumMessage(
+            TAG("valout"),
+            TAG("filters/number_obj-45"),
+            localvalue,
+            this->_currentTime
+        );
+    
+        this->numberobj_01_output_set(localvalue);
+    }
+    
+    void eventinlet_01_out1_number_set(number v) {
+        this->numberobj_01_value_set(v);
+    }
+    
+    void lores_02_resonance_set(number v) {
+        this->lores_02_resonance_setter(v);
+        v = this->lores_02_resonance;
+    }
+    
+    void lores_01_resonance_set(number v) {
+        this->lores_01_resonance_setter(v);
+        v = this->lores_01_resonance;
+    }
+    
+    void numberobj_02_output_set(number v) {
+        this->lores_02_resonance_set(v);
+        this->lores_01_resonance_set(v);
+    }
+    
+    void numberobj_02_value_set(number v) {
+        this->numberobj_02_value_setter(v);
+        v = this->numberobj_02_value;
+        number localvalue = v;
+    
+        if (this->numberobj_02_currentFormat != 6) {
+            localvalue = trunc(localvalue);
+        }
+    
+        this->getEngine()->sendNumMessage(
+            TAG("valout"),
+            TAG("filters/number_obj-40"),
+            localvalue,
+            this->_currentTime
+        );
+    
+        this->numberobj_02_output_set(localvalue);
+    }
+    
+    void eventinlet_02_out1_number_set(number v) {
+        this->numberobj_02_value_set(v);
+    }
+    
+    void numberobj_01_value_bang() {
+        number v = this->numberobj_01_value;
+        number localvalue = v;
+    
+        if (this->numberobj_01_currentFormat != 6) {
+            localvalue = trunc(localvalue);
+        }
+    
+        this->getEngine()->sendNumMessage(
+            TAG("valout"),
+            TAG("filters/number_obj-45"),
+            localvalue,
+            this->_currentTime
+        );
+    
+        this->numberobj_01_output_set(localvalue);
+    }
+    
+    void numberobj_02_value_bang() {
+        number v = this->numberobj_02_value;
+        number localvalue = v;
+    
+        if (this->numberobj_02_currentFormat != 6) {
+            localvalue = trunc(localvalue);
+        }
+    
+        this->getEngine()->sendNumMessage(
+            TAG("valout"),
+            TAG("filters/number_obj-40"),
+            localvalue,
+            this->_currentTime
+        );
+    
+        this->numberobj_02_output_set(localvalue);
+    }
+    
+    void lores_01_clear_bang() {
+        this->lores_01_reset();
+    }
+    
+    void lores_02_clear_bang() {
+        this->lores_02_reset();
+    }
+    
+    void button_01_output_bang() {
+        this->lores_01_clear_bang();
+        this->lores_02_clear_bang();
+    }
+    
+    void button_01_bangval_bang() {
+        this->getEngine()->sendBangMessage(TAG("bangout"), TAG("filters/button_obj-38"), this->_currentTime);;
+        this->button_01_output_bang();
+    }
+    
+    void lores_01_perform(
+        number cutoff,
+        number resonance,
+        const SampleValue * input,
+        SampleValue * out,
+        Index n
+    ) {
+        auto __lores_01_y_2 = this->lores_01_y_2;
+        auto __lores_01_y_1 = this->lores_01_y_1;
+        auto __lores_01_x_0 = this->lores_01_x_0;
+        auto __lores_01_b_0 = this->lores_01_b_0;
+        auto __lores_01_a_1 = this->lores_01_a_1;
+        auto __lores_01_a_2 = this->lores_01_a_2;
+        auto __lores_01_last_freq_calc = this->lores_01_last_freq_calc;
+        auto __lores_01_last_res_calc = this->lores_01_last_res_calc;
+        auto __lores_01_last_frequency = this->lores_01_last_frequency;
+        auto __lores_01_last_resonance = this->lores_01_last_resonance;
+    
+        for (Index i = 0; i < n; i++) {
+            if (resonance != __lores_01_last_resonance || cutoff != __lores_01_last_frequency) {
+                __lores_01_last_res_calc = rnbo_exp(resonance * 0.125) * 0.882497;
+                __lores_01_last_freq_calc = rnbo_cos(2.0 * pi01() / this->sr * cutoff);
+                __lores_01_last_resonance = resonance;
+                __lores_01_last_frequency = cutoff;
+            }
+    
+            number res_temp = __lores_01_last_res_calc;
+            number freq_temp = __lores_01_last_freq_calc;
+            __lores_01_a_2 = res_temp * res_temp;
+            __lores_01_a_1 = -2.0 * res_temp * freq_temp;
+            __lores_01_b_0 = 1.0 + __lores_01_a_1 + __lores_01_a_2;
+            __lores_01_x_0 = input[(Index)i];
+            number y_0 = __lores_01_x_0 * __lores_01_b_0 - __lores_01_y_1 * __lores_01_a_1 - __lores_01_y_2 * __lores_01_a_2;
+            __lores_01_y_2 = __lores_01_y_1;
+            __lores_01_y_1 = y_0;
+            out[(Index)i] = y_0;
+        }
+    
+        this->lores_01_last_resonance = __lores_01_last_resonance;
+        this->lores_01_last_frequency = __lores_01_last_frequency;
+        this->lores_01_last_res_calc = __lores_01_last_res_calc;
+        this->lores_01_last_freq_calc = __lores_01_last_freq_calc;
+        this->lores_01_a_2 = __lores_01_a_2;
+        this->lores_01_a_1 = __lores_01_a_1;
+        this->lores_01_b_0 = __lores_01_b_0;
+        this->lores_01_x_0 = __lores_01_x_0;
+        this->lores_01_y_1 = __lores_01_y_1;
+        this->lores_01_y_2 = __lores_01_y_2;
+    }
+    
+    void lores_02_perform(
+        number cutoff,
+        number resonance,
+        const SampleValue * input,
+        SampleValue * out,
+        Index n
+    ) {
+        auto __lores_02_y_2 = this->lores_02_y_2;
+        auto __lores_02_y_1 = this->lores_02_y_1;
+        auto __lores_02_x_0 = this->lores_02_x_0;
+        auto __lores_02_b_0 = this->lores_02_b_0;
+        auto __lores_02_a_1 = this->lores_02_a_1;
+        auto __lores_02_a_2 = this->lores_02_a_2;
+        auto __lores_02_last_freq_calc = this->lores_02_last_freq_calc;
+        auto __lores_02_last_res_calc = this->lores_02_last_res_calc;
+        auto __lores_02_last_frequency = this->lores_02_last_frequency;
+        auto __lores_02_last_resonance = this->lores_02_last_resonance;
+    
+        for (Index i = 0; i < n; i++) {
+            if (resonance != __lores_02_last_resonance || cutoff != __lores_02_last_frequency) {
+                __lores_02_last_res_calc = rnbo_exp(resonance * 0.125) * 0.882497;
+                __lores_02_last_freq_calc = rnbo_cos(2.0 * pi01() / this->sr * cutoff);
+                __lores_02_last_resonance = resonance;
+                __lores_02_last_frequency = cutoff;
+            }
+    
+            number res_temp = __lores_02_last_res_calc;
+            number freq_temp = __lores_02_last_freq_calc;
+            __lores_02_a_2 = res_temp * res_temp;
+            __lores_02_a_1 = -2.0 * res_temp * freq_temp;
+            __lores_02_b_0 = 1.0 + __lores_02_a_1 + __lores_02_a_2;
+            __lores_02_x_0 = input[(Index)i];
+            number y_0 = __lores_02_x_0 * __lores_02_b_0 - __lores_02_y_1 * __lores_02_a_1 - __lores_02_y_2 * __lores_02_a_2;
+            __lores_02_y_2 = __lores_02_y_1;
+            __lores_02_y_1 = y_0;
+            out[(Index)i] = y_0;
+        }
+    
+        this->lores_02_last_resonance = __lores_02_last_resonance;
+        this->lores_02_last_frequency = __lores_02_last_frequency;
+        this->lores_02_last_res_calc = __lores_02_last_res_calc;
+        this->lores_02_last_freq_calc = __lores_02_last_freq_calc;
+        this->lores_02_a_2 = __lores_02_a_2;
+        this->lores_02_a_1 = __lores_02_a_1;
+        this->lores_02_b_0 = __lores_02_b_0;
+        this->lores_02_x_0 = __lores_02_x_0;
+        this->lores_02_y_1 = __lores_02_y_1;
+        this->lores_02_y_2 = __lores_02_y_2;
+    }
+    
+    void stackprotect_perform(Index n) {
+        RNBO_UNUSED(n);
+        auto __stackprotect_count = this->stackprotect_count;
+        __stackprotect_count = 0;
+        this->stackprotect_count = __stackprotect_count;
+    }
+    
+    void lores_01_resonance_setter(number v) {
+        if (v < 0.0) {
+            v = 0.0;
+        } else if (v >= 1.0) {
+            v = 1.0 - 1E-20;
+        }
+    
+        this->lores_01_resonance = v;
+    }
+    
+    void lores_02_resonance_setter(number v) {
+        if (v < 0.0) {
+            v = 0.0;
+        } else if (v >= 1.0) {
+            v = 1.0 - 1E-20;
+        }
+    
+        this->lores_02_resonance = v;
+    }
+    
+    void numberobj_01_value_setter(number v) {
+        number localvalue = v;
+    
+        if (this->numberobj_01_currentFormat != 6) {
+            localvalue = trunc(localvalue);
+        }
+    
+        this->numberobj_01_value = localvalue;
+    }
+    
+    void numberobj_02_value_setter(number v) {
+        number localvalue = v;
+    
+        if (this->numberobj_02_currentFormat != 6) {
+            localvalue = trunc(localvalue);
+        }
+    
+        this->numberobj_02_value = localvalue;
+    }
+    
+    void lores_01_reset() {
+        this->lores_01_y_1 = 0;
+        this->lores_01_y_2 = 0;
+        this->lores_01_last_resonance = 0;
+        this->lores_01_last_frequency = 0;
+        this->lores_01_last_res_calc = 0;
+        this->lores_01_last_freq_calc = 0;
+    }
+    
+    void lores_01_dspsetup(bool force) {
+        if ((bool)(this->lores_01_setupDone) && (bool)(!(bool)(force)))
+            return;
+    
+        this->lores_01_reset();
+        this->lores_01_setupDone = true;
+    }
+    
+    void lores_02_reset() {
+        this->lores_02_y_1 = 0;
+        this->lores_02_y_2 = 0;
+        this->lores_02_last_resonance = 0;
+        this->lores_02_last_frequency = 0;
+        this->lores_02_last_res_calc = 0;
+        this->lores_02_last_freq_calc = 0;
+    }
+    
+    void lores_02_dspsetup(bool force) {
+        if ((bool)(this->lores_02_setupDone) && (bool)(!(bool)(force)))
+            return;
+    
+        this->lores_02_reset();
+        this->lores_02_setupDone = true;
+    }
+    
+    void numberobj_01_init() {
+        this->numberobj_01_currentFormat = 6;
+        this->getEngine()->sendNumMessage(TAG("setup"), TAG("filters/number_obj-45"), 1, this->_currentTime);
+    }
+    
+    void numberobj_01_getPresetValue(PatcherStateInterface& preset) {
+        preset["value"] = this->numberobj_01_value;
+    }
+    
+    void numberobj_01_setPresetValue(PatcherStateInterface& preset) {
+        if ((bool)(stateIsEmpty(preset)))
+            return;
+    
+        this->numberobj_01_value_set(preset["value"]);
+    }
+    
+    void numberobj_02_init() {
+        this->numberobj_02_currentFormat = 6;
+        this->getEngine()->sendNumMessage(TAG("setup"), TAG("filters/number_obj-40"), 1, this->_currentTime);
+    }
+    
+    void numberobj_02_getPresetValue(PatcherStateInterface& preset) {
+        preset["value"] = this->numberobj_02_value;
+    }
+    
+    void numberobj_02_setPresetValue(PatcherStateInterface& preset) {
+        if ((bool)(stateIsEmpty(preset)))
+            return;
+    
+        this->numberobj_02_value_set(preset["value"]);
+    }
+    
+    bool stackprotect_check() {
+        this->stackprotect_count++;
+    
+        if (this->stackprotect_count > 128) {
+            console->log("STACK OVERFLOW DETECTED - stopped processing branch !");
+            return true;
+        }
+    
+        return false;
+    }
+    
+    void updateTime(MillisecondTime time) {
+        this->_currentTime = time;
+        this->sampleOffsetIntoNextAudioBuffer = (SampleIndex)(rnbo_fround(this->msToSamps(time - this->getEngine()->getCurrentTime(), this->sr)));
+    
+        if (this->sampleOffsetIntoNextAudioBuffer >= (SampleIndex)(this->vs))
+            this->sampleOffsetIntoNextAudioBuffer = (SampleIndex)(this->vs) - 1;
+    
+        if (this->sampleOffsetIntoNextAudioBuffer < 0)
+            this->sampleOffsetIntoNextAudioBuffer = 0;
+    }
+    
+    void assign_defaults()
+    {
+        lores_01_cutoff = 200;
+        lores_01_resonance = 0.75;
+        lores_01_resonance_setter(lores_01_resonance);
+        lores_02_cutoff = 200;
+        lores_02_resonance = 0.75;
+        lores_02_resonance_setter(lores_02_resonance);
+        numberobj_01_value = 0;
+        numberobj_01_value_setter(numberobj_01_value);
+        numberobj_02_value = 0;
+        numberobj_02_value_setter(numberobj_02_value);
+        _currentTime = 0;
+        audioProcessSampleCount = 0;
+        sampleOffsetIntoNextAudioBuffer = 0;
+        zeroBuffer = nullptr;
+        dummyBuffer = nullptr;
+        didAllocateSignals = 0;
+        vs = 0;
+        maxvs = 0;
+        sr = 44100;
+        invsr = 0.00002267573696;
+        lores_01_setupDone = false;
+        lores_02_setupDone = false;
+        numberobj_01_currentFormat = 6;
+        numberobj_01_lastValue = 0;
+        numberobj_02_currentFormat = 6;
+        numberobj_02_lastValue = 0;
+        stackprotect_count = 0;
+        _voiceIndex = 0;
+        _noteNumber = 0;
+        isMuted = 1;
+        parameterOffset = 0;
+    }
+    
+    // member variables
+    
+        number lores_01_cutoff;
+        number lores_01_resonance;
+        number lores_02_cutoff;
+        number lores_02_resonance;
+        number numberobj_01_value;
+        number numberobj_02_value;
+        MillisecondTime _currentTime;
+        SampleIndex audioProcessSampleCount;
+        SampleIndex sampleOffsetIntoNextAudioBuffer;
+        signal zeroBuffer;
+        signal dummyBuffer;
+        bool didAllocateSignals;
+        Index vs;
+        Index maxvs;
+        number sr;
+        number invsr;
+        number lores_01_b_0;
+        number lores_01_a_1;
+        number lores_01_a_2;
+        number lores_01_x_0;
+        number lores_01_y_1;
+        number lores_01_y_2;
+        number lores_01_last_resonance;
+        number lores_01_last_frequency;
+        number lores_01_last_res_calc;
+        number lores_01_last_freq_calc;
+        bool lores_01_setupDone;
+        number lores_02_b_0;
+        number lores_02_a_1;
+        number lores_02_a_2;
+        number lores_02_x_0;
+        number lores_02_y_1;
+        number lores_02_y_2;
+        number lores_02_last_resonance;
+        number lores_02_last_frequency;
+        number lores_02_last_res_calc;
+        number lores_02_last_freq_calc;
+        bool lores_02_setupDone;
+        Int numberobj_01_currentFormat;
+        number numberobj_01_lastValue;
+        Int numberobj_02_currentFormat;
+        number numberobj_02_lastValue;
+        number stackprotect_count;
+        Index _voiceIndex;
+        Int _noteNumber;
+        Index isMuted;
+        ParameterIndex parameterOffset;
+    
+};
+
 rnbomatic()
 {
 }
 
 ~rnbomatic()
 {
+    delete this->p_01;
 }
 
 rnbomatic* getTopLevelPatcher() {
@@ -155,7 +1044,7 @@ MillisecondTime currenttime() {
 }
 
 number tempo() {
-    return this->getTopLevelPatcher()->globaltransport_getTempo();
+    return this->getTopLevelPatcher()->globaltransport_getTempo(this->currenttime());
 }
 
 number mstobeats(number ms) {
@@ -167,13 +1056,16 @@ MillisecondTime sampstoms(number samps) {
 }
 
 Index getNumMidiInputPorts() const {
-    return 0;
+    return 1;
 }
 
-void processMidiEvent(MillisecondTime , int , ConstByteArray , Index ) {}
+void processMidiEvent(MillisecondTime time, int port, ConstByteArray data, Index length) {
+    this->updateTime(time);
+    this->notein_01_midihandler(data[0] & 240, (data[0] & 15) + 1, port, data, length);
+}
 
 Index getNumMidiOutputPorts() const {
-    return 0;
+    return 1;
 }
 
 void process(
@@ -252,8 +1144,18 @@ void process(
         n
     );
 
-    this->signaladder_01_perform(in1, this->signals[0], this->signals[1], out1, n);
-    this->signaladder_02_perform(in2, this->signals[0], this->signals[1], out2, n);
+    this->p_01_perform(in1, in2, this->signals[3], this->signals[2], n);
+    this->signaladder_01_perform(this->signals[3], this->signals[0], this->signals[1], out1, n);
+    this->signaladder_02_perform(this->signals[2], this->signals[0], this->signals[1], out2, n);
+
+    this->lores_03_perform(
+        this->lores_03_cutoff,
+        this->lores_03_resonance,
+        this->zeroBuffer,
+        this->dummyBuffer,
+        n
+    );
+
     this->stackprotect_perform(n);
     this->globaltransport_advance();
     this->audioProcessSampleCount += this->vs;
@@ -289,7 +1191,9 @@ void prepareToProcess(number sampleRate, Index maxBlockSize, bool force) {
     this->cycle_tilde_02_dspsetup(forceDSPSetup);
     this->data_01_dspsetup(forceDSPSetup);
     this->groove_01_dspsetup(forceDSPSetup);
+    this->lores_03_dspsetup(forceDSPSetup);
     this->globaltransport_dspsetup(forceDSPSetup);
+    this->p_01->prepareToProcess(sampleRate, maxBlockSize, force);
 
     if (sampleRateChanged)
         this->onSampleRateChanged(sampleRate);
@@ -374,6 +1278,8 @@ void processDataViewUpdate(DataRefIndex index, MillisecondTime time) {
         this->data_01_bufferUpdated();
         this->groove_01_buffer = new Float32Buffer(this->rnbuff1);
     }
+
+    this->p_01->processDataViewUpdate(index, time);
 }
 
 void initialize() {
@@ -406,7 +1312,12 @@ Index getPatcherSerial() const {
 
 void getState(PatcherStateInterface& ) {}
 
-void setState() {}
+void setState() {
+    this->p_01 = new RNBOSubpatcher_33();
+    this->p_01->setEngineAndPatcher(this->getEngine(), this);
+    this->p_01->initialize();
+    this->p_01->setParameterOffset(this->getParameterOffset(this->p_01));
+}
 
 void getPreset(PatcherStateInterface& preset) {
     preset["__presetid"] = "rnbo";
@@ -415,6 +1326,9 @@ void getPreset(PatcherStateInterface& preset) {
     this->param_03_getPresetValue(getSubState(preset, "vol1"));
     this->param_04_getPresetValue(getSubState(preset, "vol2"));
     this->param_05_getPresetValue(getSubState(preset, "play"));
+    this->param_06_getPresetValue(getSubState(preset, "cutoff"));
+    this->param_07_getPresetValue(getSubState(preset, "resonance"));
+    this->p_01->getPreset(getSubState(getSubState(preset, "__sps"), "filters"));
 }
 
 void setPreset(MillisecondTime time, PatcherStateInterface& preset) {
@@ -424,27 +1338,32 @@ void setPreset(MillisecondTime time, PatcherStateInterface& preset) {
     this->param_03_setPresetValue(getSubState(preset, "vol1"));
     this->param_04_setPresetValue(getSubState(preset, "vol2"));
     this->param_05_setPresetValue(getSubState(preset, "play"));
+    this->param_06_setPresetValue(getSubState(preset, "cutoff"));
+    this->param_07_setPresetValue(getSubState(preset, "resonance"));
 }
 
 void processTempoEvent(MillisecondTime time, Tempo tempo) {
     this->updateTime(time);
 
-    if (this->globaltransport_setTempo(tempo, false))
-        {}
+    if (this->globaltransport_setTempo(this->_currentTime, tempo, false)) {
+        this->p_01->processTempoEvent(time, tempo);
+    }
 }
 
 void processTransportEvent(MillisecondTime time, TransportState state) {
     this->updateTime(time);
 
-    if (this->globaltransport_setState(state, false))
-        {}
+    if (this->globaltransport_setState(this->_currentTime, state, false)) {
+        this->p_01->processTransportEvent(time, state);
+    }
 }
 
 void processBeatTimeEvent(MillisecondTime time, BeatTime beattime) {
     this->updateTime(time);
 
-    if (this->globaltransport_setBeatTime(beattime, false))
-        {}
+    if (this->globaltransport_setBeatTime(this->_currentTime, beattime, false)) {
+        this->p_01->processBeatTimeEvent(time, beattime);
+    }
 }
 
 void onSampleRateChanged(double ) {}
@@ -452,8 +1371,9 @@ void onSampleRateChanged(double ) {}
 void processTimeSignatureEvent(MillisecondTime time, int numerator, int denominator) {
     this->updateTime(time);
 
-    if (this->globaltransport_setTimeSignature(numerator, denominator, false))
-        {}
+    if (this->globaltransport_setTimeSignature(this->_currentTime, numerator, denominator, false)) {
+        this->p_01->processTimeSignatureEvent(time, numerator, denominator);
+    }
 }
 
 void setParameterValue(ParameterIndex index, ParameterValue v, MillisecondTime time) {
@@ -483,6 +1403,25 @@ void setParameterValue(ParameterIndex index, ParameterValue v, MillisecondTime t
     case 4:
         {
         this->param_05_value_set(v);
+        break;
+        }
+    case 5:
+        {
+        this->param_06_value_set(v);
+        break;
+        }
+    case 6:
+        {
+        this->param_07_value_set(v);
+        break;
+        }
+    default:
+        {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            this->p_01->setParameterValue(index, v, time);
+
         break;
         }
     }
@@ -518,8 +1457,21 @@ ParameterValue getParameterValue(ParameterIndex index)  {
         {
         return this->param_05_value;
         }
+    case 5:
+        {
+        return this->param_06_value;
+        }
+    case 6:
+        {
+        return this->param_07_value;
+        }
     default:
         {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            return this->p_01->getParameterValue(index);
+
         return 0;
         }
     }
@@ -534,7 +1486,7 @@ ParameterIndex getNumSignalOutParameters() const {
 }
 
 ParameterIndex getNumParameters() const {
-    return 5;
+    return 7 + this->p_01->getNumParameters();
 }
 
 ConstCharPointer getParameterName(ParameterIndex index) const {
@@ -559,8 +1511,21 @@ ConstCharPointer getParameterName(ParameterIndex index) const {
         {
         return "play";
         }
+    case 5:
+        {
+        return "cutoff";
+        }
+    case 6:
+        {
+        return "resonance";
+        }
     default:
         {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            return this->p_01->getParameterName(index);
+
         return "bogus";
         }
     }
@@ -588,8 +1553,21 @@ ConstCharPointer getParameterId(ParameterIndex index) const {
         {
         return "play";
         }
+    case 5:
+        {
+        return "cutoff";
+        }
+    case 6:
+        {
+        return "resonance";
+        }
     default:
         {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            return this->p_01->getParameterId(index);
+
         return "bogus";
         }
     }
@@ -693,12 +1671,66 @@ void getParameterInfo(ParameterIndex index, ParameterInfo * info) const {
             info->signalIndex = INVALID_INDEX;
             break;
             }
+        case 5:
+            {
+            info->type = ParameterTypeNumber;
+            info->initialValue = 0;
+            info->min = 0;
+            info->max = 2000;
+            info->exponent = 1;
+            info->steps = 0;
+            info->debug = false;
+            info->saveable = true;
+            info->transmittable = true;
+            info->initialized = true;
+            info->visible = true;
+            info->displayName = "Cutoff";
+            info->unit = "";
+            info->ioType = IOTypeUndefined;
+            info->signalIndex = INVALID_INDEX;
+            break;
+            }
+        case 6:
+            {
+            info->type = ParameterTypeNumber;
+            info->initialValue = 0.5;
+            info->min = 0;
+            info->max = 1;
+            info->exponent = 1;
+            info->steps = 0;
+            info->debug = false;
+            info->saveable = true;
+            info->transmittable = true;
+            info->initialized = true;
+            info->visible = true;
+            info->displayName = "Resonance";
+            info->unit = "";
+            info->ioType = IOTypeUndefined;
+            info->signalIndex = INVALID_INDEX;
+            break;
+            }
+        default:
+            {
+            index -= 7;
+
+            if (index < this->p_01->getNumParameters())
+                this->p_01->getParameterInfo(index, info);
+
+            break;
+            }
         }
     }
 }
 
 void sendParameter(ParameterIndex index, bool ignoreValue) {
     this->getEngine()->notifyParameterValueChanged(index, (ignoreValue ? 0 : this->getParameterValue(index)), ignoreValue);
+}
+
+ParameterIndex getParameterOffset(BaseInterface* subpatcher) const {
+    if (subpatcher == this->p_01)
+        return 7;
+
+    return 0;
 }
 
 ParameterValue applyStepsToNormalizedParameterValue(ParameterValue normalizedValue, int steps) const {
@@ -717,6 +1749,22 @@ ParameterValue applyStepsToNormalizedParameterValue(ParameterValue normalizedVal
 
 ParameterValue convertToNormalizedParameterValue(ParameterIndex index, ParameterValue value) const {
     switch (index) {
+    case 6:
+        {
+        {
+            value = (value < 0 ? 0 : (value > 1 ? 1 : value));
+            ParameterValue normalizedValue = (value - 0) / (1 - 0);
+            return normalizedValue;
+        }
+        }
+    case 5:
+        {
+        {
+            value = (value < 0 ? 0 : (value > 2000 ? 2000 : value));
+            ParameterValue normalizedValue = (value - 0) / (2000 - 0);
+            return normalizedValue;
+        }
+        }
     case 2:
     case 3:
         {
@@ -750,6 +1798,11 @@ ParameterValue convertToNormalizedParameterValue(ParameterIndex index, Parameter
         }
     default:
         {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            return this->p_01->convertToNormalizedParameterValue(index, value);
+
         return value;
         }
     }
@@ -759,6 +1812,26 @@ ParameterValue convertFromNormalizedParameterValue(ParameterIndex index, Paramet
     value = (value < 0 ? 0 : (value > 1 ? 1 : value));
 
     switch (index) {
+    case 6:
+        {
+        {
+            value = (value < 0 ? 0 : (value > 1 ? 1 : value));
+
+            {
+                return 0 + value * (1 - 0);
+            }
+        }
+        }
+    case 5:
+        {
+        {
+            value = (value < 0 ? 0 : (value > 1 ? 1 : value));
+
+            {
+                return 0 + value * (2000 - 0);
+            }
+        }
+        }
     case 2:
     case 3:
         {
@@ -793,6 +1866,11 @@ ParameterValue convertFromNormalizedParameterValue(ParameterIndex index, Paramet
         }
     default:
         {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            return this->p_01->convertFromNormalizedParameterValue(index, value);
+
         return value;
         }
     }
@@ -820,8 +1898,21 @@ ParameterValue constrainParameterValue(ParameterIndex index, ParameterValue valu
         {
         return this->param_05_value_constrain(value);
         }
+    case 5:
+        {
+        return this->param_06_value_constrain(value);
+        }
+    case 6:
+        {
+        return this->param_07_value_constrain(value);
+        }
     default:
         {
+        index -= 7;
+
+        if (index < this->p_01->getNumParameters())
+            return this->p_01->constrainParameterValue(index, value);
+
         return value;
         }
     }
@@ -875,6 +1966,8 @@ void processNumMessage(MessageTag tag, MessageTag objectId, MillisecondTime time
         break;
         }
     }
+
+    this->p_01->processNumMessage(tag, objectId, time, payload);
 }
 
 void processListMessage(
@@ -893,6 +1986,8 @@ void processListMessage(
         break;
         }
     }
+
+    this->p_01->processListMessage(tag, objectId, time, payload);
 }
 
 void processBangMessage(MessageTag tag, MessageTag objectId, MillisecondTime time) {
@@ -906,6 +2001,8 @@ void processBangMessage(MessageTag tag, MessageTag objectId, MillisecondTime tim
         break;
         }
     }
+
+    this->p_01->processBangMessage(tag, objectId, time);
 }
 
 MessageTagInfo resolveTag(MessageTag tag) const {
@@ -919,6 +2016,11 @@ MessageTagInfo resolveTag(MessageTag tag) const {
         return "";
         }
     }
+
+    auto subpatchResult_0 = this->p_01->resolveTag(tag);
+
+    if (subpatchResult_0)
+        return subpatchResult_0;
 
     return "";
 }
@@ -1010,6 +2112,32 @@ void param_05_value_set(number v) {
     this->trigger_01_input_number_set(v);
 }
 
+void param_06_value_set(number v) {
+    v = this->param_06_value_constrain(v);
+    this->param_06_value = v;
+    this->sendParameter(5, false);
+
+    if (this->param_06_value != this->param_06_lastValue) {
+        this->getEngine()->presetTouched();
+        this->param_06_lastValue = this->param_06_value;
+    }
+
+    this->p_01_in3_number_set(v);
+}
+
+void param_07_value_set(number v) {
+    v = this->param_07_value_constrain(v);
+    this->param_07_value = v;
+    this->sendParameter(6, false);
+
+    if (this->param_07_value != this->param_07_lastValue) {
+        this->getEngine()->presetTouched();
+        this->param_07_lastValue = this->param_07_value;
+    }
+
+    this->p_01_in4_number_set(v);
+}
+
 void inport_01_value_bang_bang() {
     this->inport_01_out_bang_bang();
 }
@@ -1051,6 +2179,7 @@ Index getNumOutputChannels() const {
 }
 
 void allocateDataRefs() {
+    this->p_01->allocateDataRefs();
     this->cycle_tilde_01_buffer->requestSize(16384, 1);
     this->cycle_tilde_01_buffer->setSampleRate(this->sr);
     this->cycle_tilde_02_buffer->requestSize(16384, 1);
@@ -1078,6 +2207,7 @@ void allocateDataRefs() {
 
 void initializeObjects() {
     this->data_01_init();
+    this->p_01->initializeObjects();
 }
 
 void sendOutlet(OutletIndex index, ParameterValue value) {
@@ -1086,6 +2216,7 @@ void sendOutlet(OutletIndex index, ParameterValue value) {
 
 void startup() {
     this->updateTime(this->getEngine()->getCurrentTime());
+    this->p_01->startup();
 
     {
         this->scheduleParamInit(0, 0);
@@ -1101,6 +2232,14 @@ void startup() {
 
     {
         this->scheduleParamInit(3, 0);
+    }
+
+    {
+        this->scheduleParamInit(5, 0);
+    }
+
+    {
+        this->scheduleParamInit(6, 0);
     }
 
     this->processParamInitEvents();
@@ -1167,6 +2306,26 @@ void trigger_01_out1_bang() {
 void trigger_01_input_number_set(number v) {
     this->trigger_01_out2_set(v);
     this->trigger_01_out1_bang();
+}
+
+static number param_06_value_constrain(number v) {
+    v = (v > 2000 ? 2000 : (v < 0 ? 0 : v));
+    return v;
+}
+
+void p_01_in3_number_set(number v) {
+    this->p_01->updateTime(this->_currentTime);
+    this->p_01->eventinlet_01_out1_number_set(v);
+}
+
+static number param_07_value_constrain(number v) {
+    v = (v > 1 ? 1 : (v < 0 ? 0 : v));
+    return v;
+}
+
+void p_01_in4_number_set(number v) {
+    this->p_01->updateTime(this->_currentTime);
+    this->p_01->eventinlet_02_out1_number_set(v);
 }
 
 void unpack_01_out5_bang() {
@@ -1259,6 +2418,74 @@ void inport_01_out_list_set(const list& v) {
     this->unpack_01_input_list_set(v);
 }
 
+void noteout_01_channel_set(number v) {
+    this->noteout_01_channel = v;
+}
+
+void notein_01_outchannel_set(number v) {
+    this->noteout_01_channel_set(v);
+}
+
+void noteout_01_releasevelocity_set(number v) {
+    this->noteout_01_releasevelocity = v;
+}
+
+void notein_01_releasevelocity_set(number v) {
+    this->noteout_01_releasevelocity_set(v);
+}
+
+void noteout_01_velocity_set(number v) {
+    this->noteout_01_velocity = v;
+}
+
+void notein_01_velocity_set(number v) {
+    this->noteout_01_velocity_set(v);
+}
+
+void noteout_01_midiout_set(number ) {}
+
+void noteout_01_notenumber_set(number v) {
+    number off = this->noteout_01_releasevelocity > 0;
+    array<number, 3> r = ((bool)(off) ? this->noteout_01_innerFormat_noterelease(v, this->noteout_01_releasevelocity, this->noteout_01_channel) : this->noteout_01_innerFormat_note(v, this->noteout_01_velocity, this->noteout_01_channel));
+
+    if ((bool)(!(bool)(this->noteout_01_midioutput))) {
+        this->noteout_01_midiout_set(r[0]);
+        this->noteout_01_midiout_set(r[1]);
+        this->noteout_01_midiout_set(r[2]);
+    } else {
+        this->getEngine()->sendMidiEvent(this->noteout_01_port, r[0], r[1], r[2], this->_currentTime);
+    }
+
+    if ((bool)(off)) {
+        this->noteout_01_releasevelocity_set(0);
+    }
+}
+
+void notein_01_notenumber_set(number v) {
+    this->noteout_01_notenumber_set(v);
+}
+
+void notein_01_midihandler(int status, int channel, int port, ConstByteArray data, Index length) {
+    RNBO_UNUSED(length);
+    RNBO_UNUSED(port);
+
+    if (channel == this->notein_01_channel || this->notein_01_channel == 0) {
+        if (status == 144 || status == 128) {
+            this->notein_01_outchannel_set(channel);
+
+            if (status == 128) {
+                this->notein_01_releasevelocity_set(data[2]);
+                this->notein_01_velocity_set(0);
+            } else {
+                this->notein_01_releasevelocity_set(0);
+                this->notein_01_velocity_set(data[2]);
+            }
+
+            this->notein_01_notenumber_set(data[1]);
+        }
+    }
+}
+
 void slide_tilde_01_perform(number x, number up, number down, SampleValue * out1, Index n) {
     RNBO_UNUSED(down);
     RNBO_UNUSED(up);
@@ -1285,6 +2512,7 @@ void cycle_tilde_01_perform(
 ) {
     RNBO_UNUSED(phase_offset);
     auto __cycle_tilde_01_f2i = this->cycle_tilde_01_f2i;
+    auto __cycle_tilde_01_buffer = this->cycle_tilde_01_buffer;
     auto __cycle_tilde_01_phasei = this->cycle_tilde_01_phasei;
     Index i;
 
@@ -1299,9 +2527,9 @@ void cycle_tilde_01_perform(
             }
 
             uint32_t idx = (uint32_t)(uint32_rshift(uint_phase, 18));
-            number frac = ((BinOpInt)((UBinOpInt)uint_phase & (UBinOpInt)262143)) * 3.81471181759574e-6;
-            number y0 = this->cycle_tilde_01_buffer[(Index)idx];
-            number y1 = this->cycle_tilde_01_buffer[(Index)((UBinOpInt)(idx + 1) & (UBinOpInt)16383)];
+            number frac = ((BinOpInt)((BinOpInt)uint_phase & (BinOpInt)262143)) * 3.81471181759574e-6;
+            number y0 = __cycle_tilde_01_buffer[(Index)idx];
+            number y1 = __cycle_tilde_01_buffer[(Index)((BinOpInt)(idx + 1) & (BinOpInt)16383)];
             number y = y0 + frac * (y1 - y0);
 
             {
@@ -1344,6 +2572,7 @@ void cycle_tilde_02_perform(
 ) {
     RNBO_UNUSED(phase_offset);
     auto __cycle_tilde_02_f2i = this->cycle_tilde_02_f2i;
+    auto __cycle_tilde_02_buffer = this->cycle_tilde_02_buffer;
     auto __cycle_tilde_02_phasei = this->cycle_tilde_02_phasei;
     Index i;
 
@@ -1358,9 +2587,9 @@ void cycle_tilde_02_perform(
             }
 
             uint32_t idx = (uint32_t)(uint32_rshift(uint_phase, 18));
-            number frac = ((BinOpInt)((UBinOpInt)uint_phase & (UBinOpInt)262143)) * 3.81471181759574e-6;
-            number y0 = this->cycle_tilde_02_buffer[(Index)idx];
-            number y1 = this->cycle_tilde_02_buffer[(Index)((UBinOpInt)(idx + 1) & (UBinOpInt)16383)];
+            number frac = ((BinOpInt)((BinOpInt)uint_phase & (BinOpInt)262143)) * 3.81471181759574e-6;
+            number y0 = __cycle_tilde_02_buffer[(Index)idx];
+            number y1 = __cycle_tilde_02_buffer[(Index)((BinOpInt)(idx + 1) & (BinOpInt)16383)];
             number y = y0 + frac * (y1 - y0);
 
             {
@@ -1452,15 +2681,16 @@ void groove_01_perform(
     auto __groove_01_readIndex = this->groove_01_readIndex;
     auto __groove_01_incomingChange = this->groove_01_incomingChange;
     auto __groove_01_changeIncomingInSamples = this->groove_01_changeIncomingInSamples;
+    auto __groove_01_buffer = this->groove_01_buffer;
     SampleArray<1> out = {out1};
-    SampleIndex bufferLength = (SampleIndex)(this->groove_01_buffer->getSize());
+    SampleIndex bufferLength = (SampleIndex)(__groove_01_buffer->getSize());
     Index i = 0;
 
     if (bufferLength > 1) {
-        auto effectiveChannels = this->minimum(this->groove_01_buffer->getChannels(), 1);
-        number srMult = 0.001 * this->groove_01_buffer->getSampleRate();
+        auto effectiveChannels = this->minimum(__groove_01_buffer->getChannels(), 1);
+        number srMult = 0.001 * __groove_01_buffer->getSampleRate();
         number srInv = (number)1 / this->samplerate();
-        number rateMult = this->groove_01_buffer->getSampleRate() * srInv;
+        number rateMult = __groove_01_buffer->getSampleRate() * srInv;
 
         for (; i < n; i++) {
             Index channel = 0;
@@ -1517,7 +2747,7 @@ void groove_01_perform(
                         }
 
                         for (; channel < effectiveChannels; channel++) {
-                            number outSample = (currentRate == 1 ? this->groove_01_getSample((Index)(channel), rnbo_trunc(__groove_01_readIndex), offset, bufferLength) : this->groove_01_interpolatedSample(
+                            number outSample = (currentRate == 1 ? this->groove_01_getSample((Index)(channel), trunc(__groove_01_readIndex), offset, bufferLength) : this->groove_01_interpolatedSample(
                                 (Index)(channel),
                                 __groove_01_readIndex,
                                 loopMax,
@@ -1572,6 +2802,20 @@ void groove_01_perform(
     this->groove_01_playStatus = __groove_01_playStatus;
 }
 
+void p_01_perform(
+    const SampleValue * in1,
+    const SampleValue * in2,
+    SampleValue * out1,
+    SampleValue * out2,
+    Index n
+) {
+    // subpatcher: filters
+    ConstSampleArray<2> ins = {in1, in2};
+
+    SampleArray<2> outs = {out1, out2};
+    this->p_01->process(ins, 2, outs, 2, n);
+}
+
 void signaladder_01_perform(
     const SampleValue * in1,
     const SampleValue * in2,
@@ -1600,6 +2844,58 @@ void signaladder_02_perform(
     }
 }
 
+void lores_03_perform(
+    number cutoff,
+    number resonance,
+    const SampleValue * input,
+    SampleValue * out,
+    Index n
+) {
+    RNBO_UNUSED(resonance);
+    RNBO_UNUSED(cutoff);
+    auto __lores_03_y_2 = this->lores_03_y_2;
+    auto __lores_03_y_1 = this->lores_03_y_1;
+    auto __lores_03_x_0 = this->lores_03_x_0;
+    auto __lores_03_b_0 = this->lores_03_b_0;
+    auto __lores_03_a_1 = this->lores_03_a_1;
+    auto __lores_03_a_2 = this->lores_03_a_2;
+    auto __lores_03_last_freq_calc = this->lores_03_last_freq_calc;
+    auto __lores_03_last_res_calc = this->lores_03_last_res_calc;
+    auto __lores_03_last_frequency = this->lores_03_last_frequency;
+    auto __lores_03_last_resonance = this->lores_03_last_resonance;
+
+    for (Index i = 0; i < n; i++) {
+        if (0 != __lores_03_last_resonance || 0 != __lores_03_last_frequency) {
+            __lores_03_last_res_calc = rnbo_exp(0 * 0.125) * 0.882497;
+            __lores_03_last_freq_calc = rnbo_cos(2.0 * pi01() / this->sr * 0);
+            __lores_03_last_resonance = 0;
+            __lores_03_last_frequency = 0;
+        }
+
+        number res_temp = __lores_03_last_res_calc;
+        number freq_temp = __lores_03_last_freq_calc;
+        __lores_03_a_2 = res_temp * res_temp;
+        __lores_03_a_1 = -2.0 * res_temp * freq_temp;
+        __lores_03_b_0 = 1.0 + __lores_03_a_1 + __lores_03_a_2;
+        __lores_03_x_0 = input[(Index)i];
+        number y_0 = __lores_03_x_0 * __lores_03_b_0 - __lores_03_y_1 * __lores_03_a_1 - __lores_03_y_2 * __lores_03_a_2;
+        __lores_03_y_2 = __lores_03_y_1;
+        __lores_03_y_1 = y_0;
+        out[(Index)i] = y_0;
+    }
+
+    this->lores_03_last_resonance = __lores_03_last_resonance;
+    this->lores_03_last_frequency = __lores_03_last_frequency;
+    this->lores_03_last_res_calc = __lores_03_last_res_calc;
+    this->lores_03_last_freq_calc = __lores_03_last_freq_calc;
+    this->lores_03_a_2 = __lores_03_a_2;
+    this->lores_03_a_1 = __lores_03_a_1;
+    this->lores_03_b_0 = __lores_03_b_0;
+    this->lores_03_x_0 = __lores_03_x_0;
+    this->lores_03_y_1 = __lores_03_y_1;
+    this->lores_03_y_2 = __lores_03_y_2;
+}
+
 void stackprotect_perform(Index n) {
     RNBO_UNUSED(n);
     auto __stackprotect_count = this->stackprotect_count;
@@ -1613,6 +2909,16 @@ void data_01_chanout_set(number ) {}
 
 void data_01_sizeout_set(number v) {
     this->data_01_sizeout = v;
+}
+
+void lores_03_resonance_setter(number v) {
+    if (v < 0.0) {
+        v = 0.0;
+    } else if (v >= 1.0) {
+        v = 1.0 - 1E-20;
+    }
+
+    this->lores_03_resonance = v;
 }
 
 void param_01_getPresetValue(PatcherStateInterface& preset) {
@@ -1818,7 +3124,7 @@ number groove_01_interpolatedSample(
     SampleIndex offset,
     SampleIndex bufferLength
 ) {
-    SampleIndex index1 = (SampleIndex)(rnbo_trunc(index));
+    SampleIndex index1 = (SampleIndex)(trunc(index));
     number i_x = index - index1;
     number i_1px = 1. + i_x;
     number i_1mx = 1. - i_x;
@@ -1879,7 +3185,7 @@ number groove_01_crossfadedSample(
 
         if (diff >= 0) {
             number out2ReadIndex = readIndex + loopLength * addFactor;
-            number out2 = (rate == 1 ? this->groove_01_getSample(channel, rnbo_trunc(out2ReadIndex), offset, bufferLength) : this->groove_01_interpolatedSample(channel, out2ReadIndex, loopMax, loopLength, offset, bufferLength));
+            number out2 = (rate == 1 ? this->groove_01_getSample(channel, trunc(out2ReadIndex), offset, bufferLength) : this->groove_01_interpolatedSample(channel, out2ReadIndex, loopMax, loopLength, offset, bufferLength));
             number out2Factor = diff / crossFadeLength;
             number out1Factor = 1 - out2Factor;
             return out * out1Factor + out2 * out2Factor;
@@ -1897,25 +3203,202 @@ void groove_01_dspsetup(bool force) {
     this->groove_01_setupDone = true;
 }
 
-number globaltransport_getTempoAtSample(SampleIndex sampleOffset) {
-    RNBO_UNUSED(sampleOffset);
-    return (this->vs > 0 ? this->globaltransport_tempo[(Index)sampleOffset] : this->globaltransport_lastTempo);
+void lores_03_reset() {
+    this->lores_03_y_1 = 0;
+    this->lores_03_y_2 = 0;
+    this->lores_03_last_resonance = 0;
+    this->lores_03_last_frequency = 0;
+    this->lores_03_last_res_calc = 0;
+    this->lores_03_last_freq_calc = 0;
 }
 
-number globaltransport_getTempo() {
-    return this->globaltransport_getTempoAtSample(this->sampleOffsetIntoNextAudioBuffer);
+void lores_03_dspsetup(bool force) {
+    if ((bool)(this->lores_03_setupDone) && (bool)(!(bool)(force)))
+        return;
+
+    this->lores_03_reset();
+    this->lores_03_setupDone = true;
+}
+
+number noteout_01_innerFormat_cclamp(number v) {
+    return (v - 1 > 15 ? 15 : (v - 1 < 0 ? 0 : v - 1));
+}
+
+number noteout_01_innerFormat_mclamp(number v) {
+    return (v > 127 ? 127 : (v < 0 ? 0 : v));
+}
+
+array<number, 3> noteout_01_innerFormat_chan3bytemsg(int status, number chan, number v0, number v1) {
+    return {
+        status + this->noteout_01_innerFormat_cclamp(chan),
+        this->noteout_01_innerFormat_mclamp(v0),
+        this->noteout_01_innerFormat_mclamp(v1)
+    };
+}
+
+array<number, 2> noteout_01_innerFormat_chan2bytemsg(int status, number chan, number v) {
+    return {
+        status + this->noteout_01_innerFormat_cclamp(chan),
+        this->noteout_01_innerFormat_mclamp(v)
+    };
+}
+
+list noteout_01_innerFormat_next(list data) {
+    if (data->length > 1) {
+        switch ((int)data[0]) {
+        case 0:
+            {
+            if (data->length > 3) {
+                array<number, 3> o = this->noteout_01_innerFormat_note(data[1], data[2], data[3]);
+                return {o[0], o[1], o[2]};
+            }
+
+            break;
+            }
+        case 1:
+            {
+            if (data->length > 3) {
+                array<number, 3> o = this->noteout_01_innerFormat_polypressure(data[1], data[2], data[3]);
+                return {o[0], o[1], o[2]};
+            }
+
+            break;
+            }
+        case 2:
+            {
+            if (data->length > 3) {
+                array<number, 3> o = this->noteout_01_innerFormat_controlchange(data[1], data[2], data[3]);
+                return {o[0], o[1], o[2]};
+            }
+
+            break;
+            }
+        case 3:
+            {
+            if (data->length > 2) {
+                array<number, 2> o = this->noteout_01_innerFormat_programchange(data[1], data[2]);
+                return {o[0], o[1]};
+            }
+
+            break;
+            }
+        case 4:
+            {
+            if (data->length > 2) {
+                array<number, 2> o = this->noteout_01_innerFormat_aftertouch(data[1], data[2]);
+                return {o[0], o[1]};
+            }
+
+            break;
+            }
+        case 5:
+            {
+            if (data->length > 2) {
+                array<number, 3> o = this->noteout_01_innerFormat_pitchbend(data[1], data[2]);
+                return {o[0], o[1], o[2]};
+            }
+
+            break;
+            }
+        default:
+            {
+            break;
+            }
+        }
+    }
+
+    return {};
+}
+
+array<number, 3> noteout_01_innerFormat_note(number pitch, number velocity, number channel) {
+    return this->noteout_01_innerFormat_chan3bytemsg(0x90, channel, pitch, velocity);
+}
+
+array<number, 3> noteout_01_innerFormat_noterelease(number pitch, number velocity, number channel) {
+    return this->noteout_01_innerFormat_chan3bytemsg(0x80, channel, pitch, velocity);
+}
+
+array<number, 3> noteout_01_innerFormat_pitchbend(number v, number channel) {
+    const int stat = (const int)(0xE0 + this->noteout_01_innerFormat_cclamp(channel));
+    int i;
+
+    {
+        {
+            v = (v > 1 ? 1 : (v < -1 ? -1 : v));
+
+            if (v < 0) {
+                i = 8192 * v + 8192 + 0.5;
+            } else {
+                i = 8191 * v + 8192 + 0.5;
+            }
+        }
+    }
+
+    return this->noteout_01_innerFormat_chan3bytemsg(
+        0xE0,
+        channel,
+        (BinOpInt)((BinOpInt)i & (BinOpInt)0x7F),
+        (BinOpInt)((BinOpInt)((BinOpInt)i >> imod_nocast((UBinOpInt)7, 32)) & (BinOpInt)0x7F)
+    );
+}
+
+array<number, 3> noteout_01_innerFormat_polypressure(number pressure, number pitch, number channel) {
+    return this->noteout_01_innerFormat_chan3bytemsg(0xA0, channel, pressure, pitch);
+}
+
+array<number, 3> noteout_01_innerFormat_controlchange(number num, number value, number channel) {
+    return this->noteout_01_innerFormat_chan3bytemsg(0xB0, channel, num, value);
+}
+
+array<number, 2> noteout_01_innerFormat_programchange(number num, number channel) {
+    return this->noteout_01_innerFormat_chan2bytemsg(0xC0, channel, num);
+}
+
+array<number, 2> noteout_01_innerFormat_aftertouch(number value, number channel) {
+    return this->noteout_01_innerFormat_chan2bytemsg(0xD0, channel, value);
+}
+
+void noteout_01_innerFormat_reset() {}
+
+void param_06_getPresetValue(PatcherStateInterface& preset) {
+    preset["value"] = this->param_06_value;
+}
+
+void param_06_setPresetValue(PatcherStateInterface& preset) {
+    if ((bool)(stateIsEmpty(preset)))
+        return;
+
+    this->param_06_value_set(preset["value"]);
+}
+
+void param_07_getPresetValue(PatcherStateInterface& preset) {
+    preset["value"] = this->param_07_value;
+}
+
+void param_07_setPresetValue(PatcherStateInterface& preset) {
+    if ((bool)(stateIsEmpty(preset)))
+        return;
+
+    this->param_07_value_set(preset["value"]);
+}
+
+Index globaltransport_getSampleOffset(MillisecondTime time) {
+    return this->mstosamps(this->maximum(0, time - this->getEngine()->getCurrentTime()));
+}
+
+number globaltransport_getTempoAtSample(SampleIndex sampleOffset) {
+    return (sampleOffset >= 0 && sampleOffset < this->vs ? this->globaltransport_tempo[(Index)sampleOffset] : this->globaltransport_lastTempo);
 }
 
 number globaltransport_getStateAtSample(SampleIndex sampleOffset) {
-    RNBO_UNUSED(sampleOffset);
-    return (this->vs > 0 ? this->globaltransport_state[(Index)sampleOffset] : this->globaltransport_lastState);
+    return (sampleOffset >= 0 && sampleOffset < this->vs ? this->globaltransport_state[(Index)sampleOffset] : this->globaltransport_lastState);
 }
 
-number globaltransport_getState() {
-    return this->globaltransport_getStateAtSample(this->sampleOffsetIntoNextAudioBuffer);
+number globaltransport_getState(MillisecondTime time) {
+    return this->globaltransport_getStateAtSample(this->globaltransport_getSampleOffset(time));
 }
 
-number globaltransport_getBeatTimeAtMsTime(MillisecondTime time) {
+number globaltransport_getBeatTime(MillisecondTime time) {
     number i = 2;
 
     while (i < this->globaltransport_beatTimeChanges->length && this->globaltransport_beatTimeChanges[(Index)(i + 1)] <= time) {
@@ -1925,7 +3408,7 @@ number globaltransport_getBeatTimeAtMsTime(MillisecondTime time) {
     i -= 2;
     number beatTimeBase = this->globaltransport_beatTimeChanges[(Index)i];
 
-    if (this->globaltransport_getState() == 0)
+    if (this->globaltransport_getState(time) == 0)
         return beatTimeBase;
 
     number beatTimeBaseMsTime = this->globaltransport_beatTimeChanges[(Index)(i + 1)];
@@ -1933,68 +3416,62 @@ number globaltransport_getBeatTimeAtMsTime(MillisecondTime time) {
     return beatTimeBase + this->mstobeats(diff);
 }
 
-bool globaltransport_setTempo(number tempo, bool notify) {
+bool globaltransport_setTempo(MillisecondTime time, number tempo, bool notify) {
     if ((bool)(notify)) {
-        this->processTempoEvent(this->currenttime(), tempo);
+        this->processTempoEvent(time, tempo);
         this->globaltransport_notify = true;
-    } else if (this->globaltransport_getTempo() != tempo) {
-        auto ct = this->currenttime();
-        this->globaltransport_beatTimeChanges->push(this->globaltransport_getBeatTimeAtMsTime(ct));
-        this->globaltransport_beatTimeChanges->push(ct);
+    } else {
+        Index offset = (Index)(this->globaltransport_getSampleOffset(time));
 
-        fillSignal(
-            this->globaltransport_tempo,
-            this->vs,
-            tempo,
-            (Index)(this->sampleOffsetIntoNextAudioBuffer)
-        );
-
-        this->globaltransport_lastTempo = tempo;
-        this->globaltransport_tempoNeedsReset = true;
-        return true;
-    }
-
-    return false;
-}
-
-number globaltransport_getBeatTime() {
-    return this->globaltransport_getBeatTimeAtMsTime(this->currenttime());
-}
-
-bool globaltransport_setState(number state, bool notify) {
-    if ((bool)(notify)) {
-        this->processTransportEvent(this->currenttime(), TransportState(state));
-        this->globaltransport_notify = true;
-    } else if (this->globaltransport_getState() != state) {
-        fillSignal(
-            this->globaltransport_state,
-            this->vs,
-            state,
-            (Index)(this->sampleOffsetIntoNextAudioBuffer)
-        );
-
-        this->globaltransport_lastState = TransportState(state);
-        this->globaltransport_stateNeedsReset = true;
-
-        if (state == 0) {
-            this->globaltransport_beatTimeChanges->push(this->globaltransport_getBeatTime());
-            this->globaltransport_beatTimeChanges->push(this->currenttime());
+        if (this->globaltransport_getTempoAtSample(offset) != tempo) {
+            this->globaltransport_beatTimeChanges->push(this->globaltransport_getBeatTime(time));
+            this->globaltransport_beatTimeChanges->push(time);
+            fillSignal(this->globaltransport_tempo, this->vs, tempo, offset);
+            this->globaltransport_lastTempo = tempo;
+            this->globaltransport_tempoNeedsReset = true;
+            return true;
         }
-
-        return true;
     }
 
     return false;
 }
 
-bool globaltransport_setBeatTime(number beattime, bool notify) {
+number globaltransport_getTempo(MillisecondTime time) {
+    return this->globaltransport_getTempoAtSample(this->globaltransport_getSampleOffset(time));
+}
+
+bool globaltransport_setState(MillisecondTime time, number state, bool notify) {
     if ((bool)(notify)) {
-        this->processBeatTimeEvent(this->currenttime(), beattime);
+        this->processTransportEvent(time, TransportState(state));
+        this->globaltransport_notify = true;
+    } else {
+        Index offset = (Index)(this->globaltransport_getSampleOffset(time));
+
+        if (this->globaltransport_getStateAtSample(offset) != state) {
+            fillSignal(this->globaltransport_state, this->vs, state, offset);
+            this->globaltransport_lastState = TransportState(state);
+            this->globaltransport_stateNeedsReset = true;
+
+            if (state == 0) {
+                this->globaltransport_beatTimeChanges->push(this->globaltransport_getBeatTime(time));
+                this->globaltransport_beatTimeChanges->push(time);
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool globaltransport_setBeatTime(MillisecondTime time, number beattime, bool notify) {
+    if ((bool)(notify)) {
+        this->processBeatTimeEvent(time, beattime);
         this->globaltransport_notify = true;
         return false;
     } else {
         bool beatTimeHasChanged = false;
-        float oldBeatTime = (float)(this->globaltransport_getBeatTime());
+        float oldBeatTime = (float)(this->globaltransport_getBeatTime(time));
         float newBeatTime = (float)(beattime);
 
         if (oldBeatTime != newBeatTime) {
@@ -2002,17 +3479,17 @@ bool globaltransport_setBeatTime(number beattime, bool notify) {
         }
 
         this->globaltransport_beatTimeChanges->push(beattime);
-        this->globaltransport_beatTimeChanges->push(this->currenttime());
+        this->globaltransport_beatTimeChanges->push(time);
         return beatTimeHasChanged;
     }
 }
 
 number globaltransport_getBeatTimeAtSample(SampleIndex sampleOffset) {
     auto msOffset = this->sampstoms(sampleOffset);
-    return this->globaltransport_getBeatTimeAtMsTime(this->currenttime() + msOffset);
+    return this->globaltransport_getBeatTime(this->getEngine()->getCurrentTime() + msOffset);
 }
 
-array<number, 2> globaltransport_getTimeSignatureAtMsTime(MillisecondTime time) {
+array<number, 2> globaltransport_getTimeSignature(MillisecondTime time) {
     number i = 3;
 
     while (i < this->globaltransport_timeSignatureChanges->length && this->globaltransport_timeSignatureChanges[(Index)(i + 2)] <= time) {
@@ -2027,26 +3504,22 @@ array<number, 2> globaltransport_getTimeSignatureAtMsTime(MillisecondTime time) 
     };
 }
 
-array<number, 2> globaltransport_getTimeSignature() {
-    return this->globaltransport_getTimeSignatureAtMsTime(this->currenttime());
-}
-
 array<number, 2> globaltransport_getTimeSignatureAtSample(SampleIndex sampleOffset) {
     auto msOffset = this->sampstoms(sampleOffset);
-    return this->globaltransport_getTimeSignatureAtMsTime(this->currenttime() + msOffset);
+    return this->globaltransport_getTimeSignature(this->getEngine()->getCurrentTime() + msOffset);
 }
 
-bool globaltransport_setTimeSignature(number numerator, number denominator, bool notify) {
+bool globaltransport_setTimeSignature(MillisecondTime time, number numerator, number denominator, bool notify) {
     if ((bool)(notify)) {
-        this->processTimeSignatureEvent(this->currenttime(), (int)(numerator), (int)(denominator));
+        this->processTimeSignatureEvent(time, (int)(numerator), (int)(denominator));
         this->globaltransport_notify = true;
     } else {
-        array<number, 2> currentSig = this->globaltransport_getTimeSignature();
+        array<number, 2> currentSig = this->globaltransport_getTimeSignature(time);
 
         if (currentSig[0] != numerator || currentSig[1] != denominator) {
             this->globaltransport_timeSignatureChanges->push(numerator);
             this->globaltransport_timeSignatureChanges->push(denominator);
-            this->globaltransport_timeSignatureChanges->push(this->currenttime());
+            this->globaltransport_timeSignatureChanges->push(time);
             return true;
         }
     }
@@ -2135,6 +3608,11 @@ void updateTime(MillisecondTime time) {
 
 void assign_defaults()
 {
+    unpack_01_out1 = 0;
+    unpack_01_out2 = 0;
+    unpack_01_out3 = 0;
+    unpack_01_out4 = 0;
+    unpack_01_out5 = 0;
     dspexpr_01_in1 = 0;
     dspexpr_01_in2 = 0;
     slide_tilde_01_x = 0;
@@ -2143,11 +3621,6 @@ void assign_defaults()
     param_01_value = 0;
     cycle_tilde_01_frequency = 0;
     cycle_tilde_01_phase_offset = 0;
-    unpack_01_out1 = 0;
-    unpack_01_out2 = 0;
-    unpack_01_out3 = 0;
-    unpack_01_out4 = 0;
-    unpack_01_out5 = 0;
     dspexpr_02_in1 = 0;
     dspexpr_02_in2 = 0;
     dspexpr_03_in1 = 0;
@@ -2177,6 +3650,17 @@ void assign_defaults()
     groove_01_end = -1;
     groove_01_loop = 0;
     groove_01_crossfade = 0;
+    p_01_target = 0;
+    lores_03_cutoff = 0;
+    lores_03_resonance = 0;
+    lores_03_resonance_setter(lores_03_resonance);
+    noteout_01_velocity = 127;
+    noteout_01_releasevelocity = 0;
+    noteout_01_channel = 1;
+    noteout_01_port = 0;
+    notein_01_channel = 0;
+    param_06_value = 0;
+    param_07_value = 0.5;
     _currentTime = 0;
     audioProcessSampleCount = 0;
     sampleOffsetIntoNextAudioBuffer = 0;
@@ -2216,6 +3700,13 @@ void assign_defaults()
     groove_01_incomingChange = 2;
     groove_01_crossfadeInSamples = 0;
     groove_01_setupDone = false;
+    lores_03_setupDone = false;
+    noteout_01_midioutput = 1;
+    notein_01_status = 0;
+    notein_01_byte1 = -1;
+    notein_01_inchan = 0;
+    param_06_lastValue = 0;
+    param_07_lastValue = 0;
     globaltransport_tempo = nullptr;
     globaltransport_tempoNeedsReset = false;
     globaltransport_lastTempo = 120;
@@ -2234,6 +3725,11 @@ void assign_defaults()
 
 // member variables
 
+    number unpack_01_out1;
+    number unpack_01_out2;
+    number unpack_01_out3;
+    number unpack_01_out4;
+    number unpack_01_out5;
     number dspexpr_01_in1;
     number dspexpr_01_in2;
     number slide_tilde_01_x;
@@ -2242,11 +3738,6 @@ void assign_defaults()
     number param_01_value;
     number cycle_tilde_01_frequency;
     number cycle_tilde_01_phase_offset;
-    number unpack_01_out1;
-    number unpack_01_out2;
-    number unpack_01_out3;
-    number unpack_01_out4;
-    number unpack_01_out5;
     number dspexpr_02_in1;
     number dspexpr_02_in2;
     number dspexpr_03_in1;
@@ -2276,6 +3767,16 @@ void assign_defaults()
     number groove_01_end;
     number groove_01_loop;
     number groove_01_crossfade;
+    number p_01_target;
+    number lores_03_cutoff;
+    number lores_03_resonance;
+    number noteout_01_velocity;
+    number noteout_01_releasevelocity;
+    number noteout_01_channel;
+    number noteout_01_port;
+    number notein_01_channel;
+    number param_06_value;
+    number param_07_value;
     MillisecondTime _currentTime;
     SampleIndex audioProcessSampleCount;
     SampleIndex sampleOffsetIntoNextAudioBuffer;
@@ -2320,6 +3821,23 @@ void assign_defaults()
     Int groove_01_incomingChange;
     SampleIndex groove_01_crossfadeInSamples;
     bool groove_01_setupDone;
+    number lores_03_b_0;
+    number lores_03_a_1;
+    number lores_03_a_2;
+    number lores_03_x_0;
+    number lores_03_y_1;
+    number lores_03_y_2;
+    number lores_03_last_resonance;
+    number lores_03_last_frequency;
+    number lores_03_last_res_calc;
+    number lores_03_last_freq_calc;
+    bool lores_03_setupDone;
+    bool noteout_01_midioutput;
+    int notein_01_status;
+    int notein_01_byte1;
+    int notein_01_inchan;
+    number param_06_lastValue;
+    number param_07_lastValue;
     signal globaltransport_tempo;
     bool globaltransport_tempoNeedsReset;
     number globaltransport_lastTempo;
@@ -2338,6 +3856,7 @@ void assign_defaults()
     Index isMuted;
     indexlist paramInitIndices;
     indexlist paramInitOrder;
+    RNBOSubpatcher_33* p_01;
 
 };
 

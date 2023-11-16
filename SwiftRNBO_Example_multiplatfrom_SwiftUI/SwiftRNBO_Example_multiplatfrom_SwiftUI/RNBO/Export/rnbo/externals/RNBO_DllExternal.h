@@ -96,14 +96,14 @@ namespace RNBO {
 			host_flushClockEventsWithValue(_hostHandle, clockIndex, value, execute);
 		}
 
-		void sendMidiEvent(int port, int b1, int b2, int b3) override
+		void sendMidiEvent(int port, int b1, int b2, int b3, MillisecondTime time = 0) override
 		{
-			host_sendMidiEvent(_hostHandle, port, b1, b2, b3);
+			host_sendMidiEvent(_hostHandle, port, b1, b2, b3, time);
 		}
 
-		void sendMidiEventList(int port, const list& data) override
+		void sendMidiEventList(int port, const list& data, MillisecondTime time = 0) override
 		{
-			host_sendMidiEventList(_hostHandle, port, data);
+			host_sendMidiEventList(_hostHandle, port, data, time);
 		}
 
 		void notifyParameterValueChanged(Index index, ParameterValue value, bool ignoreSource) override
