@@ -40,6 +40,11 @@ struct RNBOParameter: Equatable {
     }
 }
 
+struct RNBOParameters {
+    var rnbo: RNBOContext?
+    var list: [RNBOParameter]
+}
+
 extension RNBOAudioUnit {
     func getParametersArray() -> [RNBOParameter] {
         var parameters: [RNBOParameter] = []

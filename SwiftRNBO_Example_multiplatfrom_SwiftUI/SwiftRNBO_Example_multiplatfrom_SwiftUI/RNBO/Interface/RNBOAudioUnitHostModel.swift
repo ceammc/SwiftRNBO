@@ -13,13 +13,13 @@ class RNBOAudioUnitHostModel: ObservableObject {
     private let audioEngine: RNBOAudioEngine
     private let audioUnit: RNBOAudioUnit
     private let eventHandler: RNBOEventHandler
-    @Published var parameters: [RNBOParameter]
+    @Published var parameters: RNBOParameters
     //    @Published var description: RNBODescription
 
     init() {
         audioEngine = RNBOAudioEngine()
         audioUnit = audioEngine.getAudioUnit()
-        parameters = audioUnit.getParametersArray()
+        parameters = RNBOParameters(list: audioUnit.getParametersArray())
         eventHandler = RNBOEventHandler()
         audioUnit.setEventHandler(eventHandler)
     }
@@ -30,16 +30,21 @@ class RNBOAudioUnitHostModel: ObservableObject {
 
     func setParameterValue(to value: Double, at parameterIndex: Int) {
         audioUnit.setParameterValue(parameterIndex, value: Float(value))
-        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
+//        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
     }
 
     func setParameterValueNormalized(to valueNormalized: Double, at parameterIndex: Int) {
         audioUnit.setParameterValueNormalized(parameterIndex, valueNormalized: Float(valueNormalized))
-        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
+//        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
     }
 
     func sendMessage(_ message: [Double]) {
         audioUnit.sendMessage("foo", list: message)
+    }
+    
+    func connect() {
+        parameters.rnbo = self
+        eventHandler.rnbo = self
     }
 }
 

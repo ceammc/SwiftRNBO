@@ -13,6 +13,9 @@ struct SwiftRNBO_Example_multiplatfrom_SwiftUIApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    rnbo.connect()
+                }
                 .environmentObject(rnbo)
         }
     }

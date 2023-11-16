@@ -11,7 +11,7 @@ struct RandomizeButton: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
     fileprivate func randomize() {
-        for i in rnbo.parameters.indices {
+        for i in rnbo.parameters.list.indices {
             rnbo.setParameterValueNormalized(to: Double.random(in: 0 ... 1), at: i)
         }
     }

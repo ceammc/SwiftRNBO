@@ -13,20 +13,20 @@
 
         var body: some View {
             VStack {
-                ForEach(rnbo.parameters.indices, id: \.self) { i in
+                ForEach(rnbo.parameters.list.indices, id: \.self) { i in
                     HStack {
                         #if os(iOS)
                             SliderNameLabel(name: rnbo.parameters[i].displayName)
                         #endif
-                        Slider(value: $rnbo.parameters[i].valueNormalized) {
-                            SliderNameLabel(name: rnbo.parameters[i].displayName)
+                        Slider(value: $rnbo.parameters.list[i].valueNormalized) {
+                            SliderNameLabel(name: rnbo.parameters.list[i].displayName)
                         } minimumValueLabel: {
-                            SliderValueLabel(value: rnbo.parameters[i].minValue)
+                            SliderValueLabel(value: rnbo.parameters.list[i].minValue)
                         } maximumValueLabel: {
-                            SliderValueLabel(value: rnbo.parameters[i].maxValue)
+                            SliderValueLabel(value: rnbo.parameters.list[i].maxValue)
                         }
-                        .onChange(of: rnbo.parameters[i].valueNormalized) { rnbo.setParameterValueNormalized(to: $0, at: i) }
-                        SliderValueLabel(value: rnbo.parameters[i].value)
+                        .onChange(of: rnbo.parameters.list[i].valueNormalized) { rnbo.setParameterValueNormalized(to: $0, at: i) }
+                        SliderValueLabel(value: rnbo.parameters.list[i].value)
                     }
                 }
             }

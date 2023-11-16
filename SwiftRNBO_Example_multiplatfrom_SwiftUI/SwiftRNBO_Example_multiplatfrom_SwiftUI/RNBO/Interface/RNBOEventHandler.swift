@@ -13,10 +13,10 @@ class RNBOEventHandler: NSObject, RNBOEventHandlerProtocol {
     func handle(_ event: RNBOParameterEvent) {
         if let rnbo = rnbo {
             DispatchQueue.main.async {
-                rnbo.parameters[event.index].value = event.value
+                rnbo.parameters.list[event.index].value = event.value
             }
 
-            let p = rnbo.parameters[event.index]
+            let p = rnbo.parameters.list[event.index]
             print("\(p.displayName): \(p.value)")
         }
     }
