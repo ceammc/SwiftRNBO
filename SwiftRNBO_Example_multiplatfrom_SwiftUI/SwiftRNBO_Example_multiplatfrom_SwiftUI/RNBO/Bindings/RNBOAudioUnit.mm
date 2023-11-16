@@ -34,6 +34,18 @@ double sampleRateHz = 44100.0;
     std::unique_ptr<RNBOEventHandler> _eventHandler;
 }
 
+#pragma mark -
+
+//-(id)init{
+//
+//    self = [super init];
+//    if (self) { self->_handler = nil;}
+//    return self;
+//}
+//-(id)initWithEventHandler:(NSObject<RNBOEventHandlerProtocol>*)eventHandler;
+
+#pragma mark -
+
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
                 options						:(AudioComponentInstantiationOptions)options
                 error						:(NSError **)outError
@@ -65,9 +77,11 @@ double sampleRateHz = 44100.0;
                                                     busses				:@[_outputBus]];
 
     self.maximumFramesToRender = 512;
-
+    
+    _eventHandler.reset(new RNBOEventHandler());
+    
     // our
-    _object.reset(new RNBO::CoreObject());
+    _object.reset(new RNBO::CoreObject(_eventHandler.get()));
     _object->prepareToProcess(_outputBusArray[0].format.sampleRate, 64);
 
     //
