@@ -272,11 +272,11 @@
 		AFF2B42F29A2093F00068DD0 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
-				AFF4B5212A0069D800087CB8 /* Synth.aif */,
-				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
 				AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */,
 				AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */,
+				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
 				AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */,
+				AFF4B5212A0069D800087CB8 /* Synth.aif */,
 			);
 			path = Interface;
 			sourceTree = "<group>";
