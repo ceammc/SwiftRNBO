@@ -328,13 +328,25 @@ double sampleRateHz = 44100.0;
 
 #pragma mark -
 
-- (void)sendMIDINote:(uint8_t)pitch velocity:(uint8_t)velocity {
+- (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
     const uint8_t noteOn = 0x90;
-    const uint8_t midiChannel = 0;
+    const uint8_t midiChannel = channel;
 
     const uint8_t noteOnLeadByte = noteOn | midiChannel;
     const uint8_t midiBytes[3] = {
         noteOnLeadByte, pitch, velocity
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+}
+
+- (void)sendNoteOffMessageWithPitch:(uint8_t)pitch releaseVelocity:(uint8_t)releaseVelocity channel:(uint8_t)channel {
+    const uint8_t noteOff = 0x80;
+    const uint8_t midiChannel = channel;
+
+    const uint8_t noteOffLeadByte = noteOff | midiChannel;
+    const uint8_t midiBytes[3] = {
+        noteOffLeadByte, pitch, releaseVelocity
     };
 
     self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));

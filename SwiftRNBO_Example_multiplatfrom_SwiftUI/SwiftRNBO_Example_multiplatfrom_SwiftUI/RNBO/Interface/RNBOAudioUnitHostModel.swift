@@ -39,8 +39,12 @@ class RNBOAudioUnitHostModel: ObservableObject {
         audioUnit.sendMessage("foo", list: message)
     }
 
-    func sendMIDINote(_ pitch: UInt8, velocity: UInt8) {
-        audioUnit.sendMIDINote(pitch, velocity: velocity)
+    func sendNoteOn(_ pitch: UInt8, velocity: UInt8 = 127, channel: UInt8 = 0) {
+        audioUnit.sendNoteOnMessage(withPitch: pitch, velocity: velocity, channel: channel)
+    }
+    
+    func sendNoteOff(_ pitch: UInt8, releaseVelocity: UInt8 = 0, channel: UInt8 = 0) {
+        audioUnit.sendNoteOffMessage(withPitch: pitch, releaseVelocity: releaseVelocity, channel: channel)
     }
 
     func connectEventHandler() {

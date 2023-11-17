@@ -75,17 +75,17 @@ namespace RNBO {
 class rnbomatic : public PatcherInterfaceImpl {
 public:
 
-class RNBOSubpatcher_72 : public PatcherInterfaceImpl {
+class RNBOSubpatcher_84 : public PatcherInterfaceImpl {
     
     friend class rnbomatic;
     
     public:
     
-    RNBOSubpatcher_72()
+    RNBOSubpatcher_84()
     {
     }
     
-    ~RNBOSubpatcher_72()
+    ~RNBOSubpatcher_84()
     {
     }
     
@@ -1062,7 +1062,7 @@ Index getNumMidiInputPorts() const {
 
 void processMidiEvent(MillisecondTime time, int port, ConstByteArray data, Index length) {
     this->updateTime(time);
-    this->notein_01_midihandler(data[0] & 240, (data[0] & 15) + 1, port, data, length);
+    this->midiin_01_midihandler(data[0] & 240, (data[0] & 15) + 1, port, data, length);
 }
 
 Index getNumMidiOutputPorts() const {
@@ -1314,7 +1314,7 @@ Index getPatcherSerial() const {
 void getState(PatcherStateInterface& ) {}
 
 void setState() {
-    this->p_01 = new RNBOSubpatcher_72();
+    this->p_01 = new RNBOSubpatcher_84();
     this->p_01->setEngineAndPatcher(this->getEngine(), this);
     this->p_01->initialize();
     this->p_01->setParameterOffset(this->getParameterOffset(this->p_01));
@@ -2512,60 +2512,17 @@ void message_01_set_set(const list& v) {
     this->getEngine()->sendListMessage(TAG("listout"), TAG("message_obj-63"), v, this->_currentTime);
 }
 
-void outport_01_input_list_set(const list& v) {
-    this->getEngine()->sendListMessage(TAG("bar"), TAG(""), v, this->_currentTime);
-}
-
-void message_01_out_set(const list& v) {
-    this->outport_01_input_list_set(v);
-}
+void message_01_out_set(const list& ) {}
 
 void message_01_trigger_bang() {
     this->message_01_out_set(this->message_01_set);
 }
 
-void noteout_01_channel_set(number v) {
-    this->noteout_01_channel = v;
-}
+void trigger_03_out3_set(number ) {}
 
-void trigger_03_out3_set(number v) {
-    this->noteout_01_channel_set(v);
-}
+void trigger_03_out2_set(number ) {}
 
-void noteout_01_velocity_set(number v) {
-    this->noteout_01_velocity = v;
-}
-
-void trigger_03_out2_set(number v) {
-    this->noteout_01_velocity_set(v);
-}
-
-void noteout_01_midiout_set(number ) {}
-
-void noteout_01_releasevelocity_set(number v) {
-    this->noteout_01_releasevelocity = v;
-}
-
-void noteout_01_notenumber_set(number v) {
-    number off = this->noteout_01_releasevelocity > 0;
-    array<number, 3> r = ((bool)(off) ? this->noteout_01_innerFormat_noterelease(v, this->noteout_01_releasevelocity, this->noteout_01_channel) : this->noteout_01_innerFormat_note(v, this->noteout_01_velocity, this->noteout_01_channel));
-
-    if ((bool)(!(bool)(this->noteout_01_midioutput))) {
-        this->noteout_01_midiout_set(r[0]);
-        this->noteout_01_midiout_set(r[1]);
-        this->noteout_01_midiout_set(r[2]);
-    } else {
-        this->getEngine()->sendMidiEvent(this->noteout_01_port, r[0], r[1], r[2], this->_currentTime);
-    }
-
-    if ((bool)(off)) {
-        this->noteout_01_releasevelocity_set(0);
-    }
-}
-
-void trigger_03_out1_set(number v) {
-    this->noteout_01_notenumber_set(v);
-}
+void trigger_03_out1_set(number ) {}
 
 void trigger_03_input_bang_bang() {
     this->trigger_03_out3_set(1);
@@ -2590,38 +2547,103 @@ void loadbang_01_output_bang() {
     this->trigger_02_input_bang_bang();
 }
 
-void notein_01_outchannel_set(number v) {
-    this->noteout_01_channel_set(v);
-}
+void midiout_01_midiin_set(number v) {
+    int vi = (int)(v);
 
-void notein_01_releasevelocity_set(number ) {}
+    if (vi == 0xF6 || (vi >= MIDI_Clock && vi <= MIDI_Reset && vi != 0xF9 && vi != 0xFD)) {
+        this->getEngine()->sendMidiEvent(this->midiout_01_port, vi, 0, 0, this->_currentTime);
+        return;
+    }
 
-void notein_01_velocity_set(number v) {
-    this->noteout_01_velocity_set(v);
-}
+    this->midiout_01_currentStatus = parseMidi(this->midiout_01_currentStatus, vi, this->midiout_01_status);
+    bool clearSysex = true;
 
-void notein_01_notenumber_set(number v) {
-    this->noteout_01_notenumber_set(v);
-}
-
-void notein_01_midihandler(int status, int channel, int port, ConstByteArray data, Index length) {
-    RNBO_UNUSED(length);
-    RNBO_UNUSED(port);
-
-    if (channel == this->notein_01_channel || this->notein_01_channel == 0) {
-        if (status == 144 || status == 128) {
-            this->notein_01_outchannel_set(channel);
-
-            if (status == 128) {
-                this->notein_01_releasevelocity_set(data[2]);
-                this->notein_01_velocity_set(0);
-            } else {
-                this->notein_01_releasevelocity_set(0);
-                this->notein_01_velocity_set(data[2]);
-            }
-
-            this->notein_01_notenumber_set(data[1]);
+    switch ((int)this->midiout_01_currentStatus) {
+    case MIDI_StatusByteReceived:
+        {
+        this->midiout_01_status = v;
+        this->midiout_01_byte1 = -1;
+        break;
         }
+    case MIDI_SecondByteReceived:
+        {
+        this->midiout_01_byte1 = v;
+        break;
+        }
+    case MIDI_ProgramChange:
+    case MIDI_ChannelPressure:
+    case MIDI_QuarterFrame:
+    case MIDI_SongSel:
+        {
+        this->midiout_01_byte1 = v;
+
+        this->getEngine()->sendMidiEvent(
+            this->midiout_01_port,
+            this->midiout_01_status,
+            this->midiout_01_byte1,
+            0,
+            this->_currentTime
+        );
+
+        break;
+        }
+    case MIDI_NoteOff:
+    case MIDI_NoteOn:
+    case MIDI_Aftertouch:
+    case MIDI_CC:
+    case MIDI_PitchBend:
+    case MIDI_SongPos:
+    case MIDI_Generic:
+        {
+        this->getEngine()->sendMidiEvent(
+            this->midiout_01_port,
+            this->midiout_01_status,
+            this->midiout_01_byte1,
+            v,
+            this->_currentTime
+        );
+
+        break;
+        }
+    case MIDI_Sysex_Started:
+        {
+        this->midiout_01_sysex->push(vi);
+        clearSysex = false;
+        break;
+        }
+    case MIDI_Sysex_Complete:
+        {
+        this->midiout_01_sysex->push(vi);
+        this->getEngine()->sendMidiEventList(this->midiout_01_port, this->midiout_01_sysex, this->_currentTime);
+        break;
+        }
+    case MIDI_InvalidByte:
+        {
+        break;
+        }
+    default:
+        {
+        break;
+        }
+    }
+
+    if ((bool)(clearSysex) && this->midiout_01_sysex->length > 0) {
+        this->midiout_01_sysex = {};
+    }
+}
+
+void midiin_01_midiout_set(number v) {
+    this->midiout_01_midiin_set(v);
+}
+
+void midiin_01_midihandler(int status, int channel, int port, ConstByteArray data, Index length) {
+    RNBO_UNUSED(port);
+    RNBO_UNUSED(channel);
+    RNBO_UNUSED(status);
+    Index i;
+
+    for (i = 0; i < length; i++) {
+        this->midiin_01_midiout_set(data[i]);
     }
 }
 
@@ -3370,146 +3392,6 @@ void lores_03_dspsetup(bool force) {
     this->lores_03_setupDone = true;
 }
 
-number noteout_01_innerFormat_cclamp(number v) {
-    return (v - 1 > 15 ? 15 : (v - 1 < 0 ? 0 : v - 1));
-}
-
-number noteout_01_innerFormat_mclamp(number v) {
-    return (v > 127 ? 127 : (v < 0 ? 0 : v));
-}
-
-array<number, 3> noteout_01_innerFormat_chan3bytemsg(int status, number chan, number v0, number v1) {
-    return {
-        status + this->noteout_01_innerFormat_cclamp(chan),
-        this->noteout_01_innerFormat_mclamp(v0),
-        this->noteout_01_innerFormat_mclamp(v1)
-    };
-}
-
-array<number, 2> noteout_01_innerFormat_chan2bytemsg(int status, number chan, number v) {
-    return {
-        status + this->noteout_01_innerFormat_cclamp(chan),
-        this->noteout_01_innerFormat_mclamp(v)
-    };
-}
-
-list noteout_01_innerFormat_next(list data) {
-    if (data->length > 1) {
-        switch ((int)data[0]) {
-        case 0:
-            {
-            if (data->length > 3) {
-                array<number, 3> o = this->noteout_01_innerFormat_note(data[1], data[2], data[3]);
-                return {o[0], o[1], o[2]};
-            }
-
-            break;
-            }
-        case 1:
-            {
-            if (data->length > 3) {
-                array<number, 3> o = this->noteout_01_innerFormat_polypressure(data[1], data[2], data[3]);
-                return {o[0], o[1], o[2]};
-            }
-
-            break;
-            }
-        case 2:
-            {
-            if (data->length > 3) {
-                array<number, 3> o = this->noteout_01_innerFormat_controlchange(data[1], data[2], data[3]);
-                return {o[0], o[1], o[2]};
-            }
-
-            break;
-            }
-        case 3:
-            {
-            if (data->length > 2) {
-                array<number, 2> o = this->noteout_01_innerFormat_programchange(data[1], data[2]);
-                return {o[0], o[1]};
-            }
-
-            break;
-            }
-        case 4:
-            {
-            if (data->length > 2) {
-                array<number, 2> o = this->noteout_01_innerFormat_aftertouch(data[1], data[2]);
-                return {o[0], o[1]};
-            }
-
-            break;
-            }
-        case 5:
-            {
-            if (data->length > 2) {
-                array<number, 3> o = this->noteout_01_innerFormat_pitchbend(data[1], data[2]);
-                return {o[0], o[1], o[2]};
-            }
-
-            break;
-            }
-        default:
-            {
-            break;
-            }
-        }
-    }
-
-    return {};
-}
-
-array<number, 3> noteout_01_innerFormat_note(number pitch, number velocity, number channel) {
-    return this->noteout_01_innerFormat_chan3bytemsg(0x90, channel, pitch, velocity);
-}
-
-array<number, 3> noteout_01_innerFormat_noterelease(number pitch, number velocity, number channel) {
-    return this->noteout_01_innerFormat_chan3bytemsg(0x80, channel, pitch, velocity);
-}
-
-array<number, 3> noteout_01_innerFormat_pitchbend(number v, number channel) {
-    const int stat = (const int)(0xE0 + this->noteout_01_innerFormat_cclamp(channel));
-    int i;
-
-    {
-        {
-            v = (v > 1 ? 1 : (v < -1 ? -1 : v));
-
-            if (v < 0) {
-                i = 8192 * v + 8192 + 0.5;
-            } else {
-                i = 8191 * v + 8192 + 0.5;
-            }
-        }
-    }
-
-    return this->noteout_01_innerFormat_chan3bytemsg(
-        0xE0,
-        channel,
-        (BinOpInt)((BinOpInt)i & (BinOpInt)0x7F),
-        (BinOpInt)((BinOpInt)((BinOpInt)i >> imod_nocast((UBinOpInt)7, 32)) & (BinOpInt)0x7F)
-    );
-}
-
-array<number, 3> noteout_01_innerFormat_polypressure(number pressure, number pitch, number channel) {
-    return this->noteout_01_innerFormat_chan3bytemsg(0xA0, channel, pressure, pitch);
-}
-
-array<number, 3> noteout_01_innerFormat_controlchange(number num, number value, number channel) {
-    return this->noteout_01_innerFormat_chan3bytemsg(0xB0, channel, num, value);
-}
-
-array<number, 2> noteout_01_innerFormat_programchange(number num, number channel) {
-    return this->noteout_01_innerFormat_chan2bytemsg(0xC0, channel, num);
-}
-
-array<number, 2> noteout_01_innerFormat_aftertouch(number value, number channel) {
-    return this->noteout_01_innerFormat_chan2bytemsg(0xD0, channel, value);
-}
-
-void noteout_01_innerFormat_reset() {}
-
 void message_01_init() {
     this->message_01_set_set({42});
 }
@@ -3798,11 +3680,8 @@ void assign_defaults()
     lores_03_cutoff = 0;
     lores_03_resonance = 0;
     lores_03_resonance_setter(lores_03_resonance);
-    noteout_01_velocity = 127;
-    noteout_01_releasevelocity = 0;
-    noteout_01_channel = 1;
-    noteout_01_port = 0;
-    notein_01_channel = 0;
+    midiout_01_port = 0;
+    midiin_01_port = 0;
     param_07_value = 0.5;
     _currentTime = 0;
     audioProcessSampleCount = 0;
@@ -3845,10 +3724,9 @@ void assign_defaults()
     groove_01_setupDone = false;
     param_06_lastValue = 0;
     lores_03_setupDone = false;
-    noteout_01_midioutput = 1;
-    notein_01_status = 0;
-    notein_01_byte1 = -1;
-    notein_01_inchan = 0;
+    midiout_01_currentStatus = -1;
+    midiout_01_status = -1;
+    midiout_01_byte1 = -1;
     param_07_lastValue = 0;
     globaltransport_tempo = nullptr;
     globaltransport_tempoNeedsReset = false;
@@ -3914,11 +3792,8 @@ void assign_defaults()
     number param_06_value;
     number lores_03_cutoff;
     number lores_03_resonance;
-    number noteout_01_velocity;
-    number noteout_01_releasevelocity;
-    number noteout_01_channel;
-    number noteout_01_port;
-    number notein_01_channel;
+    number midiout_01_port;
+    number midiin_01_port;
     list message_01_set;
     number param_07_value;
     MillisecondTime _currentTime;
@@ -3977,10 +3852,10 @@ void assign_defaults()
     number lores_03_last_res_calc;
     number lores_03_last_freq_calc;
     bool lores_03_setupDone;
-    bool noteout_01_midioutput;
-    int notein_01_status;
-    int notein_01_byte1;
-    int notein_01_inchan;
+    int midiout_01_currentStatus;
+    int midiout_01_status;
+    int midiout_01_byte1;
+    list midiout_01_sysex;
     number param_07_lastValue;
     signal globaltransport_tempo;
     bool globaltransport_tempoNeedsReset;
@@ -4000,7 +3875,7 @@ void assign_defaults()
     Index isMuted;
     indexlist paramInitIndices;
     indexlist paramInitOrder;
-    RNBOSubpatcher_72* p_01;
+    RNBOSubpatcher_84* p_01;
 
 };
 

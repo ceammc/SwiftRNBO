@@ -29,9 +29,9 @@ struct ContentView: View {
                 }
             }
             Keyboard { pitch, point in
-                rnbo.sendMIDINote(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
+                rnbo.sendNoteOn(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
             } noteOff: { pitch in
-                rnbo.sendMIDINote(UInt8(pitch.midiNoteNumber), velocity: 0)
+                rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
             }
             .frame(minWidth: 600, minHeight: 200)
         }
