@@ -25,14 +25,26 @@ class RNBOAudioUnitHostModel: ObservableObject {
         audioEngine.play()
     }
 
+    func refreshParameterValue(at parameterIndex: Int) {
+        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
+    }
+
     func setParameterValue(to value: Double, at parameterIndex: Int) {
         audioUnit.setParameterValue(parameterIndex, value: Float(value))
-//        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
+    }
+
+    func setParameterValueHot(to value: Double, at parameterIndex: Int) {
+        setParameterValue(to: value, at: parameterIndex)
+        refreshParameterValue(at: parameterIndex)
     }
 
     func setParameterValueNormalized(to valueNormalized: Double, at parameterIndex: Int) {
         audioUnit.setParameterValueNormalized(parameterIndex, valueNormalized: Float(valueNormalized))
-//        parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
+    }
+
+    func setParameterValueNormalizedHot(to valueNormalized: Double, at parameterIndex: Int) {
+        setParameterValueNormalized(to: valueNormalized, at: parameterIndex)
+        refreshParameterValue(at: parameterIndex)
     }
 
     func sendMessage(_ message: [Double]) {
@@ -42,7 +54,7 @@ class RNBOAudioUnitHostModel: ObservableObject {
     func sendNoteOn(_ pitch: UInt8, velocity: UInt8 = 127, channel: UInt8 = 0) {
         audioUnit.sendNoteOnMessage(withPitch: pitch, velocity: velocity, channel: channel)
     }
-    
+
     func sendNoteOff(_ pitch: UInt8, releaseVelocity: UInt8 = 0, channel: UInt8 = 0) {
         audioUnit.sendNoteOffMessage(withPitch: pitch, releaseVelocity: releaseVelocity, channel: channel)
     }
