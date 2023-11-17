@@ -10,17 +10,15 @@ import Foundation
 typealias RNBOContext = RNBOAudioUnitHostModel
 
 class RNBOAudioUnitHostModel: ObservableObject {
-    private let audioEngine: RNBOAudioEngine
+    private let audioEngine = RNBOAudioEngine()
     private let audioUnit: RNBOAudioUnit
-    private let eventHandler: RNBOEventHandler
+    private let eventHandler = RNBOEventHandler()
     @Published var parameters: [RNBOParameter]
     //    @Published var description: RNBODescription
 
     init() {
-        audioEngine = RNBOAudioEngine()
         audioUnit = audioEngine.getAudioUnit()
         parameters = audioUnit.getParametersArray()
-        eventHandler = RNBOEventHandler()
     }
 
     func play() {
