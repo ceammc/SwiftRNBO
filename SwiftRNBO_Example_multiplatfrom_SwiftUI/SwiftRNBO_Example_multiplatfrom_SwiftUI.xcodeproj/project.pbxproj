@@ -10,7 +10,6 @@
 		AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */; };
 		AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408F2B061DDD00FAACBF /* RNBOList.mm */; };
 		AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */; };
-		AF4B40952B06513600FAACBF /* MessageTestButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4B40942B06513600FAACBF /* MessageTestButtons.swift */; };
 		AF4B409B2B06C4B100FAACBF /* Keyboard in Frameworks */ = {isa = PBXBuildFile; productRef = AF4B409A2B06C4B100FAACBF /* Keyboard */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
 		AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41F29A2090200068DD0 /* ContentView.swift */; };
@@ -26,7 +25,6 @@
 		AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4E729A2093F00068DD0 /* rnbo_source.cpp */; };
 		AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B48929A2093F00068DD0 /* RNBO.cpp */; };
 		AFF2B4F529A2097600068DD0 /* media in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B4F429A2097600068DD0 /* media */; };
-		AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */; };
 		AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F729A20A3500068DD0 /* Sliders.swift */; };
 		AFF4B5222A006A8200087CB8 /* Synth.aif in Resources */ = {isa = PBXBuildFile; fileRef = AFF4B5212A0069D800087CB8 /* Synth.aif */; };
 /* End PBXBuildFile section */
@@ -38,7 +36,6 @@
 		AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOEventHandler.mm; sourceTree = "<group>"; };
 		AF4B408F2B061DDD00FAACBF /* RNBOList.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOList.mm; sourceTree = "<group>"; };
 		AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOEventHandler.swift; sourceTree = "<group>"; };
-		AF4B40942B06513600FAACBF /* MessageTestButtons.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTestButtons.swift; sourceTree = "<group>"; };
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift; sourceTree = "<group>"; };
 		AFF2B41F29A2090200068DD0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -208,7 +205,6 @@
 		AFF2B4E829A2093F00068DD0 /* description.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = description.json; sourceTree = "<group>"; };
 		AFF2B4F429A2097600068DD0 /* media */ = {isa = PBXFileReference; lastKnownFileType = folder; path = media; sourceTree = "<group>"; };
 		AFF2B4F729A20A3500068DD0 /* Sliders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sliders.swift; sourceTree = "<group>"; };
-		AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizeButton.swift; sourceTree = "<group>"; };
 		AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOExtensionBufferedAudioBus.hpp; sourceTree = "<group>"; };
 		AFF4B5212A0069D800087CB8 /* Synth.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Synth.aif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -644,8 +640,6 @@
 			isa = PBXGroup;
 			children = (
 				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
-				AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */,
-				AF4B40942B06513600FAACBF /* MessageTestButtons.swift */,
 			);
 			path = Controls;
 			sourceTree = "<group>";
@@ -736,8 +730,6 @@
 				AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */,
 				AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */,
 				AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */,
-				AF4B40952B06513600FAACBF /* MessageTestButtons.swift in Sources */,
-				AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */,
 				AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */,
 				AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */,
 				AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */,

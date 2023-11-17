@@ -17,9 +17,14 @@ struct ContentView: View {
                 Sliders()
             #endif
             HStack {
-                RandomizeButton()
-                MessageTestButtons()
-                Button("Play") {
+                Button("Randomize") {
+                    randomize()
+                }
+                Button("Play dependency") {
+                    let message: [Double] = [220, 330, 0.2, 0.3, 0.5]
+                    rnbo.sendMessage(message)
+                }
+                Button("Play audio input") {
                     rnbo.play()
                 }
             }
@@ -32,5 +37,11 @@ struct ContentView: View {
         }
         .padding()
         .background()
+    }
+
+    fileprivate func randomize() {
+        for i in rnbo.parameters.list.indices {
+            rnbo.setParameterValueNormalized(to: Double.random(in: 0 ... 1), at: i)
+        }
     }
 }
