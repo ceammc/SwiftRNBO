@@ -40,7 +40,7 @@ struct ContentView: View {
     }
 
     fileprivate func randomize() {
-        for i in rnbo.parameters.list.indices {
+        for i in rnbo.parameters.indices {
             rnbo.setParameterValueNormalized(to: Double.random(in: 0 ... 1), at: i)
         }
     }

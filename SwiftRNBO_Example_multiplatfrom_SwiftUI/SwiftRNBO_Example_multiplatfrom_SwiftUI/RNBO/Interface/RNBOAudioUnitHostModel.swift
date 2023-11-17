@@ -13,15 +13,14 @@ class RNBOAudioUnitHostModel: ObservableObject {
     private let audioEngine: RNBOAudioEngine
     private let audioUnit: RNBOAudioUnit
     private let eventHandler: RNBOEventHandler
-    @Published var parameters: RNBOParameters
+    @Published var parameters: [RNBOParameter]
     //    @Published var description: RNBODescription
 
     init() {
         audioEngine = RNBOAudioEngine()
         audioUnit = audioEngine.getAudioUnit()
-        parameters = RNBOParameters(list: audioUnit.getParametersArray())
+        parameters = audioUnit.getParametersArray()
         eventHandler = RNBOEventHandler()
-        audioUnit.setEventHandler(eventHandler)
     }
 
     func play() {
@@ -41,13 +40,13 @@ class RNBOAudioUnitHostModel: ObservableObject {
     func sendMessage(_ message: [Double]) {
         audioUnit.sendMessage("foo", list: message)
     }
-    
+
     func sendMIDINote(_ pitch: UInt8, velocity: UInt8) {
         audioUnit.sendMIDINote(pitch, velocity: velocity)
     }
-    
-    func connect() {
-        parameters.rnbo = self
+
+    func connectEventHandler() {
+        audioUnit.setEventHandler(eventHandler)
         eventHandler.rnbo = self
     }
 }
@@ -56,3 +55,39 @@ class RNBOAudioUnitHostModel: ObservableObject {
 // struct RNBODescription {
 //
 // }
+
+extension RNBOAudioUnitHostModel: RNBOEventHandlerProtocol {
+    func handle(_ event: RNBOParameterEvent) {
+        DispatchQueue.main.async {
+            self.parameters[event.index].value = event.value
+        }
+
+        let p = parameters[event.index]
+        print("\(p.displayName): \(p.value)")
+    }
+
+    func handle(_ event: RNBOMidiEvent) {
+        print("Received MIDI: \(event.midiData)")
+    }
+
+    func handle(_ event: RNBOMessageEvent) {
+    }
+
+    func handle(_ event: RNBOPresetEvent) {
+    }
+
+    func handle(_ event: RNBOTempoEvent) {
+    }
+
+    func handle(_ event: RNBOTransportEvent) {
+    }
+
+    func handle(_ event: RNBOBeatTimeEvent) {
+    }
+
+    func handle(_ event: RNBOTimeSignatureEvent) {
+    }
+
+    func handle(_ event: RNBOStartupEvent) {
+    }
+}
