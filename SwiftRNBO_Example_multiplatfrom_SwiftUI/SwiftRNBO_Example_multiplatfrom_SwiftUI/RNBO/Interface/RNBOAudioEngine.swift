@@ -50,11 +50,7 @@ class RNBOAudioEngine {
             audioFile = nil
         }
 
-        #if os(tvOS)
-            let type = kAudioUnitType_Generator
-        #else
-            let type = kAudioUnitType_Effect
-        #endif
+        let type = kAudioUnitType_Effect
 
         let subType: OSType = 0x71717171
         let manufacturer: OSType = 0x70707070

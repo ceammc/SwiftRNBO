@@ -32,7 +32,8 @@
             }
             .padding()
             .background()
-            .clipShape(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)))
+            .padding(.bottom)
+//            .clipShape(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)))
         }
     }
 

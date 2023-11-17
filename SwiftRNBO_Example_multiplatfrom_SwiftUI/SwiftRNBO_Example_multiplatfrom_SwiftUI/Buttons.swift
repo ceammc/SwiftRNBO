@@ -22,6 +22,7 @@ struct Buttons: View {
                 rnbo.play()
             }
         }
+        .padding(.bottom)
     }
 
     fileprivate func randomize() {

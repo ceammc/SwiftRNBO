@@ -5,6 +5,7 @@
 //  Created by Eldar Sadykov on 17.11.2023.
 //
 
+#if !os(tvOS)
 import Keyboard
 import SwiftUI
 
@@ -24,3 +25,4 @@ struct AudioKitKeyboard: View {
 #Preview {
     AudioKitKeyboard()
 }
+#endif

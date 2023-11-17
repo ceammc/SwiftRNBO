@@ -11,12 +11,12 @@ struct ContentView: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+            Buttons()
             #if !os(tvOS)
                 Sliders()
+                AudioKitKeyboard()
             #endif
-            Buttons()
-            AudioKitKeyboard()
         }
         .padding()
     }
