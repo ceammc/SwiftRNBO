@@ -243,7 +243,7 @@
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
-				AFF2B4F629A20A3500068DD0 /* Controls */,
+				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
 				AFF2B42129A2090300068DD0 /* Assets.xcassets */,
 				AFF2B42329A2090300068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements */,
 				AFF2B42429A2090300068DD0 /* Preview Content */,
@@ -634,14 +634,6 @@
 				AFF2B4D529A2093F00068DD0 /* variant.hpp */,
 			);
 			path = MPark_variant;
-			sourceTree = "<group>";
-		};
-		AFF2B4F629A20A3500068DD0 /* Controls */ = {
-			isa = PBXGroup;
-			children = (
-				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
-			);
-			path = Controls;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
