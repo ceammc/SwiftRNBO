@@ -240,7 +240,6 @@
 		AFF2B41C29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
-				AFF4B5212A0069D800087CB8 /* Synth.aif */,
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
@@ -273,6 +272,7 @@
 		AFF2B42F29A2093F00068DD0 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
+				AFF4B5212A0069D800087CB8 /* Synth.aif */,
 				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
 				AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */,
 				AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */,
