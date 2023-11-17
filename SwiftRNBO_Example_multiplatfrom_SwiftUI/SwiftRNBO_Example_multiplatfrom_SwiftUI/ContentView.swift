@@ -19,6 +19,5 @@ struct ContentView: View {
             AudioKitKeyboard()
         }
         .padding()
-        .background()
     }
 }
