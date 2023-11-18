@@ -14,7 +14,7 @@ struct Buttons: View {
             Button("Randomize") {
                 randomize()
             }
-            Button("Play dependency") {
+            Button("Send message") {
                 let message: [Double] = [220, 330, 0.2, 0.3, 0.5]
                 rnbo.sendMessage(message)
             }
