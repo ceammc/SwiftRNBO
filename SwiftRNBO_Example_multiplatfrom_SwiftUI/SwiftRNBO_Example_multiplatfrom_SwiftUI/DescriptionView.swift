@@ -33,6 +33,7 @@
                                 }
                             }
                         }
+                        
                         Section(header: Text("Inports")) {
                             if !rnboDescription.inports.isEmpty {
                                 ForEach(rnboDescription.inports, id: \.tag) { port in
