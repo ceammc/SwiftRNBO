@@ -31,6 +31,7 @@
 		AFF4B5222A006A8200087CB8 /* Synth.aif in Resources */ = {isa = PBXBuildFile; fileRef = AFF4B5212A0069D800087CB8 /* Synth.aif */; };
 		AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE412B09019A00800A23 /* RNBODescription.swift */; };
 		AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE432B09079000800A23 /* DescriptionView.swift */; };
+		AFFCBE462B09575300800A23 /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE452B09575300800A23 /* SliderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -215,6 +216,7 @@
 		AFF4B5212A0069D800087CB8 /* Synth.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Synth.aif; sourceTree = "<group>"; };
 		AFFCBE412B09019A00800A23 /* RNBODescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBODescription.swift; sourceTree = "<group>"; };
 		AFFCBE432B09079000800A23 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
+		AFFCBE452B09575300800A23 /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -253,6 +255,7 @@
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
 				AFFCBE432B09079000800A23 /* DescriptionView.swift */,
 				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
+				AFFCBE452B09575300800A23 /* SliderView.swift */,
 				AFEBC8E12B079BD80097D64B /* Buttons.swift */,
 				AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */,
 				AFF2B42129A2090300068DD0 /* Assets.xcassets */,
@@ -736,6 +739,7 @@
 				AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */,
 				AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */,
 				AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */,
+				AFFCBE462B09575300800A23 /* SliderView.swift in Sources */,
 				AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */,
 				AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */,
 				AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */,

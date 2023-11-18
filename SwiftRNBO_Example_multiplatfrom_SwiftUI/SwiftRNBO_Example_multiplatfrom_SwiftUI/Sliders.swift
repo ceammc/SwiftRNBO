@@ -12,28 +12,18 @@
         @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
         var body: some View {
-            VStack {
-                ForEach(rnbo.parameters.indices, id: \.self) { i in
-                    HStack {
-                        #if os(iOS)
-                            SliderNameLabel(name: rnbo.parameters[i].displayName)
-                        #endif
-                        Slider(value: $rnbo.parameters[i].valueNormalized) {
-                            SliderNameLabel(name: rnbo.parameters[i].displayName)
-                        } minimumValueLabel: {
-                            SliderValueLabel(value: rnbo.parameters[i].minValue)
-                        } maximumValueLabel: {
-                            SliderValueLabel(value: rnbo.parameters[i].maxValue)
-                        }
-                        .onChange(of: rnbo.parameters[i].valueNormalized) { rnbo.setParameterValueNormalized(to: $0, at: i) }
-                        SliderValueLabel(value: rnbo.parameters[i].value)
+            ScrollView {
+                VStack {
+                    ForEach($rnbo.parameters, id: \.index) { $parameter in
+                        SliderView(parameter: $parameter)
                     }
                 }
+                .padding()
+                .background()
+                .padding(.bottom)
             }
-            .padding()
-            .background()
+            .frame(minHeight: 100)
             .padding(.bottom)
-//            .clipShape(RoundedRectangle(cornerSize: CGSize(width: 8, height: 8)))
         }
     }
 

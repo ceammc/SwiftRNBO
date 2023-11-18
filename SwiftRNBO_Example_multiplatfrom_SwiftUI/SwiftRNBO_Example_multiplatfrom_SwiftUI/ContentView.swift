@@ -17,11 +17,7 @@ struct ContentView: View {
                 if rnbo.showDescription {
                     DescriptionView()
                 } else {
-                    ScrollView {
-                        Sliders()
-                    }
-                    .frame(minHeight: 100)
-                    .padding(.bottom)
+                    Sliders()
                     AudioKitKeyboard()
                 }
             #endif
