@@ -37,6 +37,10 @@ struct Parameter: Codable {
     let ioType: String
 }
 
+extension Parameter: Identifiable {
+    var id: String { paramId }
+}
+
 struct ExternalDataRef: Codable {
     let id, file, type, tag: String
 }
