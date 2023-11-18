@@ -69,39 +69,3 @@ class RNBOAudioUnitHostModel: ObservableObject {
 // struct RNBODescription {
 //
 // }
-
-extension RNBOAudioUnitHostModel: RNBOEventHandlerProtocol {
-    func handle(_ event: RNBOParameterEvent) {
-        DispatchQueue.main.async {
-            self.parameters[event.index].value = event.value
-        }
-
-        let p = parameters[event.index]
-        print("\(p.displayName): \(p.value)")
-    }
-
-    func handle(_ event: RNBOMidiEvent) {
-        print("Received MIDI: \(event.midiData)")
-    }
-
-    func handle(_ event: RNBOMessageEvent) {
-    }
-
-    func handle(_ event: RNBOPresetEvent) {
-    }
-
-    func handle(_ event: RNBOTempoEvent) {
-    }
-
-    func handle(_ event: RNBOTransportEvent) {
-    }
-
-    func handle(_ event: RNBOBeatTimeEvent) {
-    }
-
-    func handle(_ event: RNBOTimeSignatureEvent) {
-    }
-
-    func handle(_ event: RNBOStartupEvent) {
-    }
-}
