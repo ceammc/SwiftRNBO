@@ -44,6 +44,10 @@ struct RNBOParameter: Equatable {
     }
 }
 
+extension RNBOParameter: Identifiable {
+    var id: String { paramId }
+}
+
 extension RNBODescription {
     func getParametersArray() -> [RNBOParameter] {
         var parameters: [RNBOParameter] = []

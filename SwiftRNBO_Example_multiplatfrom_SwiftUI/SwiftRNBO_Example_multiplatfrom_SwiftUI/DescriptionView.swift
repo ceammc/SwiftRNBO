@@ -17,7 +17,7 @@
                     List {
                         Section(header: Text("Parameters")) {
                             if !rnboDescription.parameters.isEmpty {
-                                ForEach(rnboDescription.parameters, id: \.index) { parameter in
+                                ForEach(rnboDescription.parameters) { parameter in
 //                                    let groupTitle = parameter.displayName == "" ? parameter.name : parameter.displayName
                                     DisclosureGroup("\(parameter.index): \(parameter.paramId)") {
                                         ParameterView(parameter: parameter)

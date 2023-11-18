@@ -14,7 +14,7 @@
         var body: some View {
             ScrollView {
                 VStack {
-                    ForEach($rnbo.parameters, id: \.paramId) { $parameter in
+                    ForEach($rnbo.parameters) { $parameter in
                         SliderView(parameter: $parameter)
                     }
                 }
