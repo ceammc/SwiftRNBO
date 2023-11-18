@@ -19,6 +19,7 @@ struct AudioKitKeyboard: View {
             rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
         }
         .frame(minWidth: 600, minHeight: 100)
+        .frame(maxHeight: 200)
     }
 }
 

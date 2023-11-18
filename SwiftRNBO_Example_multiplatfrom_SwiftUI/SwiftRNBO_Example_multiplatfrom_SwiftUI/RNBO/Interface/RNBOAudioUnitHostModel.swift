@@ -14,9 +14,18 @@ class RNBOAudioUnitHostModel: ObservableObject {
     private let audioUnit: RNBOAudioUnit
     private let eventHandler = RNBOEventHandler()
     @Published var parameters: [RNBOParameter]
-    //    @Published var description: RNBODescription
+    let description: RNBODescription?
 
     init() {
+        do {
+            let url = Bundle.main.url(forResource: "description", withExtension: "json")!
+            let data = try Data(contentsOf: url)
+            description = try JSONDecoder().decode(RNBODescription.self, from: data)
+        } catch {
+            print("Error decoding JSON from URL: \(error)")
+            description = nil
+        }
+
         audioUnit = audioEngine.getAudioUnit()
         parameters = audioUnit.getParametersArray()
     }
@@ -64,8 +73,3 @@ class RNBOAudioUnitHostModel: ObservableObject {
         eventHandler.rnbo = self
     }
 }
-
-// TODO: Description import from json
-// struct RNBODescription {
-//
-// }

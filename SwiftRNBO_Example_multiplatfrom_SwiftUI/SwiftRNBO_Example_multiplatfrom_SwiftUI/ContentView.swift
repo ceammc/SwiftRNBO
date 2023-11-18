@@ -14,6 +14,7 @@ struct ContentView: View {
         VStack(spacing: 0) {
             Buttons()
             #if !os(tvOS)
+                DescriptionView()
                 Sliders()
                 AudioKitKeyboard()
             #endif

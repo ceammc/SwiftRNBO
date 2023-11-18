@@ -29,6 +29,8 @@
 		AFF2B4F529A2097600068DD0 /* media in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B4F429A2097600068DD0 /* media */; };
 		AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F729A20A3500068DD0 /* Sliders.swift */; };
 		AFF4B5222A006A8200087CB8 /* Synth.aif in Resources */ = {isa = PBXBuildFile; fileRef = AFF4B5212A0069D800087CB8 /* Synth.aif */; };
+		AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE412B09019A00800A23 /* RNBODescription.swift */; };
+		AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE432B09079000800A23 /* DescriptionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -211,6 +213,8 @@
 		AFF2B4F729A20A3500068DD0 /* Sliders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sliders.swift; sourceTree = "<group>"; };
 		AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOExtensionBufferedAudioBus.hpp; sourceTree = "<group>"; };
 		AFF4B5212A0069D800087CB8 /* Synth.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Synth.aif; sourceTree = "<group>"; };
+		AFFCBE412B09019A00800A23 /* RNBODescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBODescription.swift; sourceTree = "<group>"; };
+		AFFCBE432B09079000800A23 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,6 +251,7 @@
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
+				AFFCBE432B09079000800A23 /* DescriptionView.swift */,
 				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
 				AFEBC8E12B079BD80097D64B /* Buttons.swift */,
 				AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */,
@@ -279,6 +284,7 @@
 			isa = PBXGroup;
 			children = (
 				AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */,
+				AFFCBE412B09019A00800A23 /* RNBODescription.swift */,
 				AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */,
 				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
 				AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */,
@@ -734,9 +740,11 @@
 				AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */,
 				AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */,
 				AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */,
+				AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */,
 				AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */,
 				AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */,
 				AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */,
+				AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
