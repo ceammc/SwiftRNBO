@@ -103,15 +103,18 @@
         let inletOutlet: InletOutlet
 
         var body: some View {
-            DisclosureGroup("\(inletOutlet.type.capitalizedSentence)") {
-                if let index = inletOutlet.index {
-                    Text("Index: \(index)")
-                }
-                if let tag = inletOutlet.tag {
-                    Text("Tag: \(tag)")
-                }
-                // ... other properties
+            let indexString: String = if let index = inletOutlet.index {
+                String(index)
+            } else {
+                ""
             }
+            let tagString = if let tag = inletOutlet.tag {
+                ": \(tag)"
+            } else {
+                ""
+            }
+
+            Text("\(inletOutlet.type.capitalizedSentence) \(indexString)\(tagString)")
         }
     }
 
