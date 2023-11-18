@@ -33,7 +33,7 @@ struct Parameter: Codable {
     let displayName, unit: String
     let order: Int
     let debug, visible: Bool
-    let signalIndex: JSONNull?
+    let signalIndex: Int?
     let ioType: String
 }
 

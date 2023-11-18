@@ -17,7 +17,10 @@
                     List {
                         Section(header: Text("Parameters")) {
                             ForEach(rnboDescription.parameters.indices, id: \.self) { index in
-                                DisclosureGroup("\(rnboDescription.parameters[index].displayName)") {
+                                let displayName = rnboDescription.parameters[index].displayName
+                                let name = rnboDescription.parameters[index].name
+                                let groupTitle = displayName == "" ? name : displayName
+                                DisclosureGroup("\(groupTitle)") {
                                     ParameterView(parameter: rnboDescription.parameters[index])
                                 }
                             }
@@ -76,7 +79,27 @@
             Text("ID: \(parameter.paramId)")
             Text("Minimum: \(parameter.minimum)")
             Text("Maximum: \(parameter.maximum)")
-            // ... Display other properties of Parameter
+            Text("Minimum Value: \(parameter.minimum)")
+            Text("Maximum Value: \(parameter.maximum)")
+            Text("Exponent: \(parameter.exponent)")
+            Text("Steps: \(parameter.steps)")
+            Text("Initial Value: \(parameter.initialValue)")
+            Text("Is Enum: \(parameter.isEnum ? "Yes" : "No")")
+            // Enum values (if any)
+            if !parameter.enumValues.isEmpty {
+                Text("Enum Values: \(parameter.enumValues.map { "\($0)" }.joined(separator: ", "))")
+            }
+            Text("Display Name: \(parameter.displayName)")
+            Text("Unit: \(parameter.unit)")
+            Text("Order: \(parameter.order)")
+            Text("Debug: \(parameter.debug ? "Yes" : "No")")
+            Text("Visible: \(parameter.visible ? "Yes" : "No")")
+            if let signalIndex = parameter.signalIndex {
+                Text("Signal Index: \(signalIndex)")
+            } else {
+                Text("Signal Index: Not Available")
+            }
+            Text("IO Type: \(parameter.ioType)")
         }
     }
 
