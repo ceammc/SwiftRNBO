@@ -121,9 +121,7 @@
 
         var body: some View {
             Text("Tag: \(port.tag)")
-            if port.meta != "" {
-                Text("Meta: \(port.meta)")
-            }
+            Text("Meta: \(port.meta)")
         }
     }
 
