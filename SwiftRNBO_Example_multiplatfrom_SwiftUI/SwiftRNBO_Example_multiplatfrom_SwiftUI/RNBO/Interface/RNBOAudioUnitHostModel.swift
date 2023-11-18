@@ -14,7 +14,7 @@ class RNBOAudioUnitHostModel: ObservableObject {
     private let audioUnit: RNBOAudioUnit
     private let eventHandler = RNBOEventHandler()
     @Published var parameters: [RNBOParameter]
-    @Published var showDescription: Bool = true
+    @Published var showDescription: Bool = false
     let description: RNBODescription?
 
     init() {

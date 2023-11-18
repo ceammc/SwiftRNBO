@@ -17,10 +17,13 @@ struct ContentView: View {
                 if rnbo.showDescription {
                     DescriptionView()
                 } else {
-                    Sliders()
+                    ScrollView {
+                        Sliders()
+                    }
+                    .frame(minHeight: 100)
+                    .padding(.bottom)
+                    AudioKitKeyboard()
                 }
-                Spacer()
-                AudioKitKeyboard()
             #endif
         }
         .padding()
