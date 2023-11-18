@@ -16,42 +16,52 @@
                 if let rnboDescription = rnbo.description {
                     List {
                         Section(header: Text("Parameters")) {
-                            ForEach(rnboDescription.parameters.indices, id: \.self) { index in
-                                let displayName = rnboDescription.parameters[index].displayName
-                                let name = rnboDescription.parameters[index].name
-                                let groupTitle = displayName == "" ? name : displayName
-                                DisclosureGroup("\(groupTitle)") {
-                                    ParameterView(parameter: rnboDescription.parameters[index])
+                            if !rnboDescription.parameters.isEmpty {
+                                ForEach(rnboDescription.parameters, id: \.index) { parameter in
+                                    let groupTitle = parameter.displayName == "" ? parameter.name : parameter.displayName
+                                    DisclosureGroup("\(parameter.index): \(groupTitle)") {
+                                        ParameterView(parameter: parameter)
+                                    }
                                 }
                             }
                         }
 
                         Section(header: Text("External Data Refs")) {
-                            ForEach(rnboDescription.externalDataRefs, id: \.id) { ref in
-                                ExternalDataRefView(ref: ref)
+                            if !rnboDescription.externalDataRefs.isEmpty {
+                                ForEach(rnboDescription.externalDataRefs, id: \.id) { ref in
+                                    ExternalDataRefView(ref: ref)
+                                }
                             }
                         }
                         Section(header: Text("Inports")) {
-                            ForEach(rnboDescription.inports, id: \.tag) { port in
-                                PortView(port: port)
+                            if !rnboDescription.inports.isEmpty {
+                                ForEach(rnboDescription.inports, id: \.tag) { port in
+                                    PortView(port: port)
+                                }
                             }
                         }
 
                         Section(header: Text("Outports")) {
-                            ForEach(rnboDescription.outports, id: \.tag) { port in
-                                PortView(port: port)
+                            if !rnboDescription.outports.isEmpty {
+                                ForEach(rnboDescription.outports, id: \.tag) { port in
+                                    PortView(port: port)
+                                }
                             }
                         }
 
                         Section(header: Text("Inlets")) {
-                            ForEach(rnboDescription.inlets.indices, id: \.self) { index in
-                                InletOutletView(inletOutlet: rnboDescription.inlets[index])
+                            if !rnboDescription.inlets.isEmpty {
+                                ForEach(rnboDescription.inlets.indices, id: \.self) { index in
+                                    InletOutletView(inletOutlet: rnboDescription.inlets[index])
+                                }
                             }
                         }
 
                         Section(header: Text("Outlets")) {
-                            ForEach(rnboDescription.outlets.indices, id: \.self) { index in
-                                InletOutletView(inletOutlet: rnboDescription.outlets[index])
+                            if !rnboDescription.outlets.isEmpty {
+                                ForEach(rnboDescription.outlets.indices, id: \.self) { index in
+                                    InletOutletView(inletOutlet: rnboDescription.outlets[index])
+                                }
                             }
                         }
 
