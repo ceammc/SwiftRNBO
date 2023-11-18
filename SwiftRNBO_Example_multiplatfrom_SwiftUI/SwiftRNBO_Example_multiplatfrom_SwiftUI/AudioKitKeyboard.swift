@@ -21,10 +21,12 @@
                     Spacer()
                 }
                 Keyboard(latching: latch) { pitch, point in
+                    let pitch = UInt8(pitch.midiNoteNumber)
                     let velocity = latch ? 60 : UInt8(point.y * 127)
-                    rnbo.sendNoteOn(UInt8(pitch.midiNoteNumber), velocity: velocity)
+                    rnbo.sendNoteOn(pitch, velocity: velocity)
                 } noteOff: { pitch in
-                    rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
+                    let pitch = UInt8(pitch.midiNoteNumber)
+                    rnbo.sendNoteOff(pitch)
                 }
                 .frame(height: 100)
                 .frame(minWidth: 600)
