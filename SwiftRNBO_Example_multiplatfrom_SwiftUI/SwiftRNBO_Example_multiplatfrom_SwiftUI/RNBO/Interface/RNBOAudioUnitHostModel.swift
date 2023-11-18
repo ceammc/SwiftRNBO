@@ -28,7 +28,7 @@ class RNBOAudioUnitHostModel: ObservableObject {
         }
 
         audioUnit = audioEngine.getAudioUnit()
-        parameters = audioUnit.getParametersArray()
+        parameters = description?.getParametersArray() ?? []
     }
 
     func play() {

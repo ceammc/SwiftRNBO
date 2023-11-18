@@ -12,11 +12,12 @@ struct SliderView: View {
     @Binding var parameter: RNBOParameter
     var body: some View {
         HStack {
+            let displayName = parameter.displayName != "" ? parameter.displayName : parameter.name.capitalizedSentence
             #if os(iOS)
-                SliderNameLabel(name: parameter.displayName)
+                SliderNameLabel(name: displayName)
             #endif
             Slider(value: $parameter.valueNormalized) {
-                SliderNameLabel(name: parameter.displayName)
+                SliderNameLabel(name: displayName)
             } minimumValueLabel: {
                 SliderValueLabel(value: parameter.minValue)
             } maximumValueLabel: {

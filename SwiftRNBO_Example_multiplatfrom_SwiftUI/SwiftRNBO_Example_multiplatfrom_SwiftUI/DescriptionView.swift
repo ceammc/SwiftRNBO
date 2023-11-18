@@ -33,7 +33,7 @@
                                 }
                             }
                         }
-                        
+
                         Section(header: Text("Inports")) {
                             if !rnboDescription.inports.isEmpty {
                                 ForEach(rnboDescription.inports, id: \.tag) { port in
@@ -88,16 +88,13 @@
         var body: some View {
             Text("Name: \(parameter.name)")
             Text("ID: \(parameter.paramId)")
-            Text("Minimum: \(parameter.minimum)")
-            Text("Maximum: \(parameter.maximum)")
             Text("Minimum Value: \(parameter.minimum)")
             Text("Maximum Value: \(parameter.maximum)")
             Text("Exponent: \(parameter.exponent)")
             Text("Steps: \(parameter.steps)")
             Text("Initial Value: \(parameter.initialValue)")
             Text("Is Enum: \(parameter.isEnum ? "Yes" : "No")")
-            // Enum values (if any)
-            if !parameter.enumValues.isEmpty {
+            if parameter.isEnum {
                 Text("Enum Values: \(parameter.enumValues.map { "\($0)" }.joined(separator: ", "))")
             }
             Text("Display Name: \(parameter.displayName)")

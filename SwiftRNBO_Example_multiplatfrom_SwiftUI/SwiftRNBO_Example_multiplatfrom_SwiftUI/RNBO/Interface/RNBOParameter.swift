@@ -15,6 +15,7 @@ struct RNBOParameter: Equatable {
     let maxValue: Double
     let exponent: Double
     let unit: String
+    let name: String
     let displayName: String
     let steps: Int
 
@@ -27,7 +28,7 @@ struct RNBOParameter: Equatable {
         }
     }
 
-    init(index: Int, initialValue: Double, minValue: Double, maxValue: Double, exponent: Double, unit: String, displayName: String, steps: Int) {
+    init(index: Int, initialValue: Double, minValue: Double, maxValue: Double, exponent: Double, unit: String, name: String, displayName: String, steps: Int) {
         self.index = index
         self.minValue = minValue
         self.maxValue = maxValue
@@ -35,25 +36,28 @@ struct RNBOParameter: Equatable {
         self.initialValue = initialValue.clip(from: minValue, to: maxValue)
         value = self.initialValue
         self.unit = unit
+        self.name = name
         self.displayName = displayName
         self.steps = steps
     }
 }
 
-extension RNBOAudioUnit {
+extension RNBODescription {
     func getParametersArray() -> [RNBOParameter] {
         var parameters: [RNBOParameter] = []
-        for i in 0 ..< getParameterCount() {
+        for i in 0 ..< numParameters {
+            let parameter = self.parameters[i]
             parameters.append(
                 RNBOParameter(
                     index: i,
-                    initialValue: Double(getParameterInitialValue(i)),
-                    minValue: Double(getParameterMin(i)),
-                    maxValue: Double(getParameterMax(i)),
-                    exponent: Double(getParameterExponent(i)),
-                    unit: getParameterUnit(i),
-                    displayName: getParameterDisplayName(i),
-                    steps: Int(getParameterSteps(i))
+                    initialValue: parameter.initialValue,
+                    minValue: parameter.minimum,
+                    maxValue: parameter.maximum,
+                    exponent: parameter.exponent,
+                    unit: parameter.unit,
+                    name: parameter.name,
+                    displayName: parameter.displayName,
+                    steps: parameter.steps
                 )
             )
         }
