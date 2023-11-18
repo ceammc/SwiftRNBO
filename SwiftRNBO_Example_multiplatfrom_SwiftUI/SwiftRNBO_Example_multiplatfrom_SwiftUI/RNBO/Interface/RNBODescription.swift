@@ -29,7 +29,7 @@ struct Parameter: Codable {
     let steps: Int
     let initialValue: Double
     let isEnum: Bool
-    let enumValues: [JSONAny]
+    let enumValues: [EnumValue]
     let displayName, unit: String
     let order: Int
     let debug, visible: Bool
@@ -63,36 +63,26 @@ struct Meta: Codable {
 // Helper structs for handling JSON values and nulls
 struct JSONNull: Codable, Hashable {}
 
-struct JSONAny: Codable {
-    let value: Any
+struct EnumValue: Codable {
+    let string: String
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let intVal = try? container.decode(Int.self) {
-            value = intVal
+            string = String(intVal)
         } else if let doubleVal = try? container.decode(Double.self) {
-            value = doubleVal
+            string = String(doubleVal)
         } else if let stringVal = try? container.decode(String.self) {
-            value = stringVal
+            string = stringVal
         } else if container.decodeNil() {
-            value = JSONNull()
+            string = "null"
         } else {
-            throw DecodingError.typeMismatch(JSONAny.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Failed to decode JSONAny"))
+            throw DecodingError.typeMismatch(EnumValue.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Failed to decode JSONAny"))
         }
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        if let intVal = value as? Int {
-            try container.encode(intVal)
-        } else if let doubleVal = value as? Double {
-            try container.encode(doubleVal)
-        } else if let stringVal = value as? String {
-            try container.encode(stringVal)
-        } else if value is JSONNull {
-            try container.encodeNil()
-        } else {
-            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: encoder.codingPath, debugDescription: "JSONAny can only encode values of type Int, Double, String, or JSONNull"))
-        }
+        try container.encode(string)
     }
 }

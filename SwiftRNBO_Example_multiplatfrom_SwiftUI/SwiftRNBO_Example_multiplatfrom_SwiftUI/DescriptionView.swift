@@ -18,8 +18,8 @@
                         Section(header: Text("Parameters")) {
                             if !rnboDescription.parameters.isEmpty {
                                 ForEach(rnboDescription.parameters, id: \.index) { parameter in
-                                    let groupTitle = parameter.displayName == "" ? parameter.name : parameter.displayName
-                                    DisclosureGroup("\(parameter.index): \(groupTitle)") {
+//                                    let groupTitle = parameter.displayName == "" ? parameter.name : parameter.displayName
+                                    DisclosureGroup("\(parameter.index): \(parameter.paramId)") {
                                         ParameterView(parameter: parameter)
                                     }
                                 }
@@ -95,7 +95,7 @@
             Text("Initial Value: \(parameter.initialValue)")
             Text("Is Enum: \(parameter.isEnum ? "Yes" : "No")")
             if parameter.isEnum {
-                Text("Enum Values: \(parameter.enumValues.map { "\($0)" }.joined(separator: ", "))")
+                Text("Enum Values: \(parameter.enumValues.map { $0.string }.joined(separator: ", "))")
             }
             Text("Display Name: \(parameter.displayName)")
             Text("Unit: \(parameter.unit)")

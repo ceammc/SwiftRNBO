@@ -8,6 +8,7 @@
 import Foundation
 
 struct RNBOParameter: Equatable {
+    let paramId: String
     let index: Int
     let initialValue: Double
     var value: Double
@@ -28,7 +29,8 @@ struct RNBOParameter: Equatable {
         }
     }
 
-    init(index: Int, initialValue: Double, minValue: Double, maxValue: Double, exponent: Double, unit: String, name: String, displayName: String, steps: Int) {
+    init(paramId: String, index: Int, initialValue: Double, minValue: Double, maxValue: Double, exponent: Double, unit: String, name: String, displayName: String, steps: Int) {
+        self.paramId = paramId
         self.index = index
         self.minValue = minValue
         self.maxValue = maxValue
@@ -49,6 +51,7 @@ extension RNBODescription {
             let parameter = self.parameters[i]
             parameters.append(
                 RNBOParameter(
+                    paramId: parameter.paramId,
                     index: i,
                     initialValue: parameter.initialValue,
                     minValue: parameter.minimum,

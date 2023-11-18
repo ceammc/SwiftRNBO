@@ -12,7 +12,8 @@ struct SliderView: View {
     @Binding var parameter: RNBOParameter
     var body: some View {
         HStack {
-            let displayName = parameter.displayName != "" ? parameter.displayName : parameter.name.capitalizedSentence
+//            let displayName = parameter.displayName != "" ? parameter.displayName : parameter.name.capitalizedSentence
+            let displayName = parameter.paramId
             #if os(iOS)
                 SliderNameLabel(name: displayName)
             #endif
