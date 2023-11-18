@@ -109,7 +109,8 @@
         var body: some View {
             Text("ID: \(ref.id)")
             Text("File: \(ref.file)")
-            // ... other properties
+            Text("Tag: \(ref.tag)")
+            Text("Type: \(ref.type)")
         }
     }
 
@@ -118,7 +119,9 @@
 
         var body: some View {
             Text("Tag: \(port.tag)")
-            // ... other properties
+            if port.meta != "" {
+                Text("Meta: \(port.meta)")
+            }
         }
     }
 
@@ -145,9 +148,12 @@
         let meta: Meta
 
         var body: some View {
-            Text("Architecture: \(meta.architecture)")
-            Text("Filename: \(meta.filename)")
-            // ... other properties
+            Text("architecture: \(meta.architecture)")
+            Text("filename: \(meta.filename)")
+            Text("rnboobjname: \(meta.rnboobjname)")
+            Text("maxversion: \(meta.maxversion)")
+            Text("rnboversion: \(meta.rnboversion)")
+            Text("name: \(meta.name)")
         }
     }
 #endif

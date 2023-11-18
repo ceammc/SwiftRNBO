@@ -21,6 +21,9 @@ struct Buttons: View {
             Button("Play audio input") {
                 rnbo.play()
             }
+            Toggle(isOn: $rnbo.showDescription) {
+                Text("Show description")
+            }
         }
         .padding(.bottom)
     }

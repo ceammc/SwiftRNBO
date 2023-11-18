@@ -6,24 +6,24 @@
 //
 
 #if !os(tvOS)
-import Keyboard
-import SwiftUI
+    import Keyboard
+    import SwiftUI
 
-struct AudioKitKeyboard: View {
-    @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
+    struct AudioKitKeyboard: View {
+        @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
 
-    var body: some View {
-        Keyboard { pitch, point in
-            rnbo.sendNoteOn(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
-        } noteOff: { pitch in
-            rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
+        var body: some View {
+            Keyboard { pitch, point in
+                rnbo.sendNoteOn(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
+            } noteOff: { pitch in
+                rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
+            }
+            .frame(height: 100)
+            .frame(minWidth: 600)
         }
-        .frame(minWidth: 600, minHeight: 100)
-        .frame(maxHeight: 200)
     }
-}
 
-#Preview {
-    AudioKitKeyboard()
-}
+    #Preview {
+        AudioKitKeyboard()
+    }
 #endif
