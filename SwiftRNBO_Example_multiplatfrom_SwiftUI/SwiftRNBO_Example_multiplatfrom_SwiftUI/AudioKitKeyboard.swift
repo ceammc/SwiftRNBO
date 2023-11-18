@@ -11,15 +11,24 @@
 
     struct AudioKitKeyboard: View {
         @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
-
+        @State private var latch = false
         var body: some View {
-            Keyboard { pitch, point in
-                rnbo.sendNoteOn(UInt8(pitch.midiNoteNumber), velocity: UInt8(point.y * 127))
-            } noteOff: { pitch in
-                rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
+            VStack {
+                HStack {
+                    Toggle(isOn: $latch) {
+                        Text("Latch keys")
+                    }
+                    Spacer()
+                }
+                Keyboard(latching: latch) { pitch, point in
+                    let velocity = latch ? 60 : UInt8(point.y * 127)
+                    rnbo.sendNoteOn(UInt8(pitch.midiNoteNumber), velocity: velocity)
+                } noteOff: { pitch in
+                    rnbo.sendNoteOff(UInt8(pitch.midiNoteNumber))
+                }
+                .frame(height: 100)
+                .frame(minWidth: 600)
             }
-            .frame(height: 100)
-            .frame(minWidth: 600)
         }
     }
 
