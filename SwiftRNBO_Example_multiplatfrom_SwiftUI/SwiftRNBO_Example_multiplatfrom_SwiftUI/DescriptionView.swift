@@ -28,7 +28,7 @@
 
                         Section(header: Text("External Data Refs")) {
                             ForEach(rnboDescription.externalDataRefs, id: \.id) { ref in
-                                Text(ref.file)
+                                ExternalDataRefView(ref: ref)
                             }
                         }
                         Section(header: Text("Inports")) {
@@ -107,10 +107,12 @@
         let ref: ExternalDataRef
 
         var body: some View {
-            Text("ID: \(ref.id)")
-            Text("File: \(ref.file)")
-            Text("Tag: \(ref.tag)")
-            Text("Type: \(ref.type)")
+            DisclosureGroup(ref.id) {
+                Text("ID: \(ref.id)")
+                Text("File: \(ref.file)")
+                Text("Tag: \(ref.tag)")
+                Text("Type: \(ref.type)")
+            }
         }
     }
 
