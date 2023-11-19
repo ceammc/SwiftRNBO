@@ -50,6 +50,7 @@ struct SwiftRNBOApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear { rnbo.connectEventHandler() } // this is neccessary if you want to receive anything from the RNBO patcher, including MIDI
                 .environmentObject(rnbo)
         }
     }
@@ -65,6 +66,34 @@ rnbo.setParameterValueNormalized(to: 0.5, at: 3)
 ```
 
 ... and its `parameters` property to keep your application's UI in sync with it.
+
+## Sending and receiving MIDI
+
+```Swift
+var rnbo = RNBOAudioUnitHostModel()
+rnbo.sendNoteOn(60, velocity: 120, channel: 0) // channel is zero-based
+rnbo.sendNoteOff(60, releaseVelocity: 0, channel: 0)
+rnbo.sendAftertouch(60, pressure: 50, channel: 0)
+rnbo.sendContinuousController(11, value: 60, channel: 0) 
+rnbo.sendPatchChange(0, channel: 0) // aka program change, zero-based
+rnbo.sendPitchBend(8192, channel: 0) // 8192 is the middle point, 0 is the lowest
+rnbo.sendChannelPressure(60, channel: 0)
+```
+
+To customize how incoming MIDI messages are handled, edit the `RNBOEventHandler` class.
+
+## Sending and receiving messages (inports and outports)
+
+There are three types of messages: `bang`, `number` and `list`.
+Currently you can only send a `list` using `sendMessage` method:
+```Swift
+var rnbo = RNBOAudioUnitHostModel()
+let message: [Double] = [220, 330, 0.2, 0.3, 0.5]
+rnbo.sendMessage(message)
+```
+`Number` is a single element `list` and the `bang` should be converted from an arbitrary non-empty message in the pathcer itself for now.
+
+Currently RNBOEventHandler can't receive messages from outports. Help with implementation would be appreciated.
 
 ## Creating a new project
 
@@ -85,6 +114,8 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
    - In the Inspector area enable the '_Target Membership_' in all of the desired targets.
    - Do the same with the following files and folders inside the `RNBO` group:
      - `Bindings/RNBOAudioUnit.mm`
+     - `Bindings/RNBOEventHandler.mm`
+     - `Bindings/RNBOList.mm`
      - `Export/rnbo/RNBO.cpp`
      - `Export/rnbo_source.cpp`
      - `Export/dependencies.json`
@@ -95,7 +126,7 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 1. **Define the path to an Objective-C Bridging Header**
    - Select your project in the Xcode Navigator area (the one with the blue icon);
    - In the Editing area select your target's Build Settings;
-   - Search for the '_Objective-C Bridging Header_' field (use the '_filter_' textfield);
+   - Search for the '_Objective-C Bridging Header_' field (use the '_filter_' textfield, don't forget to select 'All' in the search toolbar);
    - Enter `${PRODUCT_NAME}/RNBO/Bindings/RNBO-Bridging-Header.h` into it.
 1. **Define the Header Search Paths**
    - Without leaving the '_Build Settings_' tab search for the '_Header Search Paths_' field;
@@ -122,16 +153,9 @@ If you already have a `media` folder as a group as a result of adding of the who
 ### Supported file sizes:
 You can only import the first **4GB** of an audio file. If the file size exceeds this limit, the rest will be omitted.
 
-## Current limitations
-
-- Only parameter changes are currently supported. MIDI functionality, messages, outports, inports, multichannel audio and other such things will be added during the ongoing development;
-- Only SwiftUI multiplatform sample project currently exists. UIKit and Objective-C examples will be added in the future;
-- Only a fraction of methods is currently implemented;
-- SwiftRNBO is currently available only as an example Xcode project, not a package. There are many inconveniences because of that. We are looking forward to fix that as soon as possible.
-
 ## Contribution
 
-Please feel free to create forks and pull requests, any help and/or suggestions would be greatly appreciated.
+Please feel free to fork and create pull requests, any help and/or suggestions would be greatly appreciated.
 
 ## Credits
 
