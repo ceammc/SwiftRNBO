@@ -44,6 +44,7 @@ extern void processBuffer(float *p, int len);
 - (void)sendMessage:(NSString *)tag list:(NSArray *)list;
 - (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel;
 - (void)sendNoteOffMessageWithPitch:(uint8_t)pitch releaseVelocity:(uint8_t)releaseVelocity channel:(uint8_t)channel;
+- (void)sendMidiCCWithNumber:(uint8_t)number value:(uint8_t)value channel:(uint8_t)channel;
 - (void)setEventHandler:(NSObject<RNBOEventHandlerProtocol> *)handler;
 - (void)eventHandlerEventsAvailable;
 @end

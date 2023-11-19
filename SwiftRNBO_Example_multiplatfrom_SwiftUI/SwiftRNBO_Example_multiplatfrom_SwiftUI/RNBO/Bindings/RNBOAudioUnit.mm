@@ -328,25 +328,41 @@ double sampleRateHz = 44100.0;
 
 #pragma mark - MIDI
 
-- (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
-    const uint8_t noteOn = 0x90;
-    const uint8_t midiChannel = channel;
+//MIDI commands
+//   0x80     Note Off
+//   0x90     Note On
+//   0xA0     Aftertouch
+//   0xB0     Continuous controller
+//   0xC0     Patch change
+//   0xD0     Channel Pressure
+//   0xE0     Pitch bend
+//   0xF0     (non-musical commands)
 
-    const uint8_t noteOnLeadByte = noteOn | midiChannel;
+- (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
+    const uint8_t command = 0x90;
+    const uint8_t leadByte = command | channel;
     const uint8_t midiBytes[3] = {
-        noteOnLeadByte, pitch, velocity
+        leadByte, pitch, velocity
     };
 
     self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
 }
 
 - (void)sendNoteOffMessageWithPitch:(uint8_t)pitch releaseVelocity:(uint8_t)releaseVelocity channel:(uint8_t)channel {
-    const uint8_t noteOff = 0x80;
-    const uint8_t midiChannel = channel;
-
-    const uint8_t noteOffLeadByte = noteOff | midiChannel;
+    const uint8_t command = 0x80;
+    const uint8_t leadByte = command | channel;
     const uint8_t midiBytes[3] = {
-        noteOffLeadByte, pitch, releaseVelocity
+        leadByte, pitch, releaseVelocity
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+}
+
+- (void)sendMidiCCWithNumber:(uint8_t)number value:(uint8_t)value channel:(uint8_t)channel {
+    const uint8_t command = 0xB0;
+    const uint8_t leadByte = command | channel;
+    const uint8_t midiBytes[3] = {
+        leadByte, number, value
     };
 
     self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));

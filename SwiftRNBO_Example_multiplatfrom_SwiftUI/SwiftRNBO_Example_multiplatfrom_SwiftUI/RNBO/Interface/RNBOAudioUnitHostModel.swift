@@ -69,6 +69,10 @@ class RNBOAudioUnitHostModel: ObservableObject {
         audioUnit.sendNoteOffMessage(withPitch: pitch, releaseVelocity: releaseVelocity, channel: channel)
     }
 
+    func sendMidiCC(_ number: UInt8, value: UInt8, channel: UInt8 = 0) {
+        audioUnit.sendMidiCC(withNumber: number, value: value, channel: channel)
+    }
+
     func connectEventHandler() {
         audioUnit.setEventHandler(eventHandler)
         eventHandler.rnbo = self
