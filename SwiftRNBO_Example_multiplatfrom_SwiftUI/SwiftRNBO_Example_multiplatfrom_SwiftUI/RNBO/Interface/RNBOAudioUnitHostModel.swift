@@ -69,8 +69,24 @@ class RNBOAudioUnitHostModel: ObservableObject {
         audioUnit.sendNoteOffMessage(withPitch: pitch, releaseVelocity: releaseVelocity, channel: channel)
     }
 
-    func sendMidiCC(_ number: UInt8, value: UInt8, channel: UInt8 = 0) {
-        audioUnit.sendMidiCC(withNumber: number, value: value, channel: channel)
+    func sendAftertouch(_ pitch: UInt8, pressure: UInt8, channel: UInt8 = 0) {
+        audioUnit.sendAftertouchMessage(withPitch: pitch, pressure: pressure, channel: channel)
+    }
+
+    func sendContinuousController(_ number: UInt8, value: UInt8, channel: UInt8 = 0) {
+        audioUnit.sendContinuousController(withNumber: number, value: value, channel: channel)
+    }
+
+    func sendPatchChange(_ program: UInt8, channel: UInt8 = 0) {
+        audioUnit.sendPatchChangeMessage(withProgram: program, channel: channel)
+    }
+
+    func sendChannelPressure(_ pressure: UInt8, channel: UInt8 = 0) {
+        audioUnit.sendChannelPressureMessage(withPressure: pressure, channel: channel)
+    }
+
+    func sendPitchBend(_ value: UInt16, channel: UInt8 = 0) {
+        audioUnit.sendPitchBendMessage(withValue: value, channel: channel)
     }
 
     func connectEventHandler() {

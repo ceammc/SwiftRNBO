@@ -328,41 +328,53 @@ double sampleRateHz = 44100.0;
 
 #pragma mark - MIDI
 
-//MIDI commands
-//   0x80     Note Off
-//   0x90     Note On
-//   0xA0     Aftertouch
-//   0xB0     Continuous controller
-//   0xC0     Patch change
-//   0xD0     Channel Pressure
-//   0xE0     Pitch bend
-//   0xF0     (non-musical commands)
-
-- (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
-    const uint8_t command = 0x90;
+- (void)sendMidiMessageWithCommand:(MidiCommand)command byte1:(uint8_t)byte1 byte2:(uint8_t)byte2 channel:(uint8_t)channel {
     const uint8_t leadByte = command | channel;
     const uint8_t midiBytes[3] = {
-        leadByte, pitch, velocity
+        leadByte, byte1, byte2
     };
 
     self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+}
+
+- (void)sendTwoByteMidiMessageWithCommand:(MidiCommand)command byte1:(uint8_t)byte1 channel:(uint8_t)channel {
+    const uint8_t leadByte = command | channel;
+    const uint8_t midiBytes[2] = {
+        leadByte, byte1
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 2));
+}
+
+- (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandNoteOn byte1:pitch byte2:velocity channel:channel];
 }
 
 - (void)sendNoteOffMessageWithPitch:(uint8_t)pitch releaseVelocity:(uint8_t)releaseVelocity channel:(uint8_t)channel {
-    const uint8_t command = 0x80;
-    const uint8_t leadByte = command | channel;
-    const uint8_t midiBytes[3] = {
-        leadByte, pitch, releaseVelocity
-    };
-
-    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+    [self sendMidiMessageWithCommand:MidiCommandNoteOff byte1:pitch byte2:releaseVelocity channel:channel];
 }
 
-- (void)sendMidiCCWithNumber:(uint8_t)number value:(uint8_t)value channel:(uint8_t)channel {
-    const uint8_t command = 0xB0;
+- (void)sendAftertouchMessageWithPitch:(uint8_t)pitch pressure:(uint8_t)pressure channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandAftertouch byte1:pitch byte2:pressure channel:channel];
+}
+
+- (void)sendContinuousControllerWithNumber:(uint8_t)number value:(uint8_t)value channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandContinuousController byte1:number byte2:value channel:channel];
+}
+
+- (void)sendPatchChangeMessageWithProgram:(uint8_t)program channel:(uint8_t)channel {
+    [self sendTwoByteMidiMessageWithCommand:MidiCommandPatchChange byte1:program channel:channel];
+}
+
+- (void)sendChannelPressureMessageWithPressure:(uint8_t)pressure channel:(uint8_t)channel {
+    [self sendTwoByteMidiMessageWithCommand:MidiCommandChannelPressure byte1:pressure channel:channel];
+}
+
+- (void)sendPitchBendMessageWithValue:(uint16_t)value channel:(uint8_t)channel {
+    const uint8_t command = MidiCommandPitchBend;
     const uint8_t leadByte = command | channel;
     const uint8_t midiBytes[3] = {
-        leadByte, number, value
+        leadByte, (uint8_t)(value & 0x7F), (uint8_t)((value >> 7) & 0x7F)
     };
 
     self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));

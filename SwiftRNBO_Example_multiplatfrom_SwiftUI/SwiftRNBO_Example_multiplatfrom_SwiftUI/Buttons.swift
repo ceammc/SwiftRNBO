@@ -11,8 +11,17 @@ struct Buttons: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
     var body: some View {
         HStack {
-            Button("Test MIDI CC") {
-                rnbo.sendMidiCC(11, value: 60)
+            Button("Test MIDI") {
+                print("CC")
+                rnbo.sendContinuousController(11, value: 60)
+                print("PitchBend")
+                rnbo.sendPitchBend(8192)
+                print("Patch")
+                rnbo.sendPatchChange(1)
+                print("Pressure")
+                rnbo.sendChannelPressure(60)
+                print("Aftertouch")
+                rnbo.sendAftertouch(60, pressure: 50)
             }
             Button("Randomize") {
                 randomize()
