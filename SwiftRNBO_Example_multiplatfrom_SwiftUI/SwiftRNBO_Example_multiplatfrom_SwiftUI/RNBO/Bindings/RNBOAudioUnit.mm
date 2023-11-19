@@ -44,7 +44,7 @@ double sampleRateHz = 44100.0;
 //}
 //-(id)initWithEventHandler:(NSObject<RNBOEventHandlerProtocol>*)eventHandler;
 
-#pragma mark -
+#pragma mark - Init
 
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
                                      options:(AudioComponentInstantiationOptions)options
@@ -326,7 +326,7 @@ double sampleRateHz = 44100.0;
     self->_object->sendMessage(RNBO::TAG([tag UTF8String]), std::unique_ptr<RNBO::list>(converted));
 }
 
-#pragma mark -
+#pragma mark - MIDI
 
 - (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
     const uint8_t noteOn = 0x90;
@@ -352,7 +352,7 @@ double sampleRateHz = 44100.0;
     self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
 }
 
-#pragma mark -
+#pragma mark - EventHandler
 
 - (void)setEventHandler:(NSObject<RNBOEventHandlerProtocol> *)handler {
     _eventHandler->setEventHandler(handler);
@@ -362,8 +362,7 @@ double sampleRateHz = 44100.0;
     _eventHandler->eventsAvailable();
 }
 
-#pragma mark -
-#pragma mark file loader
+#pragma mark - File Loader
 
 CFURLRef _getFileUrl(const std::string& filepath) {
     NSString *filePathNSString = [NSString stringWithFormat:@"%s", filepath.c_str()];
