@@ -21,10 +21,13 @@ RNBOParameterEvent convertEvent(const RNBO::ParameterEvent& event) {
 
 RNBOMidiEvent convertEvent(const RNBO::MidiEvent& event) {
     RNBOMidiEvent ret {};
+
     ret.length = event.getLength();
-    ret.midiData[0] = event.getData()[0];
-    ret.midiData[1] = event.getData()[1];
-    ret.midiData[2] = event.getData()[2];
+
+    for (uint8_t i = 0; i < ret.length; i++) {
+        ret.midiData[i] = event.getData()[i];
+    }
+
     ret.portIndex = event.getPortIndex();
     ret.timeMilliseconds = event.getTime();
 
@@ -33,6 +36,7 @@ RNBOMidiEvent convertEvent(const RNBO::MidiEvent& event) {
 
 RNBOMessageEvent convertEvent(const RNBO::MessageEvent& event) {
     RNBOMessageEvent ret {};
+
     ret.tag = event.getTag();
     ret.eventTime = event.getTime();
     ret.objectId = event.getObjectId();
