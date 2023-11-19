@@ -257,9 +257,12 @@ namespace RNBO {
 #endif	// RNBO_USE_FLOAT32
 
 
-#define uint32_add(x, y) (UBinOpInt)x + (UBinOpInt)y
+#define uint32_add(x, y) (UBinOpInt)((UBinOpInt)x + (UBinOpInt)y)
 #define uint32_trunc(x)	((UBinOpInt)((int64_t)(x)))
 #define uint32_rshift(x, y)	((UBinOpInt)x >> (UBinOpInt)y)
+
+#define imod(x, y) ((Int)x % (Int)y)
+#define imod_nocast(x, y) (x % y)
 
 } // namespace RNBO
 

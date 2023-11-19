@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */; };
+		AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF4B408F2B061DDD00FAACBF /* RNBOList.mm */; };
+		AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */; };
+		AF4B409B2B06C4B100FAACBF /* Keyboard in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, macos, ); productRef = AF4B409A2B06C4B100FAACBF /* Keyboard */; };
+		AF865DE82B0A381B0019FB28 /* MIDIHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */; };
+		AFEBC8E22B079BD80097D64B /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E12B079BD80097D64B /* Buttons.swift */; };
+		AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
 		AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41F29A2090200068DD0 /* ContentView.swift */; };
 		AFF2B42229A2090300068DD0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B42129A2090300068DD0 /* Assets.xcassets */; };
@@ -21,12 +28,23 @@
 		AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4E729A2093F00068DD0 /* rnbo_source.cpp */; };
 		AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B48929A2093F00068DD0 /* RNBO.cpp */; };
 		AFF2B4F529A2097600068DD0 /* media in Resources */ = {isa = PBXBuildFile; fileRef = AFF2B4F429A2097600068DD0 /* media */; };
-		AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */; };
 		AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B4F729A20A3500068DD0 /* Sliders.swift */; };
 		AFF4B5222A006A8200087CB8 /* Synth.aif in Resources */ = {isa = PBXBuildFile; fileRef = AFF4B5212A0069D800087CB8 /* Synth.aif */; };
+		AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE412B09019A00800A23 /* RNBODescription.swift */; };
+		AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE432B09079000800A23 /* DescriptionView.swift */; };
+		AFFCBE462B09575300800A23 /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFFCBE452B09575300800A23 /* SliderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AF4B408B2B061DDD00FAACBF /* RNBOEventHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOEventHandler.hpp; sourceTree = "<group>"; };
+		AF4B408C2B061DDD00FAACBF /* RNBOList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNBOList.h; sourceTree = "<group>"; };
+		AF4B408D2B061DDD00FAACBF /* RNBOEventHandlerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNBOEventHandlerProtocol.h; sourceTree = "<group>"; };
+		AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOEventHandler.mm; sourceTree = "<group>"; };
+		AF4B408F2B061DDD00FAACBF /* RNBOList.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOList.mm; sourceTree = "<group>"; };
+		AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOEventHandler.swift; sourceTree = "<group>"; };
+		AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIHelpers.swift; sourceTree = "<group>"; };
+		AFEBC8E12B079BD80097D64B /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioKitKeyboard.swift; sourceTree = "<group>"; };
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift; sourceTree = "<group>"; };
 		AFF2B41F29A2090200068DD0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -196,9 +214,11 @@
 		AFF2B4E829A2093F00068DD0 /* description.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = description.json; sourceTree = "<group>"; };
 		AFF2B4F429A2097600068DD0 /* media */ = {isa = PBXFileReference; lastKnownFileType = folder; path = media; sourceTree = "<group>"; };
 		AFF2B4F729A20A3500068DD0 /* Sliders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sliders.swift; sourceTree = "<group>"; };
-		AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomizeButton.swift; sourceTree = "<group>"; };
 		AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RNBOExtensionBufferedAudioBus.hpp; sourceTree = "<group>"; };
 		AFF4B5212A0069D800087CB8 /* Synth.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = Synth.aif; sourceTree = "<group>"; };
+		AFFCBE412B09019A00800A23 /* RNBODescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBODescription.swift; sourceTree = "<group>"; };
+		AFFCBE432B09079000800A23 /* DescriptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptionView.swift; sourceTree = "<group>"; };
+		AFFCBE452B09575300800A23 /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,6 +226,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF4B409B2B06C4B100FAACBF /* Keyboard in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,11 +252,14 @@
 		AFF2B41C29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
-				AFF4B5212A0069D800087CB8 /* Synth.aif */,
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
-				AFF2B4F629A20A3500068DD0 /* Controls */,
+				AFFCBE432B09079000800A23 /* DescriptionView.swift */,
+				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
+				AFFCBE452B09575300800A23 /* SliderView.swift */,
+				AFEBC8E12B079BD80097D64B /* Buttons.swift */,
+				AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */,
 				AFF2B42129A2090300068DD0 /* Assets.xcassets */,
 				AFF2B42329A2090300068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements */,
 				AFF2B42429A2090300068DD0 /* Preview Content */,
@@ -264,9 +288,13 @@
 		AFF2B42F29A2093F00068DD0 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
-				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
 				AFF2B43129A2093F00068DD0 /* RNBOAudioUnitHostModel.swift */,
+				AFFCBE412B09019A00800A23 /* RNBODescription.swift */,
+				AFF2B43029A2093F00068DD0 /* RNBOParameter.swift */,
 				AFF2B43229A2093F00068DD0 /* RNBOAudioEngine.swift */,
+				AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */,
+				AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */,
+				AFF4B5212A0069D800087CB8 /* Synth.aif */,
 			);
 			path = Interface;
 			sourceTree = "<group>";
@@ -278,6 +306,11 @@
 				AFF2B43629A2093F00068DD0 /* RNBOAudioUnit.h */,
 				AFF2B43529A2093F00068DD0 /* RNBOAudioUnit.mm */,
 				AFF4B51F2A003A0800087CB8 /* RNBOExtensionBufferedAudioBus.hpp */,
+				AF4B408B2B061DDD00FAACBF /* RNBOEventHandler.hpp */,
+				AF4B408E2B061DDD00FAACBF /* RNBOEventHandler.mm */,
+				AF4B408D2B061DDD00FAACBF /* RNBOEventHandlerProtocol.h */,
+				AF4B408C2B061DDD00FAACBF /* RNBOList.h */,
+				AF4B408F2B061DDD00FAACBF /* RNBOList.mm */,
 			);
 			path = Bindings;
 			sourceTree = "<group>";
@@ -621,15 +654,6 @@
 			path = MPark_variant;
 			sourceTree = "<group>";
 		};
-		AFF2B4F629A20A3500068DD0 /* Controls */ = {
-			isa = PBXGroup;
-			children = (
-				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
-				AFF2B4F829A20A3500068DD0 /* RandomizeButton.swift */,
-			);
-			path = Controls;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -646,6 +670,9 @@
 			dependencies = (
 			);
 			name = SwiftRNBO_Example_multiplatfrom_SwiftUI;
+			packageProductDependencies = (
+				AF4B409A2B06C4B100FAACBF /* Keyboard */,
+			);
 			productName = SwiftRNBO_Example_multiplatfrom_SwiftUI;
 			productReference = AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */;
 			productType = "com.apple.product-type.application";
@@ -658,7 +685,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					AFF2B41929A2090200068DD0 = {
 						CreatedOnToolsVersion = 14.2;
@@ -674,6 +701,9 @@
 				Base,
 			);
 			mainGroup = AFF2B41129A2090200068DD0;
+			packageReferences = (
+				AF4B40992B06C4B100FAACBF /* XCRemoteSwiftPackageReference "Keyboard" */,
+			);
 			productRefGroup = AFF2B41B29A2090200068DD0 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -707,14 +737,22 @@
 			files = (
 				AFF2B4FA29A20A3900068DD0 /* Sliders.swift in Sources */,
 				AFF2B4ED29A2094600068DD0 /* RNBOAudioUnitHostModel.swift in Sources */,
+				AF865DE82B0A381B0019FB28 /* MIDIHelpers.swift in Sources */,
+				AF4B40902B061DDD00FAACBF /* RNBOEventHandler.mm in Sources */,
+				AFEBC8E22B079BD80097D64B /* Buttons.swift in Sources */,
 				AFF2B4F229A2094D00068DD0 /* rnbo_source.cpp in Sources */,
-				AFF2B4F929A20A3900068DD0 /* RandomizeButton.swift in Sources */,
+				AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */,
+				AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */,
+				AFFCBE462B09575300800A23 /* SliderView.swift in Sources */,
 				AFF2B4F329A2095300068DD0 /* RNBO.cpp in Sources */,
 				AFF2B4EE29A2094900068DD0 /* RNBOAudioUnit.mm in Sources */,
 				AFF2B4EC29A2094600068DD0 /* RNBOParameter.swift in Sources */,
+				AF4B40912B061DDD00FAACBF /* RNBOList.mm in Sources */,
+				AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */,
 				AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */,
 				AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */,
 				AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */,
+				AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +763,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -754,9 +793,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -783,6 +824,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -812,9 +854,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -838,6 +882,7 @@
 				CODE_SIGN_ENTITLEMENTS = SwiftRNBO_Example_multiplatfrom_SwiftUI/SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftRNBO_Example_multiplatfrom_SwiftUI/Preview Content\"";
 				DEVELOPMENT_TEAM = NMWUM834MV;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -845,6 +890,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "${PRODUCT_NAME}/RNBO/export/**";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses microphone.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -856,7 +902,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
@@ -871,6 +917,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "${PRODUCT_NAME}/RNBO/Bindings/RNBO-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Debug;
 		};
@@ -882,6 +929,7 @@
 				CODE_SIGN_ENTITLEMENTS = SwiftRNBO_Example_multiplatfrom_SwiftUI/SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftRNBO_Example_multiplatfrom_SwiftUI/Preview Content\"";
 				DEVELOPMENT_TEAM = NMWUM834MV;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -889,6 +937,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "${PRODUCT_NAME}/RNBO/export/**";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses microphone.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -900,7 +949,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
@@ -915,6 +964,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "${PRODUCT_NAME}/RNBO/Bindings/RNBO-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
 			};
 			name = Release;
 		};
@@ -940,6 +990,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AF4B40992B06C4B100FAACBF /* XCRemoteSwiftPackageReference "Keyboard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AudioKit/Keyboard.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AF4B409A2B06C4B100FAACBF /* Keyboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AF4B40992B06C4B100FAACBF /* XCRemoteSwiftPackageReference "Keyboard" */;
+			productName = Keyboard;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AFF2B41229A2090200068DD0 /* Project object */;
 }

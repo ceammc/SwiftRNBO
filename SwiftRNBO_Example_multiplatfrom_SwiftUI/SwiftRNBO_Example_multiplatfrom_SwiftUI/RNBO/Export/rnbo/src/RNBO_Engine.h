@@ -247,7 +247,7 @@ namespace RNBO {
 			}
 		}
 
-		void sendParameter(Index index) override {
+		void sendParameter(Index index, bool ignoreValue) override {
 			this->getEngine()->notifyParameterValueChanged(index, this->getParameterValue(index), false);
 		}
 
@@ -256,11 +256,11 @@ namespace RNBO {
 			switch (index) {
 				case 0:
 					test_param1 = value;
-					this->sendParameter(0);
+					this->sendParameter(0, false);
 					break;
 				case 1:
 					test_param2 = value;
-					this->sendParameter(1);
+					this->sendParameter(1, false);
 					break;
 				default:
 					break;
@@ -344,7 +344,7 @@ namespace RNBO {
 
 	};
 
-	PatcherInterface* creaternbomatic()
+	PatcherInterface* createmockcore()
 	{
 		return new MockCoreObject();
 	}
@@ -352,7 +352,7 @@ namespace RNBO {
 	extern "C" PatcherFactoryFunctionPtr GetPatcherFactoryFunction(PlatformInterface* platformInterface)
 	{
 		Platform::set(platformInterface);
-		return creaternbomatic;
+		return createmockcore;
 	}
 
 	class EngineTests : public UnitTest, public EventHandler {

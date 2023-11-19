@@ -14,6 +14,7 @@
 #include <memory>
 
 #import <AudioToolbox/AudioToolbox.h>
+#include "RNBOEventHandler.hpp"
 #import "RNBOExtensionBufferedAudioBus.hpp"
 
 long int toneCount = 1;
@@ -30,15 +31,28 @@ double sampleRateHz = 44100.0;
 @implementation RNBOAudioUnit {
     BufferedInputBus _inputBus;
     std::unique_ptr<RNBO::CoreObject> _object;
+    std::unique_ptr<RNBOEventHandler> _eventHandler;
 }
 
+#pragma mark -
+
+//-(id)init{
+//
+//    self = [super init];
+//    if (self) { self->_handler = nil;}
+//    return self;
+//}
+//-(id)initWithEventHandler:(NSObject<RNBOEventHandlerProtocol>*)eventHandler;
+
+#pragma mark - Init
+
 - (instancetype)initWithComponentDescription:(AudioComponentDescription)componentDescription
-                options						:(AudioComponentInstantiationOptions)options
-                error						:(NSError **)outError
+                                     options:(AudioComponentInstantiationOptions)options
+                                       error:(NSError **)outError
 {
-    self = [super	initWithComponentDescription:componentDescription
-                    options						:options
-                    error						:outError];
+    self = [super initWithComponentDescription:componentDescription
+                                       options:options
+                                         error:outError];
 
     if (self == nil) {
         return nil;
@@ -54,18 +68,20 @@ double sampleRateHz = 44100.0;
     _inputBus.init(format, maxChannels);
 
     // Create the input and output bus arrays.
-    _inputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
-                                                    busType				:AUAudioUnitBusTypeInput
-                                                    busses				:@[_inputBus.bus]];
+    _inputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
+                                                            busType:AUAudioUnitBusTypeInput
+                                                             busses:@[_inputBus.bus]];
     // then an array with it
-    _outputBusArray = [[AUAudioUnitBusArray alloc]	initWithAudioUnit	:self
-                                                    busType				:AUAudioUnitBusTypeOutput
-                                                    busses				:@[_outputBus]];
+    _outputBusArray = [[AUAudioUnitBusArray alloc] initWithAudioUnit:self
+                                                             busType:AUAudioUnitBusTypeOutput
+                                                              busses:@[_outputBus]];
 
     self.maximumFramesToRender = 512;
 
+    _eventHandler.reset(new RNBOEventHandler());
+
     // our
-    _object.reset(new RNBO::CoreObject());
+    _object.reset(new RNBO::CoreObject(_eventHandler.get()));
     _object->prepareToProcess(_outputBusArray[0].format.sampleRate, 64);
 
     //
@@ -291,7 +307,90 @@ double sampleRateHz = 44100.0;
 }
 
 #pragma mark -
-#pragma mark file loader
+
+- (void)sendMessage:(NSString *)tag {
+    self->_object->sendMessage(RNBO::TAG([tag UTF8String]));
+}
+
+- (void)sendMessage:(NSString *)tag number:(float)number {
+    self->_object->sendMessage(RNBO::TAG([tag UTF8String]), number);
+}
+
+- (void)sendMessage:(NSString *)tag list:(NSArray *)list {
+    auto converted = new RNBO::list();
+
+    for (NSNumber *e in list) {
+        converted->push([e doubleValue]);
+    }
+
+    self->_object->sendMessage(RNBO::TAG([tag UTF8String]), std::unique_ptr<RNBO::list>(converted));
+}
+
+#pragma mark - MIDI
+
+- (void)sendMidiMessageWithCommand:(MidiCommand)command byte1:(uint8_t)byte1 byte2:(uint8_t)byte2 channel:(uint8_t)channel {
+    const uint8_t leadByte = command | channel;
+    const uint8_t midiBytes[3] = {
+        leadByte, byte1, byte2
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+}
+
+- (void)sendTwoByteMidiMessageWithCommand:(MidiCommand)command byte1:(uint8_t)byte1 channel:(uint8_t)channel {
+    const uint8_t leadByte = command | channel;
+    const uint8_t midiBytes[2] = {
+        leadByte, byte1
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 2));
+}
+
+- (void)sendNoteOnMessageWithPitch:(uint8_t)pitch velocity:(uint8_t)velocity channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandNoteOn byte1:pitch byte2:velocity channel:channel];
+}
+
+- (void)sendNoteOffMessageWithPitch:(uint8_t)pitch releaseVelocity:(uint8_t)releaseVelocity channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandNoteOff byte1:pitch byte2:releaseVelocity channel:channel];
+}
+
+- (void)sendAftertouchMessageWithPitch:(uint8_t)pitch pressure:(uint8_t)pressure channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandAftertouch byte1:pitch byte2:pressure channel:channel];
+}
+
+- (void)sendContinuousControllerWithNumber:(uint8_t)number value:(uint8_t)value channel:(uint8_t)channel {
+    [self sendMidiMessageWithCommand:MidiCommandContinuousController byte1:number byte2:value channel:channel];
+}
+
+- (void)sendPatchChangeMessageWithProgram:(uint8_t)program channel:(uint8_t)channel {
+    [self sendTwoByteMidiMessageWithCommand:MidiCommandPatchChange byte1:program channel:channel];
+}
+
+- (void)sendChannelPressureMessageWithPressure:(uint8_t)pressure channel:(uint8_t)channel {
+    [self sendTwoByteMidiMessageWithCommand:MidiCommandChannelPressure byte1:pressure channel:channel];
+}
+
+- (void)sendPitchBendMessageWithValue:(uint16_t)value channel:(uint8_t)channel {
+    const uint8_t command = MidiCommandPitchBend;
+    const uint8_t leadByte = command | channel;
+    const uint8_t midiBytes[3] = {
+        leadByte, (uint8_t)(value & 0x7F), (uint8_t)((value >> 7) & 0x7F)
+    };
+
+    self->_object->scheduleEvent(RNBO::MidiEvent(RNBO::RNBOTimeNow, 0, midiBytes, 3));
+}
+
+#pragma mark - EventHandler
+
+- (void)setEventHandler:(NSObject<RNBOEventHandlerProtocol> *)handler {
+    _eventHandler->setEventHandler(handler);
+}
+
+- (void)eventHandlerEventsAvailable {
+    _eventHandler->eventsAvailable();
+}
+
+#pragma mark - File Loader
 
 CFURLRef _getFileUrl(const std::string& filepath) {
     NSString *filePathNSString = [NSString stringWithFormat:@"%s", filepath.c_str()];
@@ -391,56 +490,63 @@ std::string _getStringFrom(CFURLRef cfUrl) {
             // Make space to store the file
             const uint32_t sampleBufferSize = sizeof(float) * frames * channels;
             float *sampleBuffer = (float *)malloc(sampleBufferSize);
-            
+
             // 11.2023: replaced converter code
             auto byteCount = sampleFormat / 8;
-            
+
             // float32 with endianness support
-            if (byteCount == 4){
-                const auto getData = [](uint8_t* d, const size_t& byteCount, const bool& b)->float {
+            if (byteCount == 4) {
+                const auto getData = [](uint8_t * d, const size_t& byteCount, const bool& b)->float {
                     uint8_t bytes[4];
-                    
-                    for (int i=0;i < 4;i++)
+
+                    for (int i = 0; i < 4; i++) {
                         // swapping bytes if needed
                         bytes[i] = d [(!b ? (i) : (byteCount - i - 1))];
-                    return *reinterpret_cast<float*>(bytes);
+                    }
+
+                    return *reinterpret_cast<float *>(bytes);
                 };
-                
+
                 std::vector<uint8_t> rawBuffer {};
                 rawBuffer.resize(frames * byteCount);
-                
+
                 AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
 
-                for (int i=0;i<frames;i++) {
+                for (int i = 0; i < frames; i++) {
                     auto rawIndex = i * byteCount;
                     sampleBuffer[i] = getData(rawBuffer.data() + rawIndex, byteCount, bigEndian);
                 }
             }
-            
+
             // int8, int16, int24
-            if (byteCount && byteCount < 4){
-                const auto getData = [](uint8_t* d, const size_t& byteCount, const bool& b)->float {
+            if (byteCount && byteCount < 4) {
+                const auto getData = [](uint8_t * d, const size_t& byteCount, const bool& b)->float {
                     float divCoeff = 1.0f / pow(2, byteCount * 8);
-                    float ret {0};
-                    for (int i=0;i < byteCount;i++)
+                    float ret {
+                        0
+                    };
+
+                    for (int i = 0; i < byteCount; i++) {
                         // first byte must be signed, others are unsigned chars
                         // value for bit shift is calculated depending on endianness value
-                        ret += (i==0 ? static_cast<int8_t>(d[i]) : d[i]) << (!b ? (i * 8) : (byteCount - i - 1) * 8);
+                        ret += (i == 0 ? static_cast<int8_t>(d[i]) : d[i]) << (!b ? (i * 8) : (byteCount - i - 1) * 8);
+                    }
+
                     ret *= divCoeff;
                     return ret;
                 };
-                
+
                 std::vector<uint8_t> rawBuffer {};
                 rawBuffer.resize(frames * byteCount);
-                
+
                 AudioFileReadBytes(audioFile, false, 0, &frames, rawBuffer.data());
 
-                for (int i=0;i<frames;i++) {
+                for (int i = 0; i < frames; i++) {
                     auto rawIndex = i * byteCount;
                     sampleBuffer[i] = getData(rawBuffer.data() + rawIndex, byteCount, bigEndian);
                 }
             }
-            
+
             AudioFileClose(audioFile);
 
             _object->setExternalData(
@@ -449,8 +555,8 @@ std::string _getStringFrom(CFURLRef cfUrl) {
                 frames * sizeof(float) / sizeof(char),
                 bufferType,
                 [](RNBO::ExternalDataId id, char *data) {
-                std::cout	<< "--- Buffer freed"
-                            << "\n";
+                std::cout << "--- Buffer freed"
+                          << "\n";
                 free(data);
             });
             std::cout << "--- Success: Read " << frames << " samples (" << dataSize << ") from file " << filepath << "\n";

@@ -7,55 +7,41 @@
 
 import Foundation
 
-struct RNBOParameter: Equatable {
-    let index: Int
-    let initialValue: Double
+struct RNBOParameter {
     var value: Double
-    let minValue: Double
-    let maxValue: Double
-    let exponent: Double
-    let unit: String
-    let displayName: String
-    let steps: Int
+    let info: ParameterInfo
 
     var valueNormalized: Double {
         get {
-            value.toNormalised(minValue: minValue, maxValue: maxValue, factor: exponent)
+            value.toNormalised(minValue: info.minimum, maxValue: info.maximum, factor: info.exponent)
         }
         set {
-            value = newValue.fromNormalised(minValue: minValue, maxValue: maxValue, factor: exponent)
+            value = newValue.fromNormalised(minValue: info.minimum, maxValue: info.maximum, factor: info.exponent)
         }
     }
 
-    init(index: Int, initialValue: Double, minValue: Double, maxValue: Double, exponent: Double, unit: String, displayName: String, steps: Int) {
-        self.index = index
-        self.minValue = minValue
-        self.maxValue = maxValue
-        self.exponent = exponent
-        self.initialValue = initialValue.clip(from: minValue, to: maxValue)
-        value = self.initialValue
-        self.unit = unit
-        self.displayName = displayName
-        self.steps = steps
+    init(_ info: ParameterInfo) {
+        value = info.initialValue.clip(from: info.minimum, to: info.maximum)
+        self.info = info
     }
 }
 
-extension RNBOAudioUnit {
+extension RNBOParameter: Equatable {
+    static func == (lhs: RNBOParameter, rhs: RNBOParameter) -> Bool {
+        (lhs.value == rhs.value) && (lhs.id == rhs.id)
+    }
+}
+
+extension RNBOParameter: Identifiable {
+    var id: String { info.paramId }
+}
+
+extension RNBODescription {
     func getParametersArray() -> [RNBOParameter] {
         var parameters: [RNBOParameter] = []
-        for i in 0 ..< getParameterCount() {
-            parameters.append(
-                RNBOParameter(
-                    index: i,
-                    initialValue: Double(getParameterInitialValue(i)),
-                    minValue: Double(getParameterMin(i)),
-                    maxValue: Double(getParameterMax(i)),
-                    exponent: Double(getParameterExponent(i)),
-                    unit: getParameterUnit(i),
-                    displayName: getParameterDisplayName(i),
-                    steps: Int(getParameterSteps(i))
-                )
-            )
+        for i in 0 ..< numParameters {
+            let parameter = self.parameters[i]
+            parameters.append(RNBOParameter(parameter))
         }
         return parameters
     }

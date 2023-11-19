@@ -15,17 +15,10 @@
       "displayName": "Frequency 1",
       "unit": "",
       "order": 0,
-      "displayorder": "-",
-      "sendinit": true,
-      "initialized": true,
       "debug": false,
-      "saveable": true,
-      "transmittable": true,
       "visible": true,
       "signalIndex": null,
-      "ioType": "IOTypeUndefined",
-      "serialId": "param_s04",
-      "constrainFunc": "param_01_value_constrain"
+      "ioType": "IOTypeUndefined"
     },
     {
       "type": "ParameterTypeNumber",
@@ -42,17 +35,10 @@
       "displayName": "Frequency 2",
       "unit": "",
       "order": 0,
-      "displayorder": "-",
-      "sendinit": true,
-      "initialized": true,
       "debug": false,
-      "saveable": true,
-      "transmittable": true,
       "visible": true,
       "signalIndex": null,
-      "ioType": "IOTypeUndefined",
-      "serialId": "param_s03",
-      "constrainFunc": "param_02_value_constrain"
+      "ioType": "IOTypeUndefined"
     },
     {
       "type": "ParameterTypeNumber",
@@ -69,17 +55,10 @@
       "displayName": "Volume 1",
       "unit": "",
       "order": 0,
-      "displayorder": "-",
-      "sendinit": true,
-      "initialized": true,
       "debug": false,
-      "saveable": true,
-      "transmittable": true,
       "visible": true,
       "signalIndex": null,
-      "ioType": "IOTypeUndefined",
-      "serialId": "param_s05",
-      "constrainFunc": "param_03_value_constrain"
+      "ioType": "IOTypeUndefined"
     },
     {
       "type": "ParameterTypeNumber",
@@ -96,17 +75,10 @@
       "displayName": "Volume 2",
       "unit": "",
       "order": 0,
-      "displayorder": "-",
-      "sendinit": true,
-      "initialized": true,
       "debug": false,
-      "saveable": true,
-      "transmittable": true,
       "visible": true,
       "signalIndex": null,
-      "ioType": "IOTypeUndefined",
-      "serialId": "param_s02",
-      "constrainFunc": "param_04_value_constrain"
+      "ioType": "IOTypeUndefined"
     },
     {
       "type": "ParameterTypeNumber",
@@ -123,26 +95,59 @@
       "displayName": "Play",
       "unit": "",
       "order": 0,
-      "displayorder": "-",
-      "sendinit": 0,
-      "initialized": true,
       "debug": false,
-      "saveable": true,
-      "transmittable": true,
       "visible": true,
       "signalIndex": null,
-      "ioType": "IOTypeUndefined",
-      "serialId": "param_s01",
-      "constrainFunc": "param_05_value_constrain"
+      "ioType": "IOTypeUndefined"
+    },
+    {
+      "type": "ParameterTypeNumber",
+      "index": 5,
+      "name": "cutoff",
+      "paramId": "cutoff",
+      "minimum": 0,
+      "maximum": 2000,
+      "exponent": 1,
+      "steps": 0,
+      "initialValue": 0,
+      "isEnum": false,
+      "enumValues": [],
+      "displayName": "Cutoff",
+      "unit": "",
+      "order": 0,
+      "debug": false,
+      "visible": true,
+      "signalIndex": null,
+      "ioType": "IOTypeUndefined"
+    },
+    {
+      "type": "ParameterTypeNumber",
+      "index": 6,
+      "name": "resonance",
+      "paramId": "resonance",
+      "minimum": 0,
+      "maximum": 1,
+      "exponent": 1,
+      "steps": 0,
+      "initialValue": 0.5,
+      "isEnum": false,
+      "enumValues": [],
+      "displayName": "Resonance",
+      "unit": "",
+      "order": 0,
+      "debug": false,
+      "visible": true,
+      "signalIndex": null,
+      "ioType": "IOTypeUndefined"
     }
   ],
-  "numParameters": 5,
+  "numParameters": 7,
   "numSignalInParameters": 0,
   "numSignalOutParameters": 0,
   "numInputChannels": 2,
   "numOutputChannels": 2,
-  "numMidiInputPorts": 0,
-  "numMidiOutputPorts": 0,
+  "numMidiInputPorts": 1,
+  "numMidiOutputPorts": 1,
   "externalDataRefs": [
     {
       "id": "rnbuff1",
@@ -158,7 +163,12 @@
       "meta": ""
     }
   ],
-  "outports": [],
+  "outports": [
+    {
+      "tag": "bar",
+      "meta": ""
+    }
+  ],
   "inlets": [
     {
       "type": "signal",
@@ -171,6 +181,9 @@
       "index": 2,
       "tag": "in2",
       "meta": ""
+    },
+    {
+      "type": "midi"
     }
   ],
   "outlets": [
@@ -185,13 +198,18 @@
       "index": 2,
       "tag": "out2",
       "meta": ""
+    },
+    {
+      "type": "midi"
     }
   ],
   "presetid": "rnbo",
   "meta": {
     "architecture": "x64",
     "filename": "SwiftRNBO_Example.maxpat",
-    "maxversion": "8.5.4",
-    "rnboversion": "1.1.1"
+    "rnboobjname": "rnbomatic",
+    "maxversion": "8.5.6",
+    "rnboversion": "1.2.2",
+    "name": "untitled"
   }
 }

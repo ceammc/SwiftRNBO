@@ -11,6 +11,10 @@ namespace RNBO {
 	template<class T, size_t N> class array {
 	public:
 
+		array() {
+			Platform::get()->memset(_values, 0, sizeof(T) * N);
+		}
+
 		template<typename... Ts> array(Ts ... args)
 		{
 			// since allocating an array of 0 length is invalid, we always allocate at least length 1

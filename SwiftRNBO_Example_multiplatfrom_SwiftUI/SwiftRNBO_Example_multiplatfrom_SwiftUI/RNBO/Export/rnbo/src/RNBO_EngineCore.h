@@ -154,15 +154,16 @@ namespace RNBO {
 			sendOutgoingEvent(event);
 		}
 
-		void sendMidiEvent(int port, int b1, int b2, int b3) override
+		void sendMidiEvent(int port, int b1, int b2, int b3, MillisecondTime time = 0.0) override
 		{
-			doSendMidiEvent(MidiEvent(_currentTime, port, b1, b2, b3));
+			doSendMidiEvent(MidiEvent(time < _currentTime ? _currentTime : time, port, b1, b2, b3));
 		}
 
-		void sendMidiEventList(int port, const list& data) override
+		void sendMidiEventList(int port, const list& data, MillisecondTime time = 0.0) override
 		{
 			size_t length = data.length;
 			size_t i;
+			auto t = time < _currentTime ? _currentTime : time;
 
 			for (i = 0; i + 2 < length; i += 3) {
 				uint8_t bytes[] = {
@@ -170,7 +171,7 @@ namespace RNBO {
 					static_cast<uint8_t>(data[i + 1]),
 					static_cast<uint8_t>(data[i + 2]),
 				};
-				doSendMidiEvent(MidiEvent(_currentTime, port, bytes, 3));
+				doSendMidiEvent(MidiEvent(t, port, bytes, 3));
 			}
 			if (i < length) {
 				length -= i;
@@ -180,7 +181,7 @@ namespace RNBO {
 					static_cast<uint8_t>(length > 2 ? data[i + 2] : 0),
 				};
 				// length is always <= 3 here, so it fits into an int
-				doSendMidiEvent(MidiEvent(_currentTime, port, bytes, length));
+				doSendMidiEvent(MidiEvent(t, port, bytes, length));
 			}
 		}
 

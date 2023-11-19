@@ -36,8 +36,8 @@ namespace RNBO {
 		virtual void flushClockEventsWithValue(EventTarget* eventTarget, ClockId clockIndex, ParameterValue value, bool execute) = 0;
 
 		// methods for generated code to send data out of the graph into the engine
-		virtual void sendMidiEvent(int port, int b1, int b2, int b3) = 0;
-		virtual void sendMidiEventList(int port, const list& data) = 0;
+		virtual void sendMidiEvent(int port, int b1, int b2, int b3, MillisecondTime time = 0.0) = 0;
+		virtual void sendMidiEventList(int port, const list& data, MillisecondTime time = 0.0) = 0;
 
 		// send an event from an external back into the RNBO graph
 		virtual void sendOutlet(EngineLink* sender, OutletIndex index, ParameterValue value, SampleOffset sampleOffset = 0) = 0;
