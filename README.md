@@ -34,9 +34,9 @@ let audioEngine = RNBOAudioEngine()
 let audioUnit = audioEngine.getAudioUnit()
 ```
 
-`RNBOParameter` is a Swift data structure for storing values and other attributes of RNBO parameters such as their initial, minimum and maximum values, normalization exponent, steps, displayed name, etc. It is used only by Swift part of your application and changing it directly has no effect on the RNBO patcher.
+`RNBOParameter` is a Swift data structure for storing values and other attributes of RNBO parameters such as their initial, minimum and maximum values, normalization exponent, steps, displayed name, etc. It is used only by Swift part of your application and changing it directly has no effect on the RNBO patcher. Use `RNBOAudioUnitHostModel`'s 'setParameterValue' family of methods instead.
 
-In order get an array of all of the parameters an `RNBOAudioUnit`'s `getParametersArray()` method can be used.
+In order get an array of all of the parameters the `RNBODescription`'s `getParametersArray()` method can be used.
 
 Since the initialization of an `RNBOAudioEngine` instance, getting an `RNBOAudioUnit` from it and storing its parameters in an array is usually done in one time during the initial setup, all of these operations are performed during the `RNBOAudioUnitHostModel` structure's initialization. Therefore, it is suggested just to store an instance of this structure in some always accessible place, for example:
 
