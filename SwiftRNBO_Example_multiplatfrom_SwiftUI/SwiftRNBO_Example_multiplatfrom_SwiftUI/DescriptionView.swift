@@ -83,7 +83,7 @@
     }
 
     struct ParameterView: View {
-        let parameter: Parameter
+        let parameter: ParameterInfo
 
         var body: some View {
             Text("Name: \(parameter.name)")

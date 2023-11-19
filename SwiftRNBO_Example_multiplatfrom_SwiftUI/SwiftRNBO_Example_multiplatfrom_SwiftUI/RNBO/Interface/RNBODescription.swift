@@ -9,7 +9,7 @@ import Foundation
 
 // Define the main struct and its related sub-structs
 struct RNBODescription: Codable {
-    let parameters: [Parameter]
+    let parameters: [ParameterInfo]
     let numParameters, numSignalInParameters, numSignalOutParameters: Int
     let numInputChannels, numOutputChannels, numMidiInputPorts, numMidiOutputPorts: Int
     let externalDataRefs: [ExternalDataRef]
@@ -21,7 +21,7 @@ struct RNBODescription: Codable {
 }
 
 // Define sub-structs used in RNBODescription
-struct Parameter: Codable {
+struct ParameterInfo: Codable {
     let type: String
     let index: Int
     let name, paramId: String
@@ -37,7 +37,7 @@ struct Parameter: Codable {
     let ioType: String
 }
 
-extension Parameter: Identifiable {
+extension ParameterInfo: Identifiable {
     var id: String { paramId }
 }
 

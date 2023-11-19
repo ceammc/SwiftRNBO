@@ -17,7 +17,7 @@ class RNBOEventHandler: NSObject, RNBOEventHandlerProtocol {
             }
 
             let p = rnbo.parameters[event.index]
-            print("\(p.displayName): \(p.value)")
+            print("\(p.info.displayName): \(p.value)")
         }
     }
 
