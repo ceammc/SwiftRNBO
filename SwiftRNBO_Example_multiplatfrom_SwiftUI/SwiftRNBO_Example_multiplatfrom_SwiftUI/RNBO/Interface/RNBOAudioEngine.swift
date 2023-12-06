@@ -30,7 +30,7 @@ class RNBOAudioEngine {
     init() {
         #if os(iOS)
             do {
-                try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothA2DP])
+                try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothA2DP, .mixWithOthers, .allowAirPlay])
                 try AVAudioSession.sharedInstance().setActive(true)
             } catch {
                 print("Error setting up audio session: \(error.localizedDescription)")

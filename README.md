@@ -34,7 +34,7 @@ let audioEngine = RNBOAudioEngine()
 let audioUnit = audioEngine.getAudioUnit()
 ```
 
-`RNBOParameter` is a Swift data structure for storing values and other attributes of RNBO parameters such as their initial, minimum and maximum values, normalization exponent, steps, displayed name, etc. It is used only by Swift part of your application and changing it directly has no effect on the RNBO patcher. Use `RNBOAudioUnitHostModel`'s 'setParameterValue' family of methods instead.
+`RNBOParameter` is a Swift data structure for storing values and other attributes of RNBO parameters such as their initial, minimum and maximum values, normalization exponent, steps, displayed name, etc. It is used only by Swift part of your application and changing it directly has no effect on the RNBO patcher. Use `RNBOAudioUnitHostModel`'s `setParameterValue()` family of methods instead.
 
 In order get an array of all of the parameters the `RNBODescription`'s `getParametersArray()` method can be used.
 
@@ -113,9 +113,7 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
    - In the Xcode's Navigator area go to `RNBO/Interface` and select all the files in that group;
    - In the Inspector area enable the '_Target Membership_' in all of the desired targets.
    - Do the same with the following files and folders inside the `RNBO` group:
-     - `Bindings/RNBOAudioUnit.mm`
-     - `Bindings/RNBOEventHandler.mm`
-     - `Bindings/RNBOList.mm`
+     -  All `*.mm` files in the `Bindings` folder
      - `Export/rnbo/RNBO.cpp`
      - `Export/rnbo_source.cpp`
      - `Export/dependencies.json`
@@ -126,7 +124,7 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 1. **Define the path to an Objective-C Bridging Header**
    - Select your project in the Xcode Navigator area (the one with the blue icon);
    - In the Editing area select your target's Build Settings;
-   - Search for the '_Objective-C Bridging Header_' field (use the '_filter_' textfield, don't forget to select 'All' in the search toolbar);
+   - Search for the '_Objective-C Bridging Header_' field (use the '_filter_' textfield, don't forget to select '_All_' in the search toolbar);
    - Enter `${PRODUCT_NAME}/RNBO/Bindings/RNBO-Bridging-Header.h` into it.
 1. **Define the Header Search Paths**
    - Without leaving the '_Build Settings_' tab search for the '_Header Search Paths_' field;
@@ -137,6 +135,11 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 1. **Disable App Sandbox (only for macOS and multiplatform)**
    - Select the '_Signing & Capabilities_' tab.
    - Locate the '_App Sandbox_' section and press the trash icon to the right of the section title.
+1. **Enable background audio (not needed for macOS)**
+   - Without leaving the '_Signing & Capabilities_' tab, click '_+ Capability_' button in the upper left corner of the area.
+   - Search for '_Background Modes_' and click on either iOS or tvOS option.
+   - This will add 2 new '_Background Modes_' sections for iOS and tvOS.
+   - Check the '_Audio, AirPlay, and Picture in Picture_' checkboxes in both sections.
 
 ## Using sample dependencies
 
