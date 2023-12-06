@@ -43,6 +43,7 @@
 		AF4B408F2B061DDD00FAACBF /* RNBOList.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNBOList.mm; sourceTree = "<group>"; };
 		AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOEventHandler.swift; sourceTree = "<group>"; };
 		AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIHelpers.swift; sourceTree = "<group>"; };
+		AFA214B62B20D01000BCD4E6 /* SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
 		AFEBC8E12B079BD80097D64B /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioKitKeyboard.swift; sourceTree = "<group>"; };
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -252,6 +253,7 @@
 		AFF2B41C29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				AFA214B62B20D01000BCD4E6 /* SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist */,
 				AFF2B42E29A2093F00068DD0 /* RNBO */,
 				AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */,
 				AFF2B41F29A2090200068DD0 /* ContentView.swift */,
@@ -890,6 +892,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "${PRODUCT_NAME}/RNBO/export/**";
+				INFOPLIST_FILE = "SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses microphone.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -937,6 +940,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "${PRODUCT_NAME}/RNBO/export/**";
+				INFOPLIST_FILE = "SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses microphone.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
