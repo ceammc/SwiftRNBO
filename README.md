@@ -137,6 +137,11 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 1. **Disable App Sandbox (only for macOS and multiplatform)**
    - Select the '_Signing & Capabilities_' tab.
    - Locate the '_App Sandbox_' section and press the trash icon to the right of the section title.
+1. **Enable background audio (not needed for macOS)**
+   - Without leaving the '_Signing & Capabilities_' tab, click '_+ Capability_' button in the upper left corner of the area.
+   - Search for 'Background Modes' and click on either iOS or tvOS option.
+   - This will add 2 new '_Background Modes_' sections for iOS and tvOS.
+   - Check the '_Audio, AirPlay, and Picture in Picture_' checkboxes in both of the added sections.
 
 ## Using sample dependencies
 
