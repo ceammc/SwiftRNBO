@@ -113,9 +113,7 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
    - In the Xcode's Navigator area go to `RNBO/Interface` and select all the files in that group;
    - In the Inspector area enable the '_Target Membership_' in all of the desired targets.
    - Do the same with the following files and folders inside the `RNBO` group:
-     - `Bindings/RNBOAudioUnit.mm`
-     - `Bindings/RNBOEventHandler.mm`
-     - `Bindings/RNBOList.mm`
+     -  All `\*.mm` files in the `Bindings` folder
      - `Export/rnbo/RNBO.cpp`
      - `Export/rnbo_source.cpp`
      - `Export/dependencies.json`
