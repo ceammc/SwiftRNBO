@@ -124,6 +124,7 @@ class RNBOAudioEngine {
     }
 
     func play() {
+        playerNode.stop()
         guard let audioFile = audioFile else {
             return
         }
