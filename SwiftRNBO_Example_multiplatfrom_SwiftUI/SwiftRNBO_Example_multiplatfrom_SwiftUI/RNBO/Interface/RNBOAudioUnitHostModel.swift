@@ -31,8 +31,20 @@ class RNBOAudioUnitHostModel: ObservableObject {
         parameters = description?.getParametersArray() ?? []
     }
 
-    func play() {
-        audioEngine.play()
+    func playAudioFile() {
+        audioEngine.playAudioFile()
+    }
+    
+    func pauseAudioFile() {
+        audioEngine.pauseAudioFile()
+    }
+
+    func toggleMic(_ on: Bool) {
+        if on {
+            audioEngine.setMicrophoneAmplitude(1.0)
+        } else {
+            audioEngine.setMicrophoneAmplitude(0.0)
+        }
     }
 
     func refreshParameterValue(at parameterIndex: Int) {
