@@ -13,6 +13,8 @@ class RNBOAudioEngine {
     private let playerNode = AVAudioPlayerNode()
     private let audioFile: AVAudioFile?
     private let distortionEffect: AVAudioUnitDistortion
+    private let inputMixer: AVAudioMixerNode
+    private let microphoneVolumeMixer: AVAudioMixerNode
 
     private func initInput() {
         let input = engine.inputNode
@@ -21,13 +23,22 @@ class RNBOAudioEngine {
 
         if format.channelCount > 0 {
             if input.outputFormat(forBus: 0).sampleRate == format.sampleRate {
-                engine.connect(input, to: avAudioUnit!, format: format)
-            } else
-            { }
+                engine.connect(input, to: microphoneVolumeMixer, format: format)
+                engine.connect(microphoneVolumeMixer, to: inputMixer, format: format)
+                engine.connect(inputMixer, to: avAudioUnit!, format: format)
+            } else {
+                print("Could not connect input node: sample rate mismatch")
+            }
         }
+    }
+    
+    func setMicrophoneAmplitude(_ amp: Float) {
+        microphoneVolumeMixer.outputVolume = amp
     }
 
     init() {
+        inputMixer = AVAudioMixerNode()
+        microphoneVolumeMixer = AVAudioMixerNode()
         #if os(iOS)
             do {
                 try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playAndRecord, options: [.defaultToSpeaker, .allowBluetoothA2DP, .mixWithOthers, .allowAirPlay])
@@ -65,9 +76,13 @@ class RNBOAudioEngine {
             self.avAudioUnit = avAudioUnit! // save AVAudioUnit
         }
 //        engine.attach(distortionEffect)
+        engine.attach(inputMixer)
+        engine.attach(microphoneVolumeMixer)
         engine.attach(playerNode)
         engine.attach(avAudioUnit!)
-
+        
+        microphoneVolumeMixer.outputVolume = 0.0
+        
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
             do {
@@ -103,7 +118,7 @@ class RNBOAudioEngine {
         // engine.connect(playerNode, to: avAudioUnit!, format: audioFile?.processingFormat)
         let audioUnitFormat = avAudioUnit!.inputFormat(forBus: 0)
 //        let procFormat = audioFile?.processingFormat
-        engine.connect(playerNode, to: avAudioUnit!, format: audioUnitFormat)
+        engine.connect(playerNode, to: inputMixer, format: audioUnitFormat)
         engine.connect(avAudioUnit!, to: engine.mainMixerNode, format: audioUnitFormat)
 
         // test directly, works here:
@@ -123,7 +138,7 @@ class RNBOAudioEngine {
         return avAudioUnit!.auAudioUnit as! RNBOAudioUnit
     }
 
-    func play() {
+    func playAudioFile() {
         playerNode.stop()
         guard let audioFile = audioFile else {
             return
@@ -137,7 +152,7 @@ class RNBOAudioEngine {
         playerNode.play()
     }
 
-    func pause() {
+    func pauseAudioFile() {
         playerNode.pause()
     }
 }

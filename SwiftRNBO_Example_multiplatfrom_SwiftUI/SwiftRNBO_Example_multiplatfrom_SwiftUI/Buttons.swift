@@ -9,6 +9,7 @@ import SwiftUI
 
 struct Buttons: View {
     @EnvironmentObject var rnbo: RNBOAudioUnitHostModel
+    @State private var enableMic: Bool = false
     var body: some View {
         HStack {
             Button("Test MIDI") {
@@ -30,11 +31,20 @@ struct Buttons: View {
                 let message: [Double] = [220, 330, 0.2, 0.3, 0.5]
                 rnbo.sendMessage(message)
             }
-            Button("Play audio input") {
-                rnbo.play()
+            Button("Play Input") {
+                rnbo.playAudioFile()
+            }
+            Button("Pause Input") {
+                rnbo.pauseAudioFile()
             }
             Toggle(isOn: $rnbo.showDescription) {
                 Text("Show description")
+            }
+            Toggle(isOn: $enableMic) {
+                Text("Mic")
+            }
+            .onChange(of: enableMic) { newValue in
+                rnbo.toggleMic(newValue)
             }
         }
         .padding(.bottom)
