@@ -24,7 +24,8 @@ struct SliderView: View {
             } maximumValueLabel: {
                 SliderValueLabel(value: parameter.info.maximum)
             }
-            .onChange(of: parameter.valueNormalized) { rnbo.setParameterValueNormalized(to: $0, at: parameter.info.index) }
+            .onChange(of: parameter.valueNormalized) { rnbo.setParameterValueNormalized(to: $0, at: parameter.info.index)
+            }
             SliderValueLabel(value: parameter.value)
         }
     }

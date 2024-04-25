@@ -36,6 +36,8 @@ extension RNBOParameter: Identifiable {
     var id: String { info.paramId }
 }
 
+extension RNBOParameter: Codable { }
+
 extension RNBODescription {
     func getParametersArray() -> [RNBOParameter] {
         var parameters: [RNBOParameter] = []

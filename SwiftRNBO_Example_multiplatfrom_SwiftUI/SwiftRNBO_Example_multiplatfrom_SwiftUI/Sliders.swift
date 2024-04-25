@@ -15,6 +15,7 @@
             ScrollView {
                 VStack {
                     ForEach($rnbo.parameters) { $parameter in
+                        // TODO: NTS - has onChange baked in
                         SliderView(parameter: $parameter)
                     }
                 }

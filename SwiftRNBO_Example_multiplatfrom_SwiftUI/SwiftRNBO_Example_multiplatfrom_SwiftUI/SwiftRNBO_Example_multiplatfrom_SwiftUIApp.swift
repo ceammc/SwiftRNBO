@@ -15,6 +15,13 @@ struct SwiftRNBO_Example_multiplatfrom_SwiftUIApp: App {
             ContentView()
                 .onAppear { rnbo.connectEventHandler() }
                 .environmentObject(rnbo)
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
+                    rnbo.saveParameters()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                    rnbo.saveParameters()
+                }
+            
         }
     }
 }

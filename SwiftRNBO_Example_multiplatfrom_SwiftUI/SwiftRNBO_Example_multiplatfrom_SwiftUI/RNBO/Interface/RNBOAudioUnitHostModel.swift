@@ -28,7 +28,14 @@ class RNBOAudioUnitHostModel: ObservableObject {
         }
 
         audioUnit = audioEngine.getAudioUnit()
-        parameters = description?.getParametersArray() ?? []
+        
+        let decoder = JSONDecoder()
+        if let codedData = try? Data(contentsOf: RNBOAudioUnitHostModel.dataModelURL()),
+           let decoded = try? decoder.decode([RNBOParameter].self, from: codedData) {
+                parameters = decoded
+        } else {
+            parameters = description?.getParametersArray() ?? []
+        }
     }
 
     func playAudioFile() {
@@ -46,6 +53,29 @@ class RNBOAudioUnitHostModel: ObservableObject {
             audioEngine.setMicrophoneAmplitude(0.0)
         }
     }
+    
+    func saveParameters() {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(parameters) {
+            do {
+                try encoded.write(to: type(of: self).dataModelURL())
+            } catch {
+                print("Couldn't write to save file: " + error.localizedDescription)
+            }
+        }
+    }
+    
+    private static func dataModelURL() -> URL {
+        let docURL = documentsDirectory()
+        return docURL.appendingPathComponent("UserSettings")
+    }
+    
+    private static func documentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
+    }
+    
 
     func refreshParameterValue(at parameterIndex: Int) {
         parameters[parameterIndex].value = Double(audioUnit.getParameterValue(parameterIndex))
