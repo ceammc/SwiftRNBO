@@ -552,7 +552,7 @@ std::string _getStringFrom(CFURLRef cfUrl) {
             _object->setExternalData(
                 idstr.c_str(),
                 (char *)sampleBuffer,
-                frames * sizeof(float) / sizeof(char),
+                frames * byteCount,
                 bufferType,
                 [](RNBO::ExternalDataId id, char *data) {
                 std::cout << "--- Buffer freed"
