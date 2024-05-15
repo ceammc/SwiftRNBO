@@ -12,6 +12,8 @@ iOS, macOS and tvOS are fully supported. However, all universal platform restric
 
 The easiest way to start using SwiftRNBO is to simply download _the sample project_. This frees you from having to set up the project yourself: everything related to the translation layer is contained in a separate folder that does not require any manual changes. The only thing that will need to be done is to replace the contents of the `Export` folder with the result of your RNBO patcher export.
 
+> **Important!** While exporting, choose the export name 'rnbo_source.cpp', otherwise it won't be recognised.
+
 If you want to create a project from scratch, please refer to [Creating a new project](#creating-a-new-project).
 
 ## Folder structure
