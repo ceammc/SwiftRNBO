@@ -12,6 +12,7 @@
 		AF4B40932B06326800FAACBF /* RNBOEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */; };
 		AF4B409B2B06C4B100FAACBF /* Keyboard in Frameworks */ = {isa = PBXBuildFile; platformFilters = (ios, macos, ); productRef = AF4B409A2B06C4B100FAACBF /* Keyboard */; };
 		AF865DE82B0A381B0019FB28 /* MIDIHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */; };
+		AFB55FBD2BF4F642002CC22C /* XYPad.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB55FBC2BF4F642002CC22C /* XYPad.swift */; };
 		AFEBC8E22B079BD80097D64B /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E12B079BD80097D64B /* Buttons.swift */; };
 		AFEBC8E42B079C150097D64B /* AudioKitKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */; };
 		AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF2B41D29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift */; };
@@ -44,6 +45,7 @@
 		AF4B40922B06326800FAACBF /* RNBOEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNBOEventHandler.swift; sourceTree = "<group>"; };
 		AF865DE72B0A381B0019FB28 /* MIDIHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIHelpers.swift; sourceTree = "<group>"; };
 		AFA214B62B20D01000BCD4E6 /* SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SwiftRNBO-Example-multiplatfrom-SwiftUI-Info.plist"; sourceTree = SOURCE_ROOT; };
+		AFB55FBC2BF4F642002CC22C /* XYPad.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYPad.swift; sourceTree = "<group>"; };
 		AFEBC8E12B079BD80097D64B /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioKitKeyboard.swift; sourceTree = "<group>"; };
 		AFF2B41A29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftRNBO_Example_multiplatfrom_SwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -261,6 +263,7 @@
 				AFF2B4F729A20A3500068DD0 /* Sliders.swift */,
 				AFFCBE452B09575300800A23 /* SliderView.swift */,
 				AFEBC8E12B079BD80097D64B /* Buttons.swift */,
+				AFB55FBC2BF4F642002CC22C /* XYPad.swift */,
 				AFEBC8E32B079C150097D64B /* AudioKitKeyboard.swift */,
 				AFF2B42129A2090300068DD0 /* Assets.xcassets */,
 				AFF2B42329A2090300068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUI.entitlements */,
@@ -753,6 +756,7 @@
 				AFFCBE422B09019A00800A23 /* RNBODescription.swift in Sources */,
 				AFF2B42029A2090200068DD0 /* ContentView.swift in Sources */,
 				AFF2B4EB29A2094600068DD0 /* RNBOAudioEngine.swift in Sources */,
+				AFB55FBD2BF4F642002CC22C /* XYPad.swift in Sources */,
 				AFF2B41E29A2090200068DD0 /* SwiftRNBO_Example_multiplatfrom_SwiftUIApp.swift in Sources */,
 				AFFCBE442B09079000800A23 /* DescriptionView.swift in Sources */,
 			);

@@ -18,6 +18,7 @@ struct ContentView: View {
                     DescriptionView()
                 } else {
                     Sliders()
+                    XYPad()
                     AudioKitKeyboard()
                 }
             #endif
