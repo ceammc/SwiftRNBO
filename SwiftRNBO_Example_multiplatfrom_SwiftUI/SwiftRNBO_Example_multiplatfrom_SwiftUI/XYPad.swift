@@ -13,8 +13,8 @@ struct XYPad: View {
     var body: some View {
         GeometryReader { geo in
             Rectangle()
-                .foregroundStyle(Color.white)
-                .gesture(DragGesture()
+                .foregroundStyle(.white)
+                .gesture(DragGesture(minimumDistance: 0)
                     .onChanged({ value in
                         let xNorm = value.location.x / geo.size.width
                         let yNorm = value.location.y / geo.size.height
