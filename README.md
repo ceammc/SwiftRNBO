@@ -12,7 +12,8 @@ iOS, macOS and tvOS are fully supported. However, all universal platform restric
 
 The easiest way to start using SwiftRNBO is to simply download _the sample project_. This frees you from having to set up the project yourself: everything related to the translation layer is contained in a separate folder that does not require any manual changes. The only thing that will need to be done is to replace the contents of the `Export` folder with the result of your RNBO patcher export.
 
-> **Important!** While exporting, choose the export name 'rnbo_source.cpp', otherwise it won't be recognised.
+> [!IMPORTANT]  
+> While exporting, choose the export name 'rnbo_source.cpp', otherwise it won't be recognised.
 
 If you want to create a project from scratch, please refer to [Creating a new project](#creating-a-new-project).
 
@@ -145,7 +146,8 @@ There are several steps to ensure that SwiftRNBO will work in your newly created
 
 ## Using sample dependencies
 
-> **Important!** In order for your audio sample dependencies to be recognized, you need to add your `media` folder from the RNBO export folder to your Bundle as a **_folder reference, not a group_**. This way its path will be preserved in App resources: `.../media/*.wav`.
+> [!IMPORTANT]  
+> In order for your audio sample dependencies to be recognized, you need to add your `media` folder from the RNBO export folder to your Bundle as a **_folder reference, not a group_**. This way its path will be preserved in App resources: `.../media/*.wav`.
 
 If you already have a `media` folder as a group as a result of adding of the whole `Export` folder to your project, you can right click on it and choose '_Show in Finder_', then drag and drop it into the same group this time with the '_Create folder references'_ option enabled. At this point you can delete the `media` group (gray icon) and leave only the `media` folder reference (blue icon). Just make sure to choose '_Remove References_' instead of '_Move to trash_' while deleting the group.
 
